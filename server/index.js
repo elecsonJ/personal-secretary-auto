@@ -244,11 +244,11 @@ function parseWeatherData(items) {
 async function getNYTTopStories() {
     if (!NYT_API_KEY) {
         console.log('NYT API 키가 없습니다.');
-        return { main: [], tech: [], science: [] };
+        return { main: [], tech: [], science: [], business: [] };
     }
     
     try {
-        const categories = ['home', 'technology', 'science'];
+        const categories = ['home', 'technology', 'science', 'business'];
         const results = {};
         
         for (const category of categories) {
@@ -257,7 +257,7 @@ async function getNYTTopStories() {
                 const data = await response.json();
                 
                 if (response.ok) {
-                    results[category] = data.results.slice(0, 2).map(article => ({
+                    results[category] = data.results.slice(0, 5).map(article => ({
                         title: article.title,
                         abstract: article.abstract,
                         url: article.url,
@@ -280,12 +280,13 @@ async function getNYTTopStories() {
         return {
             main: results.home || [],
             tech: results.technology || [],
-            science: results.science || []
+            science: results.science || [],
+            business: results.business || []
         };
         
     } catch (error) {
         console.error('NYT 전체 데이터 가져오기 실패:', error);
-        return { main: [], tech: [], science: [] };
+        return { main: [], tech: [], science: [], business: [] };
     }
 }
 
@@ -665,6 +666,20 @@ async function sendMorningBriefing() {
             
             await sendPushNotification('🔬 과학 뉴스', scienceNewsMessage, { type: 'news_science' });
         }, 2500);
+        
+        // 3초 후 경제 뉴스
+        setTimeout(async () => {
+            let businessNewsMessage = '';
+            if (topStories.business.length === 0) {
+                businessNewsMessage = '경제 뉴스 없음';
+            } else {
+                businessNewsMessage = topStories.business.map((story, index) => 
+                    `${index + 1}. ${story.title}`
+                ).join('\n');
+            }
+            
+            await sendPushNotification('💰 경제 뉴스', businessNewsMessage, { type: 'news_business' });
+        }, 3000);
         
     } catch (error) {
         console.error('아침 브리핑 오류:', error);
