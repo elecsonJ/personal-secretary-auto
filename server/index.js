@@ -289,7 +289,7 @@ async function getNotionData() {
                 filter: {
                     and: [
                         {
-                            property: 'Date', // 날짜 속성 이름
+                            property: '날짜', // 날짜 속성 이름 (한글)
                             date: {
                                 equals: today
                             }
@@ -313,14 +313,14 @@ async function getNotionData() {
                 filter: {
                     or: [
                         {
-                            property: 'Priority', // 우선순위 속성 이름
-                            select: {
+                            property: 'Status', // 상태 속성 이름 (실제로는 Status)
+                            status: {
                                 equals: 'HIGH'
                             }
                         },
                         {
-                            property: 'Priority',
-                            select: {
+                            property: 'Status',
+                            status: {
                                 equals: 'Middle'
                             }
                         }
@@ -333,14 +333,14 @@ async function getNotionData() {
         
         // 데이터 가공
         const todayEvents = calendarData.results?.map(page => ({
-            name: page.properties.Name?.title?.[0]?.plain_text || '제목 없음',
+            name: page.properties.이름?.title?.[0]?.plain_text || '제목 없음', // 한글 속성명
             date: today,
             type: 'event'
         })) || [];
         
         const highMiddleTasks = tasksData.results?.map(page => ({
             name: page.properties.Name?.title?.[0]?.plain_text || '제목 없음',
-            priority: page.properties.Priority?.select?.name || 'Unknown'
+            priority: page.properties.Status?.status?.name || 'Unknown' // status 속성 사용
         })) || [];
         
         console.log(`Notion 데이터 로드: 일정 ${todayEvents.length}개, 우선순위 태스크 ${highMiddleTasks.length}개`);
