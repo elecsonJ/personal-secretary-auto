@@ -8,20 +8,89 @@ let serviceAccount = {};
 try {
     const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT;
     if (serviceAccountString) {
+        console.log('원본 서비스 계정 정보 길이:', serviceAccountString.length);
+        console.log('원본 첫 20자:', serviceAccountString.substring(0, 20));
+        
         // Base64 디코딩 시도
         let jsonString = serviceAccountString;
         
-        // Base64로 인코딩된 경우 디코딩
+        // Base64로 인코딩된 경우 디코딩 (여러 방법 시도)
         if (!serviceAccountString.startsWith('{')) {
+            let decodingSuccess = false;
+            
+            // 방법 1: 표준 Base64 디코딩
             try {
                 jsonString = Buffer.from(serviceAccountString, 'base64').toString('utf-8');
-                console.log('Base64 디코딩 성공');
+                console.log('표준 Base64 디코딩 성공, 길이:', jsonString.length);
+                decodingSuccess = true;
             } catch (decodeError) {
-                console.log('Base64 디코딩 실패, 원본 사용');
+                console.log('표준 Base64 디코딩 실패:', decodeError.message);
+            }
+            
+            // 방법 2: URL-safe Base64 디코딩 시도
+            if (!decodingSuccess) {
+                try {
+                    const urlSafeFixed = serviceAccountString.replace(/-/g, '+').replace(/_/g, '/');
+                    // Base64 패딩 추가
+                    const paddedBase64 = urlSafeFixed + '='.repeat(4 - (urlSafeFixed.length % 4));
+                    jsonString = Buffer.from(paddedBase64, 'base64').toString('utf-8');
+                    console.log('URL-safe Base64 디코딩 성공, 길이:', jsonString.length);
+                    decodingSuccess = true;
+                } catch (decodeError) {
+                    console.log('URL-safe Base64 디코딩 실패:', decodeError.message);
+                }
+            }
+            
+            // 방법 3: 원본 문자열 그대로 사용
+            if (!decodingSuccess) {
+                console.log('Base64 디코딩 모두 실패, 원본 사용');
+                jsonString = serviceAccountString;
+            }
+            
+            if (decodingSuccess) {
+                console.log('디코딩된 첫 200자:', jsonString.substring(0, 200));
+                
+                // 위치 167 주변 문자 분석
+                if (jsonString.length > 167) {
+                    console.log('위치 160-180 문자들:', JSON.stringify(jsonString.substring(160, 180)));
+                    console.log('위치 167 문자:', JSON.stringify(jsonString.charAt(167)), '(코드:', jsonString.charCodeAt(167), ')');
+                }
             }
         }
         
-        serviceAccount = JSON.parse(jsonString);
+        console.log('JSON 파싱 시도...');
+        
+        // JSON 문자열 정리 (일반적인 문제들 해결)
+        let cleanedJson = jsonString
+            .trim()  // 앞뒤 공백 제거
+            .replace(/\r\n/g, '\n')  // Windows 줄바꿈을 Unix로 변환
+            .replace(/\r/g, '\n')    // Mac 줄바꿈을 Unix로 변환
+            .replace(/\u0000/g, ''); // null 문자 제거
+        
+        // BOM (Byte Order Mark) 제거
+        if (cleanedJson.charCodeAt(0) === 0xFEFF) {
+            cleanedJson = cleanedJson.slice(1);
+        }
+        
+        console.log('정리된 JSON 첫 200자:', cleanedJson.substring(0, 200));
+        
+        // JSON 파싱 시도 (여러 방법)
+        try {
+            serviceAccount = JSON.parse(cleanedJson);
+            console.log('첫 번째 파싱 시도 성공');
+        } catch (firstError) {
+            console.log('첫 번째 파싱 실패:', firstError.message);
+            
+            // 두 번째 시도: 잠재적인 escape 문자 문제 해결
+            try {
+                const doubleEscapedFixed = cleanedJson.replace(/\\\\/g, '\\');
+                serviceAccount = JSON.parse(doubleEscapedFixed);
+                console.log('두 번째 파싱 시도 성공 (escape 문자 수정)');
+            } catch (secondError) {
+                console.log('두 번째 파싱 실패:', secondError.message);
+                throw secondError; // 원래 오류를 다시 던짐
+            }
+        }
         
         // private_key의 \\n을 실제 줄바꿈으로 변환
         if (serviceAccount.private_key) {
@@ -37,8 +106,13 @@ try {
         console.log('Firebase 서비스 계정 정보가 없습니다.');
     }
 } catch (error) {
-    console.error('Firebase 서비스 계정 JSON 파싱 오류:', error.message);
-    console.error('JSON 내용 확인:', process.env.FIREBASE_SERVICE_ACCOUNT ? process.env.FIREBASE_SERVICE_ACCOUNT.substring(0, 100) + '...' : 'undefined');
+    console.error('Firebase 초기화 오류:', error.message);
+    if (error.message.includes('position')) {
+        console.error('파싱 오류 위치 정보:', error.message);
+    }
+    console.error('환경변수 확인:', process.env.FIREBASE_SERVICE_ACCOUNT ? 
+        `길이: ${process.env.FIREBASE_SERVICE_ACCOUNT.length}, 시작: ${process.env.FIREBASE_SERVICE_ACCOUNT.substring(0, 50)}...` : 
+        '환경변수 없음');
 }
 
 // 기상청 API 설정
