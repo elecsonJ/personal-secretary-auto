@@ -290,20 +290,13 @@ async function getNotionData() {
                 filter: {
                     and: [
                         {
-                            property: '날짜', // 날짜 속성 이름 (한글)  
+                            property: '날짜', // 날짜 속성 이름 (한글)
                             date: {
-                                on_or_after: today  // 오늘 이후 일정들
+                                equals: today  // 오늘 일정만
                             }
                         }
                     ]
-                },
-                sorts: [
-                    {
-                        property: '날짜',
-                        direction: 'ascending'
-                    }
-                ],
-                page_size: 5  // 최대 5개만
+                }
             })
         });
         
@@ -332,12 +325,6 @@ async function getNotionData() {
                             status: {
                                 equals: 'Middle'
                             }
-                        },
-                        {
-                            property: 'Status',
-                            status: {
-                                equals: 'low'  // 테스트용으로 low도 포함
-                            }
                         }
                     ]
                 }
@@ -356,25 +343,12 @@ async function getNotionData() {
             });
         }
         
-        // 데이터 가공 - 캘린더 (오늘부터 가까운 일정들)
-        const todayEvents = calendarData.results?.map(page => {
-            const eventDate = page.properties.날짜?.date?.start || 'No Date';
-            return {
-                name: page.properties.이름?.title?.[0]?.plain_text || '제목 없음', // 한글 속성명
-                date: eventDate,
-                type: 'event'
-            };
-        }).filter(event => event.date === today) || [];  // 오늘 것만 필터링
-        
-        // 오늘 일정이 없으면 가까운 미래 일정 표시
-        const upcomingEvents = calendarData.results?.slice(0, 3).map(page => {
-            const eventDate = page.properties.날짜?.date?.start || 'No Date';
-            return {
-                name: page.properties.이름?.title?.[0]?.plain_text || '제목 없음',
-                date: eventDate,
-                type: 'event'
-            };
-        }) || [];
+        // 데이터 가공 - 캘린더 (오늘 일정만)
+        const todayEvents = calendarData.results?.map(page => ({
+            name: page.properties.이름?.title?.[0]?.plain_text || '제목 없음', // 한글 속성명
+            date: today,
+            type: 'event'
+        })) || [];
         
         const highMiddleTasks = tasksData.results?.map(page => ({
             name: page.properties.Name?.title?.[0]?.plain_text || '제목 없음',
@@ -382,12 +356,8 @@ async function getNotionData() {
         })) || [];
         
         console.log(`Notion 데이터 로드: 오늘 일정 ${todayEvents.length}개, 우선순위 태스크 ${highMiddleTasks.length}개`);
-        console.log(`다가오는 일정:`, upcomingEvents.map(e => `${e.name}(${e.date})`).join(', '));
         
-        // 오늘 일정이 없으면 가까운 일정을 대신 표시
-        const eventsToShow = todayEvents.length > 0 ? todayEvents : upcomingEvents.slice(0, 2);
-        
-        return { todayEvents: eventsToShow, highMiddleTasks };
+        return { todayEvents, highMiddleTasks };
         
     } catch (error) {
         console.error('Notion API 오류:', error.message);
