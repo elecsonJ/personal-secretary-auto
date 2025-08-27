@@ -4,13 +4,22 @@ const fetch = require('node-fetch');
 require('dotenv').config();
 
 // Firebase Admin SDK 초기화
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
-
-if (Object.keys(serviceAccount).length > 0) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        projectId: serviceAccount.project_id
-    });
+let serviceAccount = {};
+try {
+    const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT;
+    if (serviceAccountString) {
+        serviceAccount = JSON.parse(serviceAccountString);
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            projectId: serviceAccount.project_id
+        });
+        console.log('Firebase Admin SDK 초기화 완료');
+    } else {
+        console.log('Firebase 서비스 계정 정보가 없습니다.');
+    }
+} catch (error) {
+    console.error('Firebase 서비스 계정 JSON 파싱 오류:', error.message);
+    console.error('JSON 내용 확인:', process.env.FIREBASE_SERVICE_ACCOUNT ? process.env.FIREBASE_SERVICE_ACCOUNT.substring(0, 100) + '...' : 'undefined');
 }
 
 // 기상청 API 설정
