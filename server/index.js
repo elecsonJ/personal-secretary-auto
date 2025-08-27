@@ -63,8 +63,9 @@ try {
         // JSON 문자열 정리 (일반적인 문제들 해결)
         let cleanedJson = jsonString
             .trim()  // 앞뒤 공백 제거
-            .replace(/\r\n/g, '\n')  // Windows 줄바꿈을 Unix로 변환
-            .replace(/\r/g, '\n')    // Mac 줄바꿈을 Unix로 변환
+            .replace(/\r\n/g, '\\n')  // Windows 줄바꿈을 JSON 이스케이프로 변환
+            .replace(/\r/g, '\\n')    // Mac 줄바꿈을 JSON 이스케이프로 변환  
+            .replace(/\n/g, '\\n')    // Unix 줄바꿈을 JSON 이스케이프로 변환
             .replace(/\u0000/g, ''); // null 문자 제거
         
         // BOM (Byte Order Mark) 제거
