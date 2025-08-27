@@ -138,8 +138,18 @@ function getMockNotionData() {
     return { todayEvents, highMiddleTasks };
 }
 
-// FCM 푸시 알림 전송 (멀티 기기)
+// FCM 푸시 알림 전송 (멀티 기디)
 async function sendPushNotification(title, body, data = {}) {
+    console.log('=== FCM 디버깅 정보 ===');
+    console.log('FCM_TOKENS 개수:', FCM_TOKENS.length);
+    console.log('FCM_TOKENS 내용:', FCM_TOKENS.map(token => token ? token.substring(0, 20) + '...' : 'null'));
+    console.log('Firebase Admin Apps 개수:', admin.apps.length);
+    console.log('환경 변수 체크:');
+    console.log('- FCM_TOKEN_MACBOOK:', process.env.FCM_TOKEN_MACBOOK ? process.env.FCM_TOKEN_MACBOOK.substring(0, 20) + '...' : 'undefined');
+    console.log('- FCM_TOKEN_IPHONE:', process.env.FCM_TOKEN_IPHONE ? process.env.FCM_TOKEN_IPHONE.substring(0, 20) + '...' : 'undefined');
+    console.log('- FCM_TOKEN:', process.env.FCM_TOKEN ? process.env.FCM_TOKEN.substring(0, 20) + '...' : 'undefined');
+    console.log('=======================');
+    
     if (FCM_TOKENS.length === 0 || !admin.apps.length) {
         console.log('FCM 설정이 없습니다. 알림 시뮬레이션:', { title, body });
         return;
