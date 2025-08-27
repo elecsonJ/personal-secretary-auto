@@ -8,7 +8,20 @@ let serviceAccount = {};
 try {
     const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT;
     if (serviceAccountString) {
-        serviceAccount = JSON.parse(serviceAccountString);
+        // Base64 디코딩 시도
+        let jsonString = serviceAccountString;
+        
+        // Base64로 인코딩된 경우 디코딩
+        if (!serviceAccountString.startsWith('{')) {
+            try {
+                jsonString = Buffer.from(serviceAccountString, 'base64').toString('utf-8');
+                console.log('Base64 디코딩 성공');
+            } catch (decodeError) {
+                console.log('Base64 디코딩 실패, 원본 사용');
+            }
+        }
+        
+        serviceAccount = JSON.parse(jsonString);
         
         // private_key의 \\n을 실제 줄바꿈으로 변환
         if (serviceAccount.private_key) {
