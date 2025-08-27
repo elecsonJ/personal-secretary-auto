@@ -144,6 +144,11 @@ const KMA_BASE_URL = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0'
 const NYT_API_KEY = process.env.NYT_API_KEY;
 const NYT_BASE_URL = 'https://api.nytimes.com/svc';
 
+// Notion API 설정
+const NOTION_API_KEY = process.env.NOTION_API_KEY;
+const NOTION_CALENDAR_DB_ID = process.env.NOTION_CALENDAR_DB_ID; // 월간 데이터베이스
+const NOTION_TASKS_DB_ID = process.env.NOTION_TASKS_DB_ID; // 공부 우선순위 데이터베이스
+
 // 서울 좌표
 const SEOUL_COORDS = { nx: 55, ny: 127 };
 
@@ -262,7 +267,93 @@ async function getNYTTopStories() {
     }
 }
 
-// 노션 모의 데이터 (실제로는 Notion API 호출)
+// 실제 Notion API 호출
+async function getNotionData() {
+    if (!NOTION_API_KEY || !NOTION_CALENDAR_DB_ID || !NOTION_TASKS_DB_ID) {
+        console.log('Notion API 정보가 없습니다. 모의 데이터 사용.');
+        return getMockNotionData();
+    }
+    
+    try {
+        const today = new Date().toISOString().slice(0, 10);
+        
+        // 1. 월간 데이터베이스에서 오늘 일정 가져오기
+        const calendarResponse = await fetch(`https://api.notion.com/v1/databases/${NOTION_CALENDAR_DB_ID}/query`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${NOTION_API_KEY}`,
+                'Content-Type': 'application/json',
+                'Notion-Version': '2022-06-28'
+            },
+            body: JSON.stringify({
+                filter: {
+                    and: [
+                        {
+                            property: 'Date', // 날짜 속성 이름
+                            date: {
+                                equals: today
+                            }
+                        }
+                    ]
+                }
+            })
+        });
+        
+        const calendarData = await calendarResponse.json();
+        
+        // 2. 공부 우선순위 데이터베이스에서 HIGH/Middle 우선순위 태스크 가져오기  
+        const tasksResponse = await fetch(`https://api.notion.com/v1/databases/${NOTION_TASKS_DB_ID}/query`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${NOTION_API_KEY}`,
+                'Content-Type': 'application/json',
+                'Notion-Version': '2022-06-28'
+            },
+            body: JSON.stringify({
+                filter: {
+                    or: [
+                        {
+                            property: 'Priority', // 우선순위 속성 이름
+                            select: {
+                                equals: 'HIGH'
+                            }
+                        },
+                        {
+                            property: 'Priority',
+                            select: {
+                                equals: 'Middle'
+                            }
+                        }
+                    ]
+                }
+            })
+        });
+        
+        const tasksData = await tasksResponse.json();
+        
+        // 데이터 가공
+        const todayEvents = calendarData.results?.map(page => ({
+            name: page.properties.Name?.title?.[0]?.plain_text || '제목 없음',
+            date: today,
+            type: 'event'
+        })) || [];
+        
+        const highMiddleTasks = tasksData.results?.map(page => ({
+            name: page.properties.Name?.title?.[0]?.plain_text || '제목 없음',
+            priority: page.properties.Priority?.select?.name || 'Unknown'
+        })) || [];
+        
+        console.log(`Notion 데이터 로드: 일정 ${todayEvents.length}개, 우선순위 태스크 ${highMiddleTasks.length}개`);
+        
+        return { todayEvents, highMiddleTasks };
+        
+    } catch (error) {
+        console.error('Notion API 오류:', error.message);
+        return getMockNotionData();
+    }
+}
+
+// 노션 모의 데이터 (fallback용)
 function getMockNotionData() {
     const today = new Date().toISOString().slice(0, 10);
     
@@ -369,7 +460,7 @@ async function checkWeatherChanges() {
 async function sendMorningBriefing() {
     try {
         const weather = await getWeatherData();
-        const { todayEvents, highMiddleTasks } = getMockNotionData();
+        const { todayEvents, highMiddleTasks } = await getNotionData();
         const topStories = await getNYTTopStories();
         
         // 1. 날씨 브리핑 (간결하게)
@@ -437,7 +528,7 @@ async function sendMorningBriefing() {
 // 저녁 내일 준비 알림
 async function sendEveningPrep() {
     try {
-        const { todayEvents, highMiddleTasks } = getMockNotionData();
+        const { todayEvents, highMiddleTasks } = await getNotionData();
         
         // 내일 캘린더 일정
         const tomorrow = new Date();

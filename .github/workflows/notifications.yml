@@ -47,6 +47,9 @@ jobs:
         echo "FCM_TOKEN_MACBOOK=${{ secrets.FCM_TOKEN_MACBOOK }}" >> $GITHUB_ENV
         echo "FCM_TOKEN_IPHONE=${{ secrets.FCM_TOKEN_IPHONE }}" >> $GITHUB_ENV
         echo "NYT_API_KEY=${{ secrets.NYT_API_KEY }}" >> $GITHUB_ENV
+        echo "NOTION_API_KEY=${{ secrets.NOTION_API_KEY }}" >> $GITHUB_ENV
+        echo "NOTION_CALENDAR_DB_ID=${{ secrets.NOTION_CALENDAR_DB_ID }}" >> $GITHUB_ENV
+        echo "NOTION_TASKS_DB_ID=${{ secrets.NOTION_TASKS_DB_ID }}" >> $GITHUB_ENV
     
     - name: Check current time and determine action
       id: determine_action
