@@ -70,8 +70,24 @@
         }
         
         .refresh-icon:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
+            background: rgba(255, 255, 255, 0.35);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+        
+        .refresh-icon:active {
+            transform: scale(0.95) rotate(180deg);
+            background: rgba(255, 255, 255, 0.4);
+        }
+        
+        @keyframes refreshSpin {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.05) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+        
+        .refresh-icon.spinning {
+            animation: refreshSpin 0.6s ease-in-out;
         }
         
         .status-card {
@@ -399,9 +415,19 @@
         }
         
         function refreshData() {
+            const refreshBtn = document.querySelector('.refresh-icon');
+            
+            // 스피닝 애니메이션 시작
+            refreshBtn.classList.add('spinning');
+            
             log('데이터 새로고침 중...', 'info');
             updateStatus();
-            log('새로고침 완료', 'success');
+            
+            // 애니메이션 완료 후 클래스 제거
+            setTimeout(() => {
+                refreshBtn.classList.remove('spinning');
+                log('새로고침 완료', 'success');
+            }, 600);
         }
         
         // 테스트용 알림 데이터 추가 함수
