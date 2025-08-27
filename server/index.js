@@ -24,8 +24,12 @@ const SEOUL_COORDS = { nx: 55, ny: 127 };
 let lastWeatherCheck = null;
 const WEATHER_CHANGE_THRESHOLD = 20;
 
-// FCM 토큰 (실제 환경에서는 데이터베이스에서 관리)
-const FCM_TOKEN = process.env.FCM_TOKEN;
+// FCM 토큰들 (멀티 기기 지원)
+const FCM_TOKENS = [
+    process.env.FCM_TOKEN_MACBOOK,
+    process.env.FCM_TOKEN_IPHONE,
+    process.env.FCM_TOKEN // 기존 호환성
+].filter(token => token && token !== 'temporary-token-will-be-replaced');
 
 // 날씨 API 호출
 async function getWeatherData() {
@@ -125,29 +129,38 @@ function getMockNotionData() {
     return { todayEvents, highMiddleTasks };
 }
 
-// FCM 푸시 알림 전송
+// FCM 푸시 알림 전송 (멀티 기기)
 async function sendPushNotification(title, body, data = {}) {
-    if (!FCM_TOKEN || !admin.apps.length) {
+    if (FCM_TOKENS.length === 0 || !admin.apps.length) {
         console.log('FCM 설정이 없습니다. 알림 시뮬레이션:', { title, body });
         return;
     }
     
-    try {
-        const message = {
-            notification: {
-                title: title,
-                body: body
-            },
-            data: data,
-            token: FCM_TOKEN
-        };
-        
-        const response = await admin.messaging().send(message);
-        console.log('푸시 알림 전송 성공:', response);
-        
-    } catch (error) {
-        console.error('푸시 알림 전송 실패:', error);
+    const results = [];
+    
+    for (const token of FCM_TOKENS) {
+        try {
+            const message = {
+                notification: {
+                    title: title,
+                    body: body
+                },
+                data: data,
+                token: token
+            };
+            
+            const response = await admin.messaging().send(message);
+            console.log(`푸시 알림 전송 성공 (${token.substring(0, 20)}...):`, response);
+            results.push({ success: true, token: token.substring(0, 20), response });
+            
+        } catch (error) {
+            console.error(`푸시 알림 전송 실패 (${token.substring(0, 20)}...):`, error.message);
+            results.push({ success: false, token: token.substring(0, 20), error: error.message });
+        }
     }
+    
+    console.log(`총 ${FCM_TOKENS.length}개 기기에 알림 전송 완료`);
+    return results;
 }
 
 // 날씨 변화 감지 및 알림
