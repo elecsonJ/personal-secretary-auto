@@ -9,6 +9,12 @@ try {
     const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT;
     if (serviceAccountString) {
         serviceAccount = JSON.parse(serviceAccountString);
+        
+        // private_key의 \\n을 실제 줄바꿈으로 변환
+        if (serviceAccount.private_key) {
+            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+        }
+        
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
             projectId: serviceAccount.project_id

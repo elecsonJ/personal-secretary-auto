@@ -44,6 +44,8 @@ jobs:
       run: |
         echo "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" >> $GITHUB_ENV
         echo "FCM_TOKEN=${{ secrets.FCM_TOKEN }}" >> $GITHUB_ENV
+        echo "FCM_TOKEN_MACBOOK=${{ secrets.FCM_TOKEN_MACBOOK }}" >> $GITHUB_ENV
+        echo "FCM_TOKEN_IPHONE=${{ secrets.FCM_TOKEN_IPHONE }}" >> $GITHUB_ENV
     
     - name: Check current time and determine action
       id: determine_action
