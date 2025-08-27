@@ -140,6 +140,10 @@ try {
 const KMA_API_KEY = 'q2PPa91pEMEbSn/7uPqM667GCdh5o9IjlxtTwfivd3vvnNB8uAFyUcn6KvGaV5aWhRLmo0NHEV8U1sK7UC8Tyw==';
 const KMA_BASE_URL = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0';
 
+// NYT API 설정
+const NYT_API_KEY = process.env.NYT_API_KEY;
+const NYT_BASE_URL = 'https://api.nytimes.com/svc';
+
 // 서울 좌표
 const SEOUL_COORDS = { nx: 55, ny: 127 };
 
@@ -226,6 +230,36 @@ function parseWeatherData(items) {
         hasRain: currentRainItem ? parseInt(currentRainItem.fcstValue) > 30 : false,
         timestamp: new Date().toISOString()
     };
+}
+
+// NYT Top Stories API 호출
+async function getNYTTopStories() {
+    if (!NYT_API_KEY) {
+        console.log('NYT API 키가 없습니다.');
+        return [];
+    }
+    
+    try {
+        const response = await fetch(`${NYT_BASE_URL}/topstories/v2/world.json?api-key=${NYT_API_KEY}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+            // 상위 3개 기사만 선택
+            return data.results.slice(0, 3).map(article => ({
+                title: article.title,
+                abstract: article.abstract,
+                url: article.url,
+                published: article.published_date
+            }));
+        } else {
+            console.error('NYT API 오류:', data.fault?.faultstring || 'Unknown error');
+            return [];
+        }
+        
+    } catch (error) {
+        console.error('NYT 데이터 가져오기 실패:', error);
+        return [];
+    }
 }
 
 // 노션 모의 데이터 (실제로는 Notion API 호출)
@@ -336,51 +370,64 @@ async function sendMorningBriefing() {
     try {
         const weather = await getWeatherData();
         const { todayEvents, highMiddleTasks } = getMockNotionData();
+        const topStories = await getNYTTopStories();
         
-        // 1. 날씨 브리핑
-        let weatherMessage = '🌅 좋은 아침입니다!\n\n🌤️ 서울 오늘의 날씨\n';
+        // 1. 날씨 브리핑 (간결하게)
+        let weatherMessage = '';
         if (weather) {
-            weatherMessage += `🌡️ ${weather.temperature}\n`;
+            weatherMessage = `🌡️ ${weather.temperature} `;
             weatherMessage += weather.hasRain 
-                ? `☔ 강수확률: ${weather.rainProbability}\n🌂 우산을 챙기세요!` 
-                : `☀️ 맑은 날씨입니다!`;
+                ? `☔ ${weather.rainProbability} 🌂 우산 필요` 
+                : `☀️ 맑음`;
         } else {
-            weatherMessage += '날씨 정보를 가져올 수 없습니다.';
+            weatherMessage = '날씨 정보 없음';
         }
         
         await sendPushNotification('🌅 날씨 브리핑', weatherMessage, { type: 'weather_daily' });
         
-        // 0.5초 후 캘린더 알림
+        // 0.5초 후 캘린더 알림 (간결하게)
         setTimeout(async () => {
-            let calendarMessage = '📅 오늘 일정';
+            let calendarMessage = '';
             if (todayEvents.length === 0) {
-                calendarMessage += '\n\n오늘은 일정이 없습니다.\n여유로운 하루를 보내세요! 😊';
+                calendarMessage = '일정 없음 😊';
             } else {
-                calendarMessage += ` (${todayEvents.length}개)\n\n`;
-                todayEvents.forEach(event => {
+                todayEvents.forEach((event, index) => {
                     const emoji = event.type === 'social' ? '🍻' : '📚';
-                    calendarMessage += `${emoji} ${event.name}\n`;
+                    calendarMessage += `${emoji} ${event.name}${index < todayEvents.length - 1 ? '\n' : ''}`;
                 });
             }
             
-            await sendPushNotification('📅 오늘 일정 알림', calendarMessage, { type: 'task_daily' });
+            await sendPushNotification('📅 오늘 일정', calendarMessage, { type: 'task_daily' });
         }, 500);
         
-        // 1초 후 우선순위 태스크 알림
+        // 1초 후 우선순위 태스크 알림 (간결하게)
         setTimeout(async () => {
-            let taskMessage = '🎯 우선순위 태스크';
+            let taskMessage = '';
             if (highMiddleTasks.length === 0) {
-                taskMessage += '\n\n오늘은 HIGH, Middle 우선순위 태스크가 없습니다.\n여유로운 하루를 보내세요! 😌';
+                taskMessage = '우선순위 태스크 없음 😌';
             } else {
-                taskMessage += ` (${highMiddleTasks.length}개)\n\n`;
-                highMiddleTasks.forEach(task => {
+                highMiddleTasks.forEach((task, index) => {
                     const emoji = task.priority === 'HIGH' ? '🔴' : '🟡';
-                    taskMessage += `${emoji} ${task.name}\n`;
+                    taskMessage += `${emoji} ${task.name}${index < highMiddleTasks.length - 1 ? '\n' : ''}`;
                 });
             }
             
-            await sendPushNotification('🎯 우선순위 태스크 알림', taskMessage, { type: 'task_urgent' });
+            await sendPushNotification('🎯 우선순위 태스크', taskMessage, { type: 'task_urgent' });
         }, 1000);
+        
+        // 1.5초 후 뉴스 브리핑
+        setTimeout(async () => {
+            let newsMessage = '';
+            if (topStories.length === 0) {
+                newsMessage = '뉴스 정보 없음';
+            } else {
+                newsMessage = topStories.slice(0, 2).map((story, index) => 
+                    `${index + 1}. ${story.title}`
+                ).join('\n');
+            }
+            
+            await sendPushNotification('📰 주요 뉴스', newsMessage, { type: 'news_daily' });
+        }, 1500);
         
     } catch (error) {
         console.error('아침 브리핑 오류:', error);
@@ -400,12 +447,14 @@ async function sendEveningPrep() {
         // 임시로 내일 이벤트는 빈 배열로 처리
         const tomorrowEvents = [];
         
-        let tomorrowMessage = '🗓️ 내일 일정';
+        let tomorrowMessage = '';
         if (tomorrowEvents.length === 0) {
-            tomorrowMessage += '\n\n내일은 일정이 없습니다.\n여유로운 하루를 준비하세요! 😊';
+            tomorrowMessage = '내일 일정 없음 😊';
         } else {
-            tomorrowMessage += ` (${tomorrowEvents.length}개)\n\n`;
-            // 내일 이벤트 처리 로직
+            tomorrowEvents.forEach((event, index) => {
+                const emoji = event.type === 'social' ? '🍻' : '📚';
+                tomorrowMessage += `${emoji} ${event.name}${index < tomorrowEvents.length - 1 ? '\n' : ''}`;
+            });
         }
         
         await sendPushNotification('🗓️ 내일 일정', tomorrowMessage, { type: 'task_daily' });
