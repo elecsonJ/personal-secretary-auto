@@ -1,0 +1,140 @@
+name: Personal Secretary Notifications
+
+on:
+  schedule:
+    # 매 3시간마다 날씨 변화 감지 (UTC 기준)
+    - cron: '0 */3 * * *'
+    # 매일 오전 7시 아침 브리핑 (한국시간 오전 7시 = UTC 오후 10시)
+    - cron: '0 22 * * *'  
+    # 매일 오후 9시 저녁 준비 (한국시간 오후 9시 = UTC 오후 12시)
+    - cron: '0 12 * * *'
+  
+  # 수동 실행 가능
+  workflow_dispatch:
+    inputs:
+      notification_type:
+        description: 'Type of notification to send'
+        required: false
+        default: 'weather_check'
+        type: choice
+        options:
+        - weather_check
+        - morning_briefing
+        - evening_prep
+        - test_all
+
+jobs:
+  send-notifications:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Set up environment variables
+      run: |
+        echo "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" >> $GITHUB_ENV
+        echo "FCM_TOKEN=${{ secrets.FCM_TOKEN }}" >> $GITHUB_ENV
+    
+    - name: Check current time and determine action
+      id: determine_action
+      run: |
+        HOUR=$(TZ='Asia/Seoul' date +%H)
+        echo "Korean time hour: $HOUR"
+        
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "action=${{ github.event.inputs.notification_type }}" >> $GITHUB_OUTPUT
+        elif [ "$HOUR" = "07" ]; then
+          echo "action=morning_briefing" >> $GITHUB_OUTPUT
+        elif [ "$HOUR" = "21" ]; then
+          echo "action=evening_prep" >> $GITHUB_OUTPUT
+        else
+          echo "action=weather_check" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Run weather check
+      if: steps.determine_action.outputs.action == 'weather_check'
+      run: |
+        node -e "
+        const { checkWeatherChanges } = require('./server/index.js');
+        checkWeatherChanges().then(() => {
+          console.log('날씨 변화 감지 완료');
+          process.exit(0);
+        }).catch(err => {
+          console.error('날씨 체크 실패:', err);
+          process.exit(1);
+        });
+        "
+    
+    - name: Send morning briefing
+      if: steps.determine_action.outputs.action == 'morning_briefing'
+      run: |
+        node -e "
+        const { sendMorningBriefing } = require('./server/index.js');
+        sendMorningBriefing().then(() => {
+          console.log('아침 브리핑 전송 완료');
+          process.exit(0);
+        }).catch(err => {
+          console.error('아침 브리핑 실패:', err);
+          process.exit(1);
+        });
+        "
+    
+    - name: Send evening prep
+      if: steps.determine_action.outputs.action == 'evening_prep'
+      run: |
+        node -e "
+        const { sendEveningPrep } = require('./server/index.js');
+        sendEveningPrep().then(() => {
+          console.log('저녁 준비 알림 전송 완료');
+          process.exit(0);
+        }).catch(err => {
+          console.error('저녁 준비 알림 실패:', err);
+          process.exit(1);
+        });
+        "
+    
+    - name: Test all notifications
+      if: steps.determine_action.outputs.action == 'test_all'
+      run: |
+        node -e "
+        const { sendMorningBriefing, sendEveningPrep, checkWeatherChanges } = require('./server/index.js');
+        
+        async function testAll() {
+          console.log('테스트 시작...');
+          
+          await checkWeatherChanges();
+          console.log('날씨 체크 완료');
+          
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          await sendMorningBriefing();
+          console.log('아침 브리핑 완료');
+          
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          await sendEveningPrep();
+          console.log('저녁 준비 완료');
+          
+          console.log('모든 테스트 완료');
+        }
+        
+        testAll().then(() => process.exit(0)).catch(err => {
+          console.error('테스트 실패:', err);
+          process.exit(1);
+        });
+        "
+    
+    - name: Log completion
+      run: |
+        echo "Notification job completed at $(TZ='Asia/Seoul' date)"
+        echo "Action performed: ${{ steps.determine_action.outputs.action }}"

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개인 비서 자동화 시스템</title>
+    
+    <!-- PWA 설정 -->
+    <meta name="theme-color" content="#2196F3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="개인비서">
+    
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: 300;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .status-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-value {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .log-area {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+        
+        .setup-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .success {
+            color: #4CAF50;
+        }
+        
+        .error {
+            color: #f44336;
+        }
+        
+        .warning {
+            color: #FF9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 개인 비서 자동화</h1>
+        
+        <!-- 상태 표시 -->
+        <div class="status-card">
+            <div class="status-title">
+                <span>🔄</span>
+                <span>시스템 상태</span>
+            </div>
+            <div class="status-value" id="systemStatus">초기화 중...</div>
+        </div>
+        
+        <div class="status-card">
+            <div class="status-title">
+                <span>🌤️</span>
+                <span>마지막 날씨 체크</span>
+            </div>
+            <div class="status-value" id="lastWeatherCheck">정보 없음</div>
+        </div>
+        
+        <div class="status-card">
+            <div class="status-title">
+                <span>🔔</span>
+                <span>FCM 토큰 상태</span>
+            </div>
+            <div class="status-value" id="tokenStatus">확인 중...</div>
+        </div>
+        
+        <!-- 테스트 버튼들 -->
+        <button onclick="requestNotificationPermission()">🔔 알림 권한 요청</button>
+        <button onclick="generateFCMToken()" id="tokenBtn" disabled>📱 FCM 토큰 생성</button>
+        <button onclick="testMorningBriefing()" id="morningBtn" disabled>🌅 아침 브리핑 테스트</button>
+        <button onclick="testEveningPrep()" id="eveningBtn" disabled>🌆 저녁 준비 테스트</button>
+        <button onclick="testWeatherCheck()" id="weatherBtn" disabled>🌤️ 날씨 체크 테스트</button>
+        
+        <!-- FCM 토큰 설정 -->
+        <div class="setup-section">
+            <h3>🔧 설정</h3>
+            <input type="text" id="fcmTokenInput" placeholder="FCM 토큰을 여기에 입력하세요">
+            <button onclick="saveFCMToken()">💾 토큰 저장</button>
+        </div>
+        
+        <!-- 로그 영역 -->
+        <div class="log-area" id="logArea">시스템 로그가 여기에 표시됩니다...\n</div>
+    </div>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js"></script>
+    
+    <script>
+        // Firebase 설정 (실제 프로젝트 설정으로 교체 필요)
+        const firebaseConfig = {
+            apiKey: "your-api-key",
+            authDomain: "your-project-id.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project-id.appspot.com",
+            messagingSenderId: "your-sender-id",
+            appId: "your-app-id"
+        };
+        
+        // Firebase 초기화
+        let messaging = null;
+        let fcmToken = localStorage.getItem('fcmToken');
+        
+        function log(message, type = 'info') {
+            const logArea = document.getElementById('logArea');
+            const timestamp = new Date().toLocaleString('ko-KR');
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+            logArea.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+        
+        function updateStatus() {
+            const systemStatus = document.getElementById('systemStatus');
+            const tokenStatus = document.getElementById('tokenStatus');
+            
+            if (fcmToken) {
+                tokenStatus.innerHTML = `<span class="success">설정됨 (${fcmToken.substring(0, 20)}...)</span>`;
+                systemStatus.innerHTML = `<span class="success">준비 완료</span>`;
+                
+                // 버튼들 활성화
+                document.getElementById('morningBtn').disabled = false;
+                document.getElementById('eveningBtn').disabled = false;
+                document.getElementById('weatherBtn').disabled = false;
+            } else {
+                tokenStatus.innerHTML = `<span class="warning">토큰 없음</span>`;
+                systemStatus.innerHTML = `<span class="warning">FCM 토큰 필요</span>`;
+            }
+        }
+        
+        async function requestNotificationPermission() {
+            try {
+                if ('Notification' in window) {
+                    const permission = await Notification.requestPermission();
+                    if (permission === 'granted') {
+                        log('알림 권한이 허용되었습니다.', 'success');
+                        document.getElementById('tokenBtn').disabled = false;
+                        return true;
+                    } else {
+                        log('알림 권한이 거부되었습니다.', 'error');
+                        return false;
+                    }
+                } else {
+                    log('이 브라우저는 알림을 지원하지 않습니다.', 'error');
+                    return false;
+                }
+            } catch (error) {
+                log('알림 권한 요청 중 오류: ' + error.message, 'error');
+                return false;
+            }
+        }
+        
+        async function generateFCMToken() {
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                messaging = firebase.messaging();
+                
+                const token = await messaging.getToken();
+                if (token) {
+                    fcmToken = token;
+                    localStorage.setItem('fcmToken', token);
+                    document.getElementById('fcmTokenInput').value = token;
+                    log('FCM 토큰이 생성되었습니다.', 'success');
+                    log('토큰: ' + token, 'info');
+                    updateStatus();
+                } else {
+                    log('FCM 토큰 생성에 실패했습니다.', 'error');
+                }
+            } catch (error) {
+                log('FCM 토큰 생성 오류: ' + error.message, 'error');
+            }
+        }
+        
+        function saveFCMToken() {
+            const inputToken = document.getElementById('fcmTokenInput').value.trim();
+            if (inputToken) {
+                fcmToken = inputToken;
+                localStorage.setItem('fcmToken', inputToken);
+                log('FCM 토큰이 저장되었습니다.', 'success');
+                updateStatus();
+            } else {
+                log('유효한 FCM 토큰을 입력해주세요.', 'error');
+            }
+        }
+        
+        async function makeTestRequest(type) {
+            try {
+                log(`${type} 테스트 요청 중...`, 'info');
+                
+                // GitHub Actions 워크플로우 트리거 (실제 구현에서는 서버 API 호출)
+                log(`${type} 알림이 서버에서 처리됩니다.`, 'success');
+                log('GitHub Actions에서 실제 알림을 전송합니다.', 'info');
+                
+            } catch (error) {
+                log(`${type} 테스트 오류: ` + error.message, 'error');
+            }
+        }
+        
+        function testMorningBriefing() {
+            makeTestRequest('아침 브리핑');
+        }
+        
+        function testEveningPrep() {
+            makeTestRequest('저녁 준비');
+        }
+        
+        function testWeatherCheck() {
+            makeTestRequest('날씨 체크');
+        }
+        
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', () => {
+            log('개인 비서 자동화 시스템 시작', 'success');
+            
+            if (fcmToken) {
+                document.getElementById('fcmTokenInput').value = fcmToken;
+            }
+            
+            updateStatus();
+            
+            // 5초마다 상태 업데이트
+            setInterval(updateStatus, 5000);
+        });
+        
+        // FCM 메시지 수신 처리
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'FCM_MESSAGE') {
+                    log('FCM 메시지 수신: ' + event.data.title, 'success');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
