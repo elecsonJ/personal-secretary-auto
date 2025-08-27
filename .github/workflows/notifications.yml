@@ -64,8 +64,9 @@ jobs:
     - name: Run weather check
       if: steps.determine_action.outputs.action == 'weather_check'
       run: |
+        cd server
         node -e "
-        const { checkWeatherChanges } = require('./server/index.js');
+        const { checkWeatherChanges } = require('./index.js');
         checkWeatherChanges().then(() => {
           console.log('날씨 변화 감지 완료');
           process.exit(0);
@@ -78,8 +79,9 @@ jobs:
     - name: Send morning briefing
       if: steps.determine_action.outputs.action == 'morning_briefing'
       run: |
+        cd server
         node -e "
-        const { sendMorningBriefing } = require('./server/index.js');
+        const { sendMorningBriefing } = require('./index.js');
         sendMorningBriefing().then(() => {
           console.log('아침 브리핑 전송 완료');
           process.exit(0);
@@ -92,8 +94,9 @@ jobs:
     - name: Send evening prep
       if: steps.determine_action.outputs.action == 'evening_prep'
       run: |
+        cd server
         node -e "
-        const { sendEveningPrep } = require('./server/index.js');
+        const { sendEveningPrep } = require('./index.js');
         sendEveningPrep().then(() => {
           console.log('저녁 준비 알림 전송 완료');
           process.exit(0);
@@ -106,8 +109,9 @@ jobs:
     - name: Test all notifications
       if: steps.determine_action.outputs.action == 'test_all'
       run: |
+        cd server
         node -e "
-        const { sendMorningBriefing, sendEveningPrep, checkWeatherChanges } = require('./server/index.js');
+        const { sendMorningBriefing, sendEveningPrep, checkWeatherChanges } = require('./index.js');
         
         async function testAll() {
           console.log('테스트 시작...');
