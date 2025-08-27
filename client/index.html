@@ -366,9 +366,42 @@
             makeTestRequest('날씨 체크');
         }
         
+        // 테스트용 알림 데이터 추가 함수
+        function addTestNotificationData() {
+            const existingHistory = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+            
+            // 이미 테스트 데이터가 있으면 추가하지 않음
+            if (existingHistory.length > 0) return;
+            
+            const testNotifications = [
+                {
+                    id: Date.now(),
+                    title: '🌤️ 오늘 날씨',
+                    body: '22°C ☀️ 맑음\n강수확률: 10%\n미세먼지: 좋음',
+                    data: { type: 'weather_daily' },
+                    timestamp: new Date(Date.now() - 3600000).toISOString(), // 1시간 전
+                    sent: true
+                },
+                {
+                    id: Date.now() + 1,
+                    title: '📰 메인 뉴스',
+                    body: '1. 주요 경제 동향\n2. 국제 정치 소식\n3. 사회 이슈\n4. 문화 예술\n5. 스포츠 소식',
+                    data: { type: 'news_main' },
+                    timestamp: new Date(Date.now() - 7200000).toISOString(), // 2시간 전
+                    sent: true
+                }
+            ];
+            
+            localStorage.setItem('notificationHistory', JSON.stringify(testNotifications));
+            log('테스트 알림 데이터 추가 완료', 'success');
+        }
+        
         // 페이지 로드 시 초기화
         window.addEventListener('load', () => {
             log('개인 비서 자동화 시스템 시작', 'success');
+            
+            // 테스트 데이터 추가 (최초 1회만)
+            addTestNotificationData();
             
             if (fcmToken) {
                 document.getElementById('fcmTokenInput').value = fcmToken;
