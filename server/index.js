@@ -109,6 +109,26 @@ try {
     console.error('Firebase 초기화 오류:', error.message);
     if (error.message.includes('position')) {
         console.error('파싱 오류 위치 정보:', error.message);
+        
+        // 문제가 있는 위치의 문자들을 16진수로 출력
+        const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT;
+        if (serviceAccountString && !serviceAccountString.startsWith('{')) {
+            try {
+                const decoded = Buffer.from(serviceAccountString, 'base64').toString('utf-8');
+                const match = error.message.match(/position (\d+)/);
+                if (match) {
+                    const pos = parseInt(match[1]);
+                    console.error(`위치 ${pos} 주변 문자들 (16진수):`);
+                    for (let i = Math.max(0, pos - 10); i < Math.min(decoded.length, pos + 10); i++) {
+                        const char = decoded.charAt(i);
+                        const hex = decoded.charCodeAt(i).toString(16).padStart(2, '0');
+                        console.error(`${i}: '${char}' (0x${hex})`);
+                    }
+                }
+            } catch (decodeError) {
+                console.error('디코딩 실패로 16진수 분석 불가:', decodeError.message);
+            }
+        }
     }
     console.error('환경변수 확인:', process.env.FIREBASE_SERVICE_ACCOUNT ? 
         `길이: ${process.env.FIREBASE_SERVICE_ACCOUNT.length}, 시작: ${process.env.FIREBASE_SERVICE_ACCOUNT.substring(0, 50)}...` : 
