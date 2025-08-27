@@ -271,6 +271,9 @@ async function getNYTTopStories() {
 async function getNotionData() {
     if (!NOTION_API_KEY || !NOTION_CALENDAR_DB_ID || !NOTION_TASKS_DB_ID) {
         console.log('Notion API 정보가 없습니다. 모의 데이터 사용.');
+        console.log(`NOTION_API_KEY 존재: ${!!NOTION_API_KEY}`);
+        console.log(`NOTION_CALENDAR_DB_ID 존재: ${!!NOTION_CALENDAR_DB_ID}`);  
+        console.log(`NOTION_TASKS_DB_ID 존재: ${!!NOTION_TASKS_DB_ID}`);
         return getMockNotionData();
     }
     
@@ -303,6 +306,11 @@ async function getNotionData() {
         const calendarData = await calendarResponse.json();
         console.log(`캘린더 API 응답:`, calendarData.results ? `${calendarData.results.length}개 결과` : '오류', calendarData.code || '');
         
+        // API 오류 상세 정보
+        if (!calendarData.results) {
+            console.error('캘린더 API 전체 응답:', JSON.stringify(calendarData, null, 2));
+        }
+        
         // 2. 공부 우선순위 데이터베이스에서 HIGH/Middle 우선순위 태스크 가져오기  
         const tasksResponse = await fetch(`https://api.notion.com/v1/databases/${NOTION_TASKS_DB_ID}/query`, {
             method: 'POST',
@@ -333,6 +341,11 @@ async function getNotionData() {
         
         const tasksData = await tasksResponse.json();
         console.log(`태스크 API 응답:`, tasksData.results ? `${tasksData.results.length}개 결과` : '오류', tasksData.code || '');
+        
+        // API 오류 상세 정보
+        if (!tasksData.results) {
+            console.error('태스크 API 전체 응답:', JSON.stringify(tasksData, null, 2));
+        }
         
         // 모든 태스크의 상태 확인 (디버깅용)
         if (tasksData.results) {
