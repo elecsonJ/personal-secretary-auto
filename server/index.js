@@ -378,6 +378,59 @@ async function getNotionData() {
     }
 }
 
+// 내일 일정 가져오기
+async function getTomorrowEvents(tomorrowDate) {
+    if (!NOTION_API_KEY || !NOTION_CALENDAR_DB_ID) {
+        console.log('Notion API 정보가 없습니다. 내일 일정 없음.');
+        return [];
+    }
+    
+    try {
+        console.log(`내일 일정 조회: ${tomorrowDate}`);
+        
+        const response = await fetch(`https://api.notion.com/v1/databases/${NOTION_CALENDAR_DB_ID}/query`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${NOTION_API_KEY}`,
+                'Content-Type': 'application/json',
+                'Notion-Version': '2022-06-28'
+            },
+            body: JSON.stringify({
+                filter: {
+                    and: [
+                        {
+                            property: '날짜',
+                            date: {
+                                equals: tomorrowDate
+                            }
+                        }
+                    ]
+                }
+            })
+        });
+        
+        const data = await response.json();
+        console.log(`내일 일정 API 응답:`, data.results ? `${data.results.length}개 결과` : '오류');
+        
+        if (!data.results) {
+            console.error('내일 일정 API 오류:', data);
+            return [];
+        }
+        
+        const tomorrowEvents = data.results.map(page => ({
+            name: page.properties.이름?.title?.[0]?.plain_text || '제목 없음',
+            date: tomorrowDate,
+            type: 'event'
+        }));
+        
+        return tomorrowEvents;
+        
+    } catch (error) {
+        console.error('내일 일정 가져오기 오류:', error.message);
+        return [];
+    }
+}
+
 // 노션 모의 데이터 (fallback용)
 function getMockNotionData() {
     const today = new Date().toISOString().slice(0, 10);
@@ -560,8 +613,8 @@ async function sendEveningPrep() {
         tomorrow.setDate(tomorrow.getDate() + 1);
         const tomorrowStr = tomorrow.toISOString().slice(0, 10);
         
-        // 임시로 내일 이벤트는 빈 배열로 처리
-        const tomorrowEvents = [];
+        // 내일 일정을 실제 Notion에서 가져오기
+        const tomorrowEvents = await getTomorrowEvents(tomorrowStr);
         
         let tomorrowMessage = '';
         if (tomorrowEvents.length === 0) {
