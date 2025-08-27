@@ -173,6 +173,9 @@
         <button onclick="testEveningPrep()" id="eveningBtn" disabled>🌆 저녁 준비 테스트</button>
         <button onclick="testWeatherCheck()" id="weatherBtn" disabled>🌤️ 날씨 체크 테스트</button>
         
+        <!-- 대시보드 링크 -->
+        <button onclick="window.location.href='dashboard.html'">📱 알림 내역 보기</button>
+        
         <!-- FCM 토큰 설정 -->
         <div class="setup-section">
             <h3>🔧 설정</h3>
@@ -326,11 +329,31 @@
             setInterval(updateStatus, 5000);
         });
         
-        // FCM 메시지 수신 처리
+        // FCM 메시지 수신 처리 및 내역 저장
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.addEventListener('message', (event) => {
                 if (event.data && event.data.type === 'FCM_MESSAGE') {
                     log('FCM 메시지 수신: ' + event.data.title, 'success');
+                    
+                    // 알림 내역 저장
+                    const notification = {
+                        id: Date.now(),
+                        title: event.data.title,
+                        body: event.data.body,
+                        data: event.data.data || {},
+                        timestamp: new Date().toISOString(),
+                        sent: true
+                    };
+                    
+                    const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                    history.unshift(notification);
+                    
+                    // 최대 100개까지만 보관
+                    if (history.length > 100) {
+                        history.splice(100);
+                    }
+                    
+                    localStorage.setItem('notificationHistory', JSON.stringify(history));
                 }
             });
         }

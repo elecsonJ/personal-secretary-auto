@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개인 비서 알림 내역</title>
+    
+    <!-- PWA 설정 -->
+    <meta name="theme-color" content="#2196F3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="알림내역">
+    
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+        
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .notification-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .notification-time {
+            font-size: 12px;
+            opacity: 0.7;
+            white-space: nowrap;
+        }
+        
+        .notification-body {
+            line-height: 1.5;
+            font-size: 14px;
+            opacity: 0.9;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .notification-type {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-top: 8px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.7;
+        }
+        
+        .empty {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.7;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-sent {
+            background: #4CAF50;
+        }
+        
+        .status-failed {
+            background: #f44336;
+        }
+        
+        @media (max-width: 480px) {
+            .notification-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .notification-time {
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 알림 내역</h1>
+            <button class="refresh-btn" onclick="loadNotifications()">🔄 새로고침</button>
+        </div>
+        
+        <div id="notifications-container">
+            <div class="loading">알림 내역을 불러오는 중...</div>
+        </div>
+    </div>
+    
+    <script>
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor(diff / (1000 * 60));
+            
+            if (minutes < 1) return '방금 전';
+            if (minutes < 60) return `${minutes}분 전`;
+            if (hours < 24) return `${hours}시간 전`;
+            
+            return date.toLocaleDateString('ko-KR', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function getTypeEmoji(type) {
+            const typeMap = {
+                'weather_daily': '🌤️',
+                'weather_urgent': '⚠️',
+                'task_daily': '📅',
+                'task_urgent': '🎯',
+                'news_main': '📰',
+                'news_tech': '🤖',
+                'news_science': '🔬',
+                'general': '📢'
+            };
+            return typeMap[type] || '📢';
+        }
+        
+        async function loadNotifications() {
+            const container = document.getElementById('notifications-container');
+            container.innerHTML = '<div class="loading">알림 내역을 불러오는 중...</div>';
+            
+            try {
+                // 실제 환경에서는 서버 API 엔드포인트 호출
+                // 현재는 로컬 스토리지 사용
+                const notifications = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                
+                if (notifications.length === 0) {
+                    container.innerHTML = '<div class="empty">저장된 알림 내역이 없습니다.</div>';
+                    return;
+                }
+                
+                container.innerHTML = notifications.map(notification => `
+                    <div class="notification-card">
+                        <div class="notification-header">
+                            <div>
+                                <div class="notification-title">
+                                    <span class="status-indicator ${notification.sent ? 'status-sent' : 'status-failed'}"></span>
+                                    ${getTypeEmoji(notification.data?.type)} ${notification.title}
+                                </div>
+                            </div>
+                            <div class="notification-time">${formatTime(notification.timestamp)}</div>
+                        </div>
+                        <div class="notification-body">${notification.body}</div>
+                        ${notification.data?.type ? `<div class="notification-type">${notification.data.type}</div>` : ''}
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('알림 내역 로드 오류:', error);
+                container.innerHTML = '<div class="empty">알림 내역을 불러오는데 실패했습니다.</div>';
+            }
+        }
+        
+        // 페이지 로드시 알림 내역 로드
+        window.addEventListener('load', loadNotifications);
+        
+        // 5초마다 자동 새로고침
+        setInterval(loadNotifications, 5000);
+    </script>
+</body>
+</html>

@@ -163,6 +163,9 @@ const FCM_TOKENS = [
     process.env.FCM_TOKEN // 기존 호환성
 ].filter(token => token && token !== 'temporary-token-will-be-replaced');
 
+// 알림 내역 저장 (메모리 내 저장, 실제 환경에서는 DB 사용 권장)
+let notificationHistory = [];
+
 // 날씨 API 호출
 async function getWeatherData() {
     try {
@@ -237,33 +240,52 @@ function parseWeatherData(items) {
     };
 }
 
-// NYT Top Stories API 호출
+// NYT Top Stories API 호출 (다중 카테고리)
 async function getNYTTopStories() {
     if (!NYT_API_KEY) {
         console.log('NYT API 키가 없습니다.');
-        return [];
+        return { main: [], tech: [], science: [] };
     }
     
     try {
-        const response = await fetch(`${NYT_BASE_URL}/topstories/v2/world.json?api-key=${NYT_API_KEY}`);
-        const data = await response.json();
+        const categories = ['home', 'technology', 'science'];
+        const results = {};
         
-        if (response.ok) {
-            // 상위 3개 기사만 선택
-            return data.results.slice(0, 3).map(article => ({
-                title: article.title,
-                abstract: article.abstract,
-                url: article.url,
-                published: article.published_date
-            }));
-        } else {
-            console.error('NYT API 오류:', data.fault?.faultstring || 'Unknown error');
-            return [];
+        for (const category of categories) {
+            try {
+                const response = await fetch(`${NYT_BASE_URL}/topstories/v2/${category}.json?api-key=${NYT_API_KEY}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    results[category] = data.results.slice(0, 2).map(article => ({
+                        title: article.title,
+                        abstract: article.abstract,
+                        url: article.url,
+                        published: article.published_date,
+                        category: category
+                    }));
+                } else {
+                    console.error(`NYT ${category} API 오류:`, data.fault?.faultstring || 'Unknown error');
+                    results[category] = [];
+                }
+            } catch (error) {
+                console.error(`NYT ${category} 데이터 가져오기 실패:`, error);
+                results[category] = [];
+            }
+            
+            // API 호출 간격 (rate limit 방지)
+            await new Promise(resolve => setTimeout(resolve, 200));
         }
         
+        return {
+            main: results.home || [],
+            tech: results.technology || [],
+            science: results.science || []
+        };
+        
     } catch (error) {
-        console.error('NYT 데이터 가져오기 실패:', error);
-        return [];
+        console.error('NYT 전체 데이터 가져오기 실패:', error);
+        return { main: [], tech: [], science: [] };
     }
 }
 
@@ -455,7 +477,7 @@ function getMockNotionData() {
     return { todayEvents, highMiddleTasks };
 }
 
-// FCM 푸시 알림 전송 (멀티 기디)
+// FCM 푸시 알림 전송 (멀티 기디) + 내역 저장
 async function sendPushNotification(title, body, data = {}) {
     console.log('=== FCM 디버깅 정보 ===');
     console.log('FCM_TOKENS 개수:', FCM_TOKENS.length);
@@ -467,8 +489,26 @@ async function sendPushNotification(title, body, data = {}) {
     console.log('- FCM_TOKEN:', process.env.FCM_TOKEN ? process.env.FCM_TOKEN.substring(0, 20) + '...' : 'undefined');
     console.log('=======================');
     
+    // 알림 내역 저장
+    const notification = {
+        id: Date.now(),
+        title: title,
+        body: body,
+        data: data,
+        timestamp: new Date().toISOString(),
+        sent: true
+    };
+    
+    notificationHistory.unshift(notification); // 최신순으로 저장
+    
+    // 최대 100개까지만 보관 (메모리 관리)
+    if (notificationHistory.length > 100) {
+        notificationHistory = notificationHistory.slice(0, 100);
+    }
+    
     if (FCM_TOKENS.length === 0 || !admin.apps.length) {
         console.log('FCM 설정이 없습니다. 알림 시뮬레이션:', { title, body });
+        notification.sent = false;
         return;
     }
     
@@ -584,19 +624,47 @@ async function sendMorningBriefing() {
             await sendPushNotification('🎯 우선순위 태스크', taskMessage, { type: 'task_urgent' });
         }, 1000);
         
-        // 1.5초 후 뉴스 브리핑
+        // 1.5초 후 메인 뉴스
         setTimeout(async () => {
-            let newsMessage = '';
-            if (topStories.length === 0) {
-                newsMessage = '뉴스 정보 없음';
+            let mainNewsMessage = '';
+            if (topStories.main.length === 0) {
+                mainNewsMessage = '메인 뉴스 없음';
             } else {
-                newsMessage = topStories.slice(0, 2).map((story, index) => 
+                mainNewsMessage = topStories.main.map((story, index) => 
                     `${index + 1}. ${story.title}`
                 ).join('\n');
             }
             
-            await sendPushNotification('📰 주요 뉴스', newsMessage, { type: 'news_daily' });
+            await sendPushNotification('📰 주요 뉴스', mainNewsMessage, { type: 'news_main' });
         }, 1500);
+        
+        // 2초 후 기술 뉴스
+        setTimeout(async () => {
+            let techNewsMessage = '';
+            if (topStories.tech.length === 0) {
+                techNewsMessage = '기술 뉴스 없음';
+            } else {
+                techNewsMessage = topStories.tech.map((story, index) => 
+                    `${index + 1}. ${story.title}`
+                ).join('\n');
+            }
+            
+            await sendPushNotification('🤖 기술 뉴스', techNewsMessage, { type: 'news_tech' });
+        }, 2000);
+        
+        // 2.5초 후 과학 뉴스
+        setTimeout(async () => {
+            let scienceNewsMessage = '';
+            if (topStories.science.length === 0) {
+                scienceNewsMessage = '과학 뉴스 없음';
+            } else {
+                scienceNewsMessage = topStories.science.map((story, index) => 
+                    `${index + 1}. ${story.title}`
+                ).join('\n');
+            }
+            
+            await sendPushNotification('🔬 과학 뉴스', scienceNewsMessage, { type: 'news_science' });
+        }, 2500);
         
     } catch (error) {
         console.error('아침 브리핑 오류:', error);
