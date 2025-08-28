@@ -4,9 +4,9 @@ on:
   schedule:
     # 매 3시간마다 날씨 변화 감지 (UTC 기준)
     - cron: '0 */3 * * *'
-    # 매일 오전 7시 아침 브리핑 (한국시간 오전 7시 = UTC 오후 10시)
+    # 매일 오전 7시 아침 브리핑 (한국시간 오전 7시 = UTC 전날 22시)
     - cron: '0 22 * * *'  
-    # 매일 오후 9시 저녁 준비 (한국시간 오후 9시 = UTC 오후 12시)
+    # 매일 오후 9시 저녁 준비 (한국시간 오후 9시 = UTC 당일 12시)
     - cron: '0 12 * * *'
   
   # 수동 실행 가능
@@ -55,13 +55,14 @@ jobs:
       id: determine_action
       run: |
         HOUR=$(TZ='Asia/Seoul' date +%H)
-        echo "Korean time hour: $HOUR"
+        MINUTE=$(TZ='Asia/Seoul' date +%M)
+        echo "Korean time: $HOUR:$MINUTE"
         
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
           echo "action=${{ github.event.inputs.notification_type }}" >> $GITHUB_OUTPUT
-        elif [ "$HOUR" = "07" ]; then
+        elif [ "$HOUR" = "07" ] && [ "$MINUTE" -lt "15" ]; then
           echo "action=morning_briefing" >> $GITHUB_OUTPUT
-        elif [ "$HOUR" = "21" ]; then
+        elif [ "$HOUR" = "21" ] && [ "$MINUTE" -lt "15" ]; then
           echo "action=evening_prep" >> $GITHUB_OUTPUT
         else
           echo "action=weather_check" >> $GITHUB_OUTPUT

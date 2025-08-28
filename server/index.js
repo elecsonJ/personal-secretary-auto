@@ -681,6 +681,27 @@ async function sendMorningBriefing() {
             await sendPushNotification('💰 경제 뉴스', businessNewsMessage, { type: 'news_business' });
         }, 3000);
         
+        // 3.5초 후 내일 일정 알림
+        setTimeout(async () => {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().slice(0, 10);
+            
+            const tomorrowEvents = await getTomorrowEvents(tomorrowStr);
+            
+            let tomorrowMessage = '';
+            if (tomorrowEvents.length === 0) {
+                tomorrowMessage = '내일 일정 없음 😊';
+            } else {
+                tomorrowEvents.forEach((event, index) => {
+                    const emoji = event.type === 'social' ? '🍻' : '📚';
+                    tomorrowMessage += `${emoji} ${event.name}${index < tomorrowEvents.length - 1 ? '\n' : ''}`;
+                });
+            }
+            
+            await sendPushNotification('📅 내일 일정', tomorrowMessage, { type: 'task_daily' });
+        }, 3500);
+        
     } catch (error) {
         console.error('아침 브리핑 오류:', error);
     }
