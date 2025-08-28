@@ -595,112 +595,105 @@ async function sendMorningBriefing() {
         
         await sendPushNotification('🌅 날씨 브리핑', weatherMessage, { type: 'weather_daily' });
         
-        // 0.5초 후 캘린더 알림 (간결하게)
-        setTimeout(async () => {
-            let calendarMessage = '';
-            if (todayEvents.length === 0) {
-                calendarMessage = '일정 없음 😊';
-            } else {
-                todayEvents.forEach((event, index) => {
-                    const emoji = event.type === 'social' ? '🍻' : '📚';
-                    calendarMessage += `${emoji} ${event.name}${index < todayEvents.length - 1 ? '\n' : ''}`;
-                });
-            }
-            
-            await sendPushNotification('📅 오늘 일정', calendarMessage, { type: 'task_daily' });
-        }, 500);
+        // 0.5초 대기 후 캘린더 알림
+        await new Promise(resolve => setTimeout(resolve, 500));
+        let calendarMessage = '';
+        if (todayEvents.length === 0) {
+            calendarMessage = '일정 없음 😊';
+        } else {
+            todayEvents.forEach((event, index) => {
+                const emoji = event.type === 'social' ? '🍻' : '📚';
+                calendarMessage += `${emoji} ${event.name}${index < todayEvents.length - 1 ? '\n' : ''}`;
+            });
+        }
         
-        // 1초 후 우선순위 태스크 알림 (간결하게)
-        setTimeout(async () => {
-            let taskMessage = '';
-            if (highMiddleTasks.length === 0) {
-                taskMessage = '우선순위 태스크 없음 😌';
-            } else {
-                highMiddleTasks.forEach((task, index) => {
-                    const emoji = task.priority === 'HIGH' ? '🔴' : '🟡';
-                    taskMessage += `${emoji} ${task.name}${index < highMiddleTasks.length - 1 ? '\n' : ''}`;
-                });
-            }
-            
-            await sendPushNotification('🎯 우선순위 태스크', taskMessage, { type: 'task_urgent' });
-        }, 1000);
+        await sendPushNotification('📅 오늘 일정', calendarMessage, { type: 'task_daily' });
         
-        // 1.5초 후 메인 뉴스
-        setTimeout(async () => {
-            let mainNewsMessage = '';
-            if (topStories.main.length === 0) {
-                mainNewsMessage = '메인 뉴스 없음';
-            } else {
-                mainNewsMessage = topStories.main.map((story, index) => 
-                    `${index + 1}. ${story.title}`
-                ).join('\n');
-            }
-            
-            await sendPushNotification('📰 주요 뉴스', mainNewsMessage, { type: 'news_main' });
-        }, 1500);
+        // 0.5초 대기 후 우선순위 태스크 알림
+        await new Promise(resolve => setTimeout(resolve, 500));
+        let taskMessage = '';
+        if (highMiddleTasks.length === 0) {
+            taskMessage = '우선순위 태스크 없음 😌';
+        } else {
+            highMiddleTasks.forEach((task, index) => {
+                const emoji = task.priority === 'HIGH' ? '🔴' : '🟡';
+                taskMessage += `${emoji} ${task.name}${index < highMiddleTasks.length - 1 ? '\n' : ''}`;
+            });
+        }
         
-        // 2초 후 기술 뉴스
-        setTimeout(async () => {
-            let techNewsMessage = '';
-            if (topStories.tech.length === 0) {
-                techNewsMessage = '기술 뉴스 없음';
-            } else {
-                techNewsMessage = topStories.tech.map((story, index) => 
-                    `${index + 1}. ${story.title}`
-                ).join('\n');
-            }
-            
-            await sendPushNotification('🤖 기술 뉴스', techNewsMessage, { type: 'news_tech' });
-        }, 2000);
+        await sendPushNotification('🎯 우선순위 태스크', taskMessage, { type: 'task_urgent' });
         
-        // 2.5초 후 과학 뉴스
-        setTimeout(async () => {
-            let scienceNewsMessage = '';
-            if (topStories.science.length === 0) {
-                scienceNewsMessage = '과학 뉴스 없음';
-            } else {
-                scienceNewsMessage = topStories.science.map((story, index) => 
-                    `${index + 1}. ${story.title}`
-                ).join('\n');
-            }
-            
-            await sendPushNotification('🔬 과학 뉴스', scienceNewsMessage, { type: 'news_science' });
-        }, 2500);
+        // 0.5초 대기 후 메인 뉴스
+        await new Promise(resolve => setTimeout(resolve, 500));
+        let mainNewsMessage = '';
+        if (topStories.main.length === 0) {
+            mainNewsMessage = '메인 뉴스 없음';
+        } else {
+            mainNewsMessage = topStories.main.map((story, index) => 
+                `${index + 1}. ${story.title}`
+            ).join('\n');
+        }
         
-        // 3초 후 경제 뉴스
-        setTimeout(async () => {
-            let businessNewsMessage = '';
-            if (topStories.business.length === 0) {
-                businessNewsMessage = '경제 뉴스 없음';
-            } else {
-                businessNewsMessage = topStories.business.map((story, index) => 
-                    `${index + 1}. ${story.title}`
-                ).join('\n');
-            }
-            
-            await sendPushNotification('💰 경제 뉴스', businessNewsMessage, { type: 'news_business' });
-        }, 3000);
+        await sendPushNotification('📰 주요 뉴스', mainNewsMessage, { type: 'news_main' });
         
-        // 3.5초 후 내일 일정 알림
-        setTimeout(async () => {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowStr = tomorrow.toISOString().slice(0, 10);
-            
-            const tomorrowEvents = await getTomorrowEvents(tomorrowStr);
-            
-            let tomorrowMessage = '';
-            if (tomorrowEvents.length === 0) {
-                tomorrowMessage = '내일 일정 없음 😊';
-            } else {
-                tomorrowEvents.forEach((event, index) => {
-                    const emoji = event.type === 'social' ? '🍻' : '📚';
-                    tomorrowMessage += `${emoji} ${event.name}${index < tomorrowEvents.length - 1 ? '\n' : ''}`;
-                });
-            }
-            
-            await sendPushNotification('📅 내일 일정', tomorrowMessage, { type: 'task_daily' });
-        }, 3500);
+        // 0.5초 대기 후 기술 뉴스
+        await new Promise(resolve => setTimeout(resolve, 500));
+        let techNewsMessage = '';
+        if (topStories.tech.length === 0) {
+            techNewsMessage = '기술 뉴스 없음';
+        } else {
+            techNewsMessage = topStories.tech.map((story, index) => 
+                `${index + 1}. ${story.title}`
+            ).join('\n');
+        }
+        
+        await sendPushNotification('🤖 기술 뉴스', techNewsMessage, { type: 'news_tech' });
+        
+        // 0.5초 대기 후 과학 뉴스
+        await new Promise(resolve => setTimeout(resolve, 500));
+        let scienceNewsMessage = '';
+        if (topStories.science.length === 0) {
+            scienceNewsMessage = '과학 뉴스 없음';
+        } else {
+            scienceNewsMessage = topStories.science.map((story, index) => 
+                `${index + 1}. ${story.title}`
+            ).join('\n');
+        }
+        
+        await sendPushNotification('🔬 과학 뉴스', scienceNewsMessage, { type: 'news_science' });
+        
+        // 0.5초 대기 후 경제 뉴스
+        await new Promise(resolve => setTimeout(resolve, 500));
+        let businessNewsMessage = '';
+        if (topStories.business.length === 0) {
+            businessNewsMessage = '경제 뉴스 없음';
+        } else {
+            businessNewsMessage = topStories.business.map((story, index) => 
+                `${index + 1}. ${story.title}`
+            ).join('\n');
+        }
+        
+        await sendPushNotification('💰 경제 뉴스', businessNewsMessage, { type: 'news_business' });
+        
+        // 0.5초 대기 후 내일 일정 알림
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().slice(0, 10);
+        
+        const tomorrowEvents = await getTomorrowEvents(tomorrowStr);
+        
+        let tomorrowMessage = '';
+        if (tomorrowEvents.length === 0) {
+            tomorrowMessage = '내일 일정 없음 😊';
+        } else {
+            tomorrowEvents.forEach((event, index) => {
+                const emoji = event.type === 'social' ? '🍻' : '📚';
+                tomorrowMessage += `${emoji} ${event.name}${index < tomorrowEvents.length - 1 ? '\n' : ''}`;
+            });
+        }
+        
+        await sendPushNotification('📅 내일 일정', tomorrowMessage, { type: 'task_daily' });
         
     } catch (error) {
         console.error('아침 브리핑 오류:', error);
