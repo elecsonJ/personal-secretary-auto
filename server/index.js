@@ -250,11 +250,15 @@ function parseWeatherData(items) {
     // 카테고리별 데이터 추출
     const rainItems = todayItems.filter(item => item.category === 'POP').sort((a, b) => a.fcstTime.localeCompare(b.fcstTime));
     const tempItems = todayItems.filter(item => item.category === 'TMP').sort((a, b) => a.fcstTime.localeCompare(b.fcstTime));
+    const maxTempItems = todayItems.filter(item => item.category === 'TMX'); // 일 최고기온
+    const minTempItems = todayItems.filter(item => item.category === 'TMN'); // 일 최저기온
     const precipItems = todayItems.filter(item => item.category === 'PCP').sort((a, b) => a.fcstTime.localeCompare(b.fcstTime)); // 시간당 강수량
     const precipTypeItems = todayItems.filter(item => item.category === 'PTY').sort((a, b) => a.fcstTime.localeCompare(b.fcstTime)); // 강수형태
     
     const currentRainItem = rainItems[0];
     const currentTempItem = tempItems[0];
+    const maxTempItem = maxTempItems[0];
+    const minTempItem = minTempItems[0];
     
     // 강수 시간대 분석
     const rainPeriods = [];
@@ -299,6 +303,8 @@ function parseWeatherData(items) {
     return {
         rainProbability: currentRainItem ? `${currentRainItem.fcstValue}%` : '0%',
         temperature: currentTempItem ? `${currentTempItem.fcstValue}°C` : 'N/A',
+        maxTemperature: maxTempItem ? `${maxTempItem.fcstValue}°C` : null,
+        minTemperature: minTempItem ? `${minTempItem.fcstValue}°C` : null,
         hasRain: currentRainItem ? parseInt(currentRainItem.fcstValue) > 30 : false,
         rainPeriods: rainPeriods,
         maxPrecipitation: maxPrecip,
@@ -656,6 +662,16 @@ async function sendMorningBriefing() {
         let weatherMessage = '';
         if (weather) {
             weatherMessage = `🌡️ ${weather.temperature}`;
+            
+            // 최고/최저기온 추가
+            if (weather.maxTemperature || weather.minTemperature) {
+                const tempRange = [];
+                if (weather.minTemperature) tempRange.push(`최저 ${weather.minTemperature}`);
+                if (weather.maxTemperature) tempRange.push(`최고 ${weather.maxTemperature}`);
+                if (tempRange.length > 0) {
+                    weatherMessage += ` (${tempRange.join(', ')})`;
+                }
+            }
             
             if (weather.hasRain && weather.rainPeriods.length > 0) {
                 // 강수 있을 때 - 시간대와 강도 정보
