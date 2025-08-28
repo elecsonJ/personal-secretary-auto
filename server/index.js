@@ -154,7 +154,28 @@ const SEOUL_COORDS = { nx: 55, ny: 127 };
 
 // 이전 날씨 데이터 저장
 let lastWeatherCheck = null;
-const WEATHER_CHANGE_THRESHOLD = 20;
+const WEATHER_CHANGE_THRESHOLD = 20; // 기본 임계값
+
+// 상황별 임계값 계산
+function getAdaptiveThreshold(prevRain, currentRain) {
+    const prev = parseInt(prevRain.replace('%', ''));
+    const curr = parseInt(currentRain.replace('%', ''));
+    
+    // 맑음→비 상황 (중요!)
+    if (prev < 20 && curr > 40) return 15;
+    
+    // 비→맑음 상황 (외출 계획에 중요!)
+    if (prev > 60 && curr < 30) return 20;
+    
+    // 폭우 관련 (80% 이상)
+    if (Math.max(prev, curr) > 80) return 10;
+    
+    // 미세 변화 (둘 다 낮은 확률)
+    if (Math.max(prev, curr) < 30) return 25;
+    
+    // 기본값
+    return WEATHER_CHANGE_THRESHOLD;
+}
 
 // FCM 토큰들 (멀티 기기 지원)
 const FCM_TOKENS = [
@@ -220,22 +241,68 @@ async function getWeatherData() {
     }
 }
 
-// 날씨 데이터 파싱
+// 날씨 데이터 파싱 (강수 상세정보 추가)
 function parseWeatherData(items) {
     const now = new Date();
     const today = now.toISOString().slice(0, 10).replace(/-/g, '');
     const todayItems = items.filter(item => item.fcstDate === today);
     
-    const rainItems = todayItems.filter(item => item.category === 'POP');
-    const tempItems = todayItems.filter(item => item.category === 'TMP');
+    // 카테고리별 데이터 추출
+    const rainItems = todayItems.filter(item => item.category === 'POP').sort((a, b) => a.fcstTime.localeCompare(b.fcstTime));
+    const tempItems = todayItems.filter(item => item.category === 'TMP').sort((a, b) => a.fcstTime.localeCompare(b.fcstTime));
+    const precipItems = todayItems.filter(item => item.category === 'PCP').sort((a, b) => a.fcstTime.localeCompare(b.fcstTime)); // 시간당 강수량
+    const precipTypeItems = todayItems.filter(item => item.category === 'PTY').sort((a, b) => a.fcstTime.localeCompare(b.fcstTime)); // 강수형태
     
     const currentRainItem = rainItems[0];
     const currentTempItem = tempItems[0];
+    
+    // 강수 시간대 분석
+    const rainPeriods = [];
+    let rainStart = null;
+    
+    for (let i = 0; i < rainItems.length; i++) {
+        const prob = parseInt(rainItems[i].fcstValue);
+        const time = rainItems[i].fcstTime;
+        const hourMin = `${time.slice(0,2)}:${time.slice(2,4)}`;
+        
+        if (prob > 30) { // 30% 이상을 비 가능성으로 판단
+            if (!rainStart) rainStart = hourMin;
+        } else if (rainStart) {
+            const prevTime = i > 0 ? rainItems[i-1].fcstTime : time;
+            const prevHourMin = `${prevTime.slice(0,2)}:${prevTime.slice(2,4)}`;
+            rainPeriods.push({ start: rainStart, end: prevHourMin });
+            rainStart = null;
+        }
+    }
+    
+    // 마지막 구간 처리
+    if (rainStart) {
+        const lastTime = rainItems[rainItems.length - 1].fcstTime;
+        const lastHourMin = `${lastTime.slice(0,2)}:${lastTime.slice(2,4)}`;
+        rainPeriods.push({ start: rainStart, end: lastHourMin });
+    }
+    
+    // 강수량 정보 (PCP 카테고리에서)
+    let maxPrecip = 0;
+    precipItems.forEach(item => {
+        const precip = parseFloat(item.fcstValue.replace('mm', '') || 0);
+        if (precip > maxPrecip) maxPrecip = precip;
+    });
+    
+    // 강수형태 (PTY: 0=없음, 1=비, 2=비/눈, 3=눈, 5=빗방울, 6=빗방울날림, 7=눈날림)
+    const precipTypes = precipTypeItems.map(item => {
+        const typeCode = parseInt(item.fcstValue);
+        const typeNames = { 0: '', 1: '비', 2: '비/눈', 3: '눈', 5: '빗방울', 6: '빗방울날림', 7: '눈날림' };
+        return typeNames[typeCode] || '';
+    }).filter(type => type !== '');
     
     return {
         rainProbability: currentRainItem ? `${currentRainItem.fcstValue}%` : '0%',
         temperature: currentTempItem ? `${currentTempItem.fcstValue}°C` : 'N/A',
         hasRain: currentRainItem ? parseInt(currentRainItem.fcstValue) > 30 : false,
+        rainPeriods: rainPeriods,
+        maxPrecipitation: maxPrecip,
+        precipitationTypes: precipTypes,
         timestamp: new Date().toISOString()
     };
 }
@@ -552,8 +619,11 @@ async function checkWeatherChanges() {
             const prevRain = parseInt(lastWeatherCheck.rainProbability.replace('%', ''));
             const currentRain = parseInt(currentWeather.rainProbability.replace('%', ''));
             const change = Math.abs(currentRain - prevRain);
+            const threshold = getAdaptiveThreshold(lastWeatherCheck.rainProbability, currentWeather.rainProbability);
             
-            if (change >= WEATHER_CHANGE_THRESHOLD) {
+            console.log(`날씨 변화 체크: ${prevRain}% → ${currentRain}% (변화: ${change}%, 임계값: ${threshold}%)`);
+            
+            if (change >= threshold) {
                 const direction = currentRain > prevRain ? '증가' : '감소';
                 const emoji = direction === '증가' ? '☔⚠️' : '☀️✨';
                 
@@ -582,13 +652,38 @@ async function sendMorningBriefing() {
         const { todayEvents, highMiddleTasks } = await getNotionData();
         const topStories = await getNYTTopStories();
         
-        // 1. 날씨 브리핑 (간결하게)
+        // 1. 날씨 브리핑 (상세 강수정보 포함)
         let weatherMessage = '';
         if (weather) {
-            weatherMessage = `🌡️ ${weather.temperature} `;
-            weatherMessage += weather.hasRain 
-                ? `☔ ${weather.rainProbability} 🌂 우산 필요` 
-                : `☀️ 맑음`;
+            weatherMessage = `🌡️ ${weather.temperature}`;
+            
+            if (weather.hasRain && weather.rainPeriods.length > 0) {
+                // 강수 있을 때 - 시간대와 강도 정보
+                weatherMessage += ` ☔ ${weather.rainProbability}`;
+                
+                // 강수 시간대
+                const timePeriods = weather.rainPeriods.map(period => 
+                    `${period.start}-${period.end}`
+                ).join(', ');
+                weatherMessage += `\n⏰ 강수시간: ${timePeriods}`;
+                
+                // 강수량
+                if (weather.maxPrecipitation > 0) {
+                    const intensity = weather.maxPrecipitation < 1 ? '약한비' : 
+                                    weather.maxPrecipitation < 3 ? '보통비' : 
+                                    weather.maxPrecipitation < 15 ? '강한비' : '매우강한비';
+                    weatherMessage += `\n💧 예상강수량: ${weather.maxPrecipitation}mm (${intensity})`;
+                }
+                
+                // 강수형태
+                if (weather.precipitationTypes.length > 0) {
+                    weatherMessage += `\n${weather.precipitationTypes.includes('눈') ? '❄️' : '🌧️'} 형태: ${weather.precipitationTypes.join(', ')}`;
+                }
+                
+                weatherMessage += '\n🌂 우산 챙기세요!';
+            } else {
+                weatherMessage += ` ☀️ ${weather.rainProbability} 맑음`;
+            }
         } else {
             weatherMessage = '날씨 정보 없음';
         }
