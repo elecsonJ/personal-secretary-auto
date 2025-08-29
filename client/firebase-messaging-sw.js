@@ -73,6 +73,32 @@ messaging.onBackgroundMessage((payload) => {
     console.log('[FINAL] body:', notificationBody);
     console.log('=== 메시지 처리 완료 ===');
     
+    // 메인 스레드로 알림 데이터 전송 (localStorage 저장용)
+    const notificationData = {
+        id: Date.now(),
+        title: notificationTitle,
+        body: notificationBody,
+        data: payload.data || {},
+        timestamp: new Date().toISOString(),
+        sent: true
+    };
+    
+    console.log('[STORAGE] 메인 스레드로 알림 데이터 전송:', notificationData);
+    
+    // 모든 활성 클라이언트에게 메시지 전송
+    self.clients.matchAll().then(clients => {
+        console.log('[STORAGE] 활성 클라이언트 수:', clients.length);
+        clients.forEach((client, index) => {
+            console.log(`[STORAGE] 클라이언트 ${index + 1}에게 메시지 전송`);
+            client.postMessage({
+                type: 'NOTIFICATION_RECEIVED',
+                notification: notificationData
+            });
+        });
+    }).catch(error => {
+        console.error('[STORAGE] 클라이언트 메시지 전송 실패:', error);
+    });
+    
     const notificationOptions = {
         body: notificationBody,
         icon: '/icons/icon-192.png',

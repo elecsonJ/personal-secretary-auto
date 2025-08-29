@@ -422,12 +422,58 @@
             
             log('데이터 새로고침 중...', 'info');
             updateStatus();
+            updateLatestNotification();
             
             // 애니메이션 완료 후 클래스 제거
             setTimeout(() => {
                 refreshBtn.classList.remove('spinning');
                 log('새로고침 완료', 'success');
             }, 600);
+        }
+        
+        // Service Worker 메시지 리스너 (FCM 알림 저장용)
+        function setupServiceWorkerMessageListener() {
+            console.log('[MAIN] Service Worker 메시지 리스너 설정');
+            
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                console.log('[MAIN] Service Worker로부터 메시지 수신:', event.data);
+                
+                if (event.data && event.data.type === 'NOTIFICATION_RECEIVED') {
+                    const notification = event.data.notification;
+                    console.log('[MAIN] FCM 알림 데이터 처리:', notification);
+                    
+                    // 기존 히스토리 가져오기
+                    const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                    console.log('[MAIN] 기존 히스토리 항목 수:', history.length);
+                    
+                    // 중복 방지: 같은 timestamp의 알림이 이미 있는지 확인
+                    const isDuplicate = history.some(item => 
+                        Math.abs(new Date(item.timestamp) - new Date(notification.timestamp)) < 1000
+                    );
+                    
+                    if (!isDuplicate) {
+                        // 새 알림을 맨 앞에 추가
+                        history.unshift(notification);
+                        console.log('[MAIN] 새 알림 추가됨. 총 항목 수:', history.length);
+                        
+                        // 최대 100개까지만 보관
+                        if (history.length > 100) {
+                            history.splice(100);
+                            console.log('[MAIN] 히스토리 100개로 제한');
+                        }
+                        
+                        // localStorage에 저장
+                        localStorage.setItem('notificationHistory', JSON.stringify(history));
+                        console.log('[MAIN] 알림 히스토리 저장 완료');
+                        
+                        // UI 업데이트
+                        updateLatestNotification();
+                        log(`FCM 알림 저장: ${notification.title}`, 'success');
+                    } else {
+                        console.log('[MAIN] 중복 알림 무시됨');
+                    }
+                }
+            });
         }
         
         // 테스트용 알림 데이터 추가 함수
@@ -463,6 +509,9 @@
         // 페이지 로드 시 초기화
         window.addEventListener('load', () => {
             log('개인 비서 자동화 시스템 시작', 'success');
+            
+            // Service Worker 메시지 리스너 설정
+            setupServiceWorkerMessageListener();
             
             // 테스트 데이터 추가 (최초 1회만)
             addTestNotificationData();
