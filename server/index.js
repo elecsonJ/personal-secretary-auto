@@ -1,6 +1,8 @@
 const admin = require('firebase-admin');
 const cron = require('node-cron');
 const fetch = require('node-fetch');
+const fs = require('fs').promises;
+const path = require('path');
 require('dotenv').config();
 
 // Firebase Admin SDK 초기화
@@ -624,6 +626,32 @@ async function sendPushNotification(title, body, data = {}) {
     return results;
 }
 
+// 날씨 상태 파일 경로
+const WEATHER_STATE_FILE = path.join(__dirname, '..', 'data', 'weather-state.json');
+
+// 날씨 상태 읽기
+async function loadWeatherState() {
+    try {
+        await fs.mkdir(path.dirname(WEATHER_STATE_FILE), { recursive: true });
+        const data = await fs.readFile(WEATHER_STATE_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.log('이전 날씨 데이터 없음, 새로 시작');
+        return null;
+    }
+}
+
+// 날씨 상태 저장
+async function saveWeatherState(weatherData) {
+    try {
+        await fs.mkdir(path.dirname(WEATHER_STATE_FILE), { recursive: true });
+        await fs.writeFile(WEATHER_STATE_FILE, JSON.stringify(weatherData, null, 2));
+        console.log('날씨 상태 저장 완료');
+    } catch (error) {
+        console.error('날씨 상태 저장 실패:', error);
+    }
+}
+
 // 날씨 변화 감지 및 알림
 async function checkWeatherChanges() {
     try {
@@ -632,11 +660,21 @@ async function checkWeatherChanges() {
         
         console.log('현재 날씨:', currentWeather);
         
-        if (lastWeatherCheck) {
-            const prevRain = parseInt(lastWeatherCheck.rainProbability.replace('%', ''));
+        // 이전 날씨 데이터 로드
+        const previousWeather = await loadWeatherState();
+        
+        if (!previousWeather) {
+            console.log('첫 날씨 체크 - 데이터 저장만 수행');
+            await saveWeatherState(currentWeather);
+            lastWeatherCheck = currentWeather;
+            return;
+        }
+        
+        if (previousWeather) {
+            const prevRain = parseInt(previousWeather.rainProbability.replace('%', ''));
             const currentRain = parseInt(currentWeather.rainProbability.replace('%', ''));
             const change = Math.abs(currentRain - prevRain);
-            const threshold = getAdaptiveThreshold(lastWeatherCheck.rainProbability, currentWeather.rainProbability);
+            const threshold = getAdaptiveThreshold(previousWeather.rainProbability, currentWeather.rainProbability);
             
             console.log(`날씨 변화 체크: ${prevRain}% → ${currentRain}% (변화: ${change}%, 임계값: ${threshold}%)`);
             
@@ -647,7 +685,7 @@ async function checkWeatherChanges() {
                 await sendPushNotification(
                     `${emoji} 날씨 급변 알림`,
                     `강수확률이 ${change}% ${direction}했습니다!\n` +
-                    `이전: ${lastWeatherCheck.rainProbability}\n` +
+                    `이전: ${previousWeather.rainProbability}\n` +
                     `현재: ${currentWeather.rainProbability}\n` +
                     `온도: ${currentWeather.temperature}`,
                     { type: 'weather_urgent' }
@@ -655,6 +693,8 @@ async function checkWeatherChanges() {
             }
         }
         
+        // 현재 날씨 저장
+        await saveWeatherState(currentWeather);
         lastWeatherCheck = currentWeather;
         
     } catch (error) {

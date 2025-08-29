@@ -51,6 +51,14 @@ jobs:
         echo "NOTION_CALENDAR_DB_ID=${{ secrets.NOTION_CALENDAR_DB_ID }}" >> $GITHUB_ENV
         echo "NOTION_TASKS_DB_ID=${{ secrets.NOTION_TASKS_DB_ID }}" >> $GITHUB_ENV
     
+    # 이전 날씨 데이터 복원
+    - name: Download previous weather data
+      uses: actions/download-artifact@v3
+      with:
+        name: weather-data
+        path: ./data
+      continue-on-error: true
+    
     - name: Check current time and determine action
       id: determine_action
       run: |
@@ -144,6 +152,15 @@ jobs:
           process.exit(1);
         });
         "
+    
+    # 날씨 데이터 저장 (다음 실행을 위해)
+    - name: Save weather data
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: weather-data
+        path: ./data/weather-state.json
+        retention-days: 7
     
     - name: Log completion
       run: |
