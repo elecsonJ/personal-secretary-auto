@@ -693,8 +693,11 @@ async function saveWeatherState(weatherData) {
 }
 
 // 날씨 변화 감지 및 알림
-async function checkWeatherChanges() {
+async function checkWeatherChanges(githubExecutionId = null) {
     try {
+        if (githubExecutionId) {
+            console.log(`🚀 GitHub Actions Execution ID: ${githubExecutionId}`);
+        }
         const currentWeather = await getWeatherData();
         if (!currentWeather) return;
         
@@ -728,7 +731,7 @@ async function checkWeatherChanges() {
                     `이전: ${previousWeather.rainProbability}\n` +
                     `현재: ${currentWeather.rainProbability}\n` +
                     `온도: ${currentWeather.temperature}`,
-                    { type: 'weather_urgent' }
+                    { type: 'weather_urgent', executionId: githubExecutionId }
                 );
             }
         }
@@ -792,9 +795,12 @@ async function releaseExecutionLock() {
 }
 
 // 아침 브리핑 알림
-async function sendMorningBriefing() {
+async function sendMorningBriefing(githubExecutionId = null) {
     globalExecutionCounter++;
     console.log(`📊 sendMorningBriefing 호출됨 (글로벌 실행 카운터: ${globalExecutionCounter})`);
+    if (githubExecutionId) {
+        console.log(`🚀 GitHub Actions Execution ID: ${githubExecutionId}`);
+    }
     
     const executionId = await acquireExecutionLock('morning_briefing');
     
@@ -857,7 +863,10 @@ async function sendMorningBriefing() {
         }
         
         console.log(`📧 [${executionId}] 날씨 브리핑 알림 전송`);
-        await sendPushNotification('🌅 날씨 브리핑', weatherMessage, { type: 'weather_daily', executionId });
+        await sendPushNotification('🌅 날씨 브리핑', weatherMessage, { 
+            type: 'weather_daily', 
+            executionId: githubExecutionId || executionId 
+        });
         
         // 0.5초 대기 후 캘린더 알림
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -872,7 +881,7 @@ async function sendMorningBriefing() {
         }
         
         console.log(`📧 [${executionId}] 오늘 일정 알림 전송`);
-        await sendPushNotification('📅 오늘 일정', calendarMessage, { type: 'task_daily', executionId });
+        await sendPushNotification('📅 오늘 일정', calendarMessage, { type: 'task_daily', executionId: githubExecutionId || executionId });
         
         // 0.5초 대기 후 우선순위 태스크 알림
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -887,7 +896,7 @@ async function sendMorningBriefing() {
         }
         
         console.log(`📧 [${executionId}] 우선순위 태스크 알림 전송`);
-        await sendPushNotification('🎯 우선순위 태스크', taskMessage, { type: 'task_urgent', executionId });
+        await sendPushNotification('🎯 우선순위 태스크', taskMessage, { type: 'task_urgent', executionId: githubExecutionId || executionId });
         
         // 0.5초 대기 후 메인 뉴스
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -901,7 +910,7 @@ async function sendMorningBriefing() {
         }
         
         console.log(`📧 [${executionId}] 주요 뉴스 알림 전송`);
-        await sendPushNotification('📰 주요 뉴스', mainNewsMessage, { type: 'news_main', executionId });
+        await sendPushNotification('📰 주요 뉴스', mainNewsMessage, { type: 'news_main', executionId: githubExecutionId || executionId });
         
         // 0.5초 대기 후 기술 뉴스
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -915,7 +924,7 @@ async function sendMorningBriefing() {
         }
         
         console.log(`📧 [${executionId}] 기술 뉴스 알림 전송`);
-        await sendPushNotification('🤖 기술 뉴스', techNewsMessage, { type: 'news_tech', executionId });
+        await sendPushNotification('🤖 기술 뉴스', techNewsMessage, { type: 'news_tech', executionId: githubExecutionId || executionId });
         
         // 0.5초 대기 후 과학 뉴스
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -929,7 +938,7 @@ async function sendMorningBriefing() {
         }
         
         console.log(`📧 [${executionId}] 과학 뉴스 알림 전송`);
-        await sendPushNotification('🔬 과학 뉴스', scienceNewsMessage, { type: 'news_science', executionId });
+        await sendPushNotification('🔬 과학 뉴스', scienceNewsMessage, { type: 'news_science', executionId: githubExecutionId || executionId });
         
         // 0.5초 대기 후 경제 뉴스
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -943,7 +952,7 @@ async function sendMorningBriefing() {
         }
         
         console.log(`📧 [${executionId}] 경제 뉴스 알림 전송`);
-        await sendPushNotification('💰 경제 뉴스', businessNewsMessage, { type: 'news_business', executionId });
+        await sendPushNotification('💰 경제 뉴스', businessNewsMessage, { type: 'news_business', executionId: githubExecutionId || executionId });
         
         // 0.5초 대기 후 내일 일정 알림
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -964,7 +973,7 @@ async function sendMorningBriefing() {
         }
         
         console.log(`📧 [${executionId}] 내일 일정 알림 전송`);
-        await sendPushNotification('📅 내일 일정', tomorrowMessage, { type: 'task_daily', executionId });
+        await sendPushNotification('📅 내일 일정', tomorrowMessage, { type: 'task_daily', executionId: githubExecutionId || executionId });
         
         console.log(`✅ [${executionId}] sendMorningBriefing 완료 (총 푸시 전송: ${globalPushCounter}개)`);
         
@@ -977,8 +986,11 @@ async function sendMorningBriefing() {
 }
 
 // 저녁 내일 준비 알림
-async function sendEveningPrep() {
+async function sendEveningPrep(githubExecutionId = null) {
     try {
+        if (githubExecutionId) {
+            console.log(`🚀 GitHub Actions Execution ID: ${githubExecutionId}`);
+        }
         const { todayEvents, highMiddleTasks } = await getNotionData();
         
         // 내일 캘린더 일정
@@ -999,7 +1011,7 @@ async function sendEveningPrep() {
             });
         }
         
-        await sendPushNotification('🗓️ 내일 일정', tomorrowMessage, { type: 'task_daily' });
+        await sendPushNotification('🗓️ 내일 일정', tomorrowMessage, { type: 'task_daily', executionId: githubExecutionId });
         
         // 0.5초 후 남은 우선순위 작업 알림
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -1010,7 +1022,7 @@ async function sendEveningPrep() {
             remainingMessage += `\n\n아직 ${highMiddleTasks.length}개의 우선순위 작업이 남아있습니다.\n내일을 위해 정리하고 푹 쉬세요! 🛌`;
         }
         
-        await sendPushNotification('🌆 오늘 남은 우선순위 작업', remainingMessage, { type: 'task_daily' });
+        await sendPushNotification('🌆 오늘 남은 우선순위 작업', remainingMessage, { type: 'task_daily', executionId: githubExecutionId });
         
     } catch (error) {
         console.error('저녁 준비 알림 오류:', error);

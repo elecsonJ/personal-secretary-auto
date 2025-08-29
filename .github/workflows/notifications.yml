@@ -87,7 +87,9 @@ jobs:
         cd server
         node -e "
         const { checkWeatherChanges } = require('./index.js');
-        checkWeatherChanges().then(() => {
+        const executionId = 'github-actions-${{ github.run_id }}-${{ github.run_number }}';
+        console.log('GitHub Actions Execution ID:', executionId);
+        checkWeatherChanges(executionId).then(() => {
           console.log('날씨 변화 감지 완료');
           process.exit(0);
         }).catch(err => {
@@ -102,7 +104,9 @@ jobs:
         cd server
         node -e "
         const { sendMorningBriefing } = require('./index.js');
-        sendMorningBriefing().then(() => {
+        const executionId = 'github-actions-${{ github.run_id }}-${{ github.run_number }}';
+        console.log('GitHub Actions Execution ID:', executionId);
+        sendMorningBriefing(executionId).then(() => {
           console.log('아침 브리핑 전송 완료');
           process.exit(0);
         }).catch(err => {
@@ -117,7 +121,9 @@ jobs:
         cd server
         node -e "
         const { sendEveningPrep } = require('./index.js');
-        sendEveningPrep().then(() => {
+        const executionId = 'github-actions-${{ github.run_id }}-${{ github.run_number }}';
+        console.log('GitHub Actions Execution ID:', executionId);
+        sendEveningPrep(executionId).then(() => {
           console.log('저녁 준비 알림 전송 완료');
           process.exit(0);
         }).catch(err => {
@@ -132,21 +138,23 @@ jobs:
         cd server
         node -e "
         const { sendMorningBriefing, sendEveningPrep, checkWeatherChanges } = require('./index.js');
+        const executionId = 'github-actions-${{ github.run_id }}-${{ github.run_number }}';
+        console.log('GitHub Actions Execution ID:', executionId);
         
         async function testAll() {
           console.log('테스트 시작...');
           
-          await checkWeatherChanges();
+          await checkWeatherChanges(executionId);
           console.log('날씨 체크 완료');
           
           await new Promise(resolve => setTimeout(resolve, 2000));
           
-          await sendMorningBriefing();
+          await sendMorningBriefing(executionId);
           console.log('아침 브리핑 완료');
           
           await new Promise(resolve => setTimeout(resolve, 2000));
           
-          await sendEveningPrep();
+          await sendEveningPrep(executionId);
           console.log('저녁 준비 완료');
           
           console.log('모든 테스트 완료');
