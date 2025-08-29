@@ -577,12 +577,17 @@ function getMockNotionData() {
     return { todayEvents, highMiddleTasks };
 }
 
+// 전역 실행 카운터
+let globalExecutionCounter = 0;
+let globalPushCounter = 0;
+
 // FCM 푸시 알림 전송 (멀티 기디) + 내역 저장
 async function sendPushNotification(title, body, data = {}) {
     const pushId = `push-${Date.now()}`;
     const execId = data.executionId || 'unknown';
+    globalPushCounter++;
     
-    console.log(`🔔 [${execId}] [${pushId}] "${title}" 알림 전송 시작`);
+    console.log(`🔔 [${execId}] [${pushId}] "${title}" 알림 전송 시작 (글로벌 푸시 카운터: ${globalPushCounter})`);
     console.log('=== FCM 디버깅 정보 ===');
     console.log('FCM_TOKENS 개수:', FCM_TOKENS.length);
     console.log('고유 토큰 확인:', FCM_TOKENS.map((token, i) => 
@@ -772,14 +777,17 @@ async function releaseExecutionLock() {
 
 // 아침 브리핑 알림
 async function sendMorningBriefing() {
+    globalExecutionCounter++;
+    console.log(`📊 sendMorningBriefing 호출됨 (글로벌 실행 카운터: ${globalExecutionCounter})`);
+    
     const executionId = await acquireExecutionLock('morning_briefing');
     
     if (!executionId) {
-        console.log('아침 브리핑이 이미 실행 중이므로 종료');
+        console.log(`⛔ [실행차단] 아침 브리핑이 이미 실행 중이므로 종료 (카운터: ${globalExecutionCounter})`);
         return;
     }
     
-    console.log(`🚀 [${executionId}] sendMorningBriefing 시작`);
+    console.log(`🚀 [${executionId}] sendMorningBriefing 실제 시작 (실행 카운터: ${globalExecutionCounter})`);
     
     try {
         const weather = await getWeatherData();
@@ -942,12 +950,13 @@ async function sendMorningBriefing() {
         console.log(`📧 [${executionId}] 내일 일정 알림 전송`);
         await sendPushNotification('📅 내일 일정', tomorrowMessage, { type: 'task_daily', executionId });
         
-        console.log(`✅ [${executionId}] sendMorningBriefing 완료`);
+        console.log(`✅ [${executionId}] sendMorningBriefing 완료 (총 푸시 전송: ${globalPushCounter}개)`);
         
     } catch (error) {
         console.error(`❌ [${executionId}] 아침 브리핑 오류:`, error);
     } finally {
         await releaseExecutionLock();
+        console.log(`🔓 [${executionId}] 실행 잠금 해제 완료`);
     }
 }
 
