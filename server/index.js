@@ -180,10 +180,24 @@ function getAdaptiveThreshold(prevRain, currentRain) {
 }
 
 // FCM 토큰들 (멀티 기기 지원)
-const FCM_TOKENS = [
+const RAW_TOKENS = [
     process.env.FCM_TOKEN_MACBOOK,
     process.env.FCM_TOKEN_IPHONE
 ].filter(token => token && token !== 'temporary-token-will-be-replaced');
+
+// 토큰 중복 체크 및 제거
+const FCM_TOKENS = [...new Set(RAW_TOKENS)];
+
+// 중복 토큰 경고
+if (RAW_TOKENS.length !== FCM_TOKENS.length) {
+    console.warn('⚠️ 중복된 FCM 토큰이 발견되었습니다!');
+    console.warn(`원본 토큰 수: ${RAW_TOKENS.length}, 고유 토큰 수: ${FCM_TOKENS.length}`);
+    
+    // 어떤 토큰이 중복인지 확인
+    if (process.env.FCM_TOKEN_MACBOOK === process.env.FCM_TOKEN_IPHONE) {
+        console.warn('FCM_TOKEN_MACBOOK과 FCM_TOKEN_IPHONE이 같은 값입니다!');
+    }
+}
 
 // 알림 내역 저장 (메모리 내 저장, 실제 환경에서는 DB 사용 권장)
 let notificationHistory = [];
