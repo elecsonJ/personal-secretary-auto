@@ -179,12 +179,12 @@ function getAdaptiveThreshold(prevRain, currentRain) {
     return WEATHER_CHANGE_THRESHOLD;
 }
 
-// FCM 토큰들 (멀티 기기 지원)
-const FCM_TOKENS = [
+// FCM 토큰들 (멀티 기기 지원) - 중복 제거
+const FCM_TOKENS = [...new Set([
     process.env.FCM_TOKEN_MACBOOK,
     process.env.FCM_TOKEN_IPHONE,
     process.env.FCM_TOKEN // 기존 호환성
-].filter(token => token && token !== 'temporary-token-will-be-replaced');
+].filter(token => token && token !== 'temporary-token-will-be-replaced'))];
 
 // 알림 내역 저장 (메모리 내 저장, 실제 환경에서는 DB 사용 권장)
 let notificationHistory = [];
@@ -568,12 +568,15 @@ function getMockNotionData() {
 async function sendPushNotification(title, body, data = {}) {
     console.log('=== FCM 디버깅 정보 ===');
     console.log('FCM_TOKENS 개수:', FCM_TOKENS.length);
-    console.log('FCM_TOKENS 내용:', FCM_TOKENS.map(token => token ? token.substring(0, 20) + '...' : 'null'));
+    console.log('고유 토큰 확인:', FCM_TOKENS.map((token, i) => 
+        token ? `토큰${i+1}: ${token.substring(0, 10)}...${token.substring(token.length-5)}` : 'null'
+    ));
     console.log('Firebase Admin Apps 개수:', admin.apps.length);
     console.log('환경 변수 체크:');
-    console.log('- FCM_TOKEN_MACBOOK:', process.env.FCM_TOKEN_MACBOOK ? process.env.FCM_TOKEN_MACBOOK.substring(0, 20) + '...' : 'undefined');
-    console.log('- FCM_TOKEN_IPHONE:', process.env.FCM_TOKEN_IPHONE ? process.env.FCM_TOKEN_IPHONE.substring(0, 20) + '...' : 'undefined');
-    console.log('- FCM_TOKEN:', process.env.FCM_TOKEN ? process.env.FCM_TOKEN.substring(0, 20) + '...' : 'undefined');
+    console.log('- FCM_TOKEN_MACBOOK:', process.env.FCM_TOKEN_MACBOOK ? process.env.FCM_TOKEN_MACBOOK.substring(0, 10) + '...' : 'undefined');
+    console.log('- FCM_TOKEN_IPHONE:', process.env.FCM_TOKEN_IPHONE ? process.env.FCM_TOKEN_IPHONE.substring(0, 10) + '...' : 'undefined');
+    console.log('- FCM_TOKEN:', process.env.FCM_TOKEN ? process.env.FCM_TOKEN.substring(0, 10) + '...' : 'undefined');
+    console.log('중복 제거 후 실제 전송될 토큰 수:', FCM_TOKENS.length);
     console.log('=======================');
     
     // 알림 내역 저장
