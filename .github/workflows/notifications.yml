@@ -28,6 +28,11 @@ jobs:
   send-notifications:
     runs-on: ubuntu-latest
     
+    # 중복 실행 방지
+    concurrency:
+      group: notifications-${{ github.event_name }}-${{ github.event.inputs.notification_type || 'scheduled' }}
+      cancel-in-progress: false
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4

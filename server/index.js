@@ -721,9 +721,64 @@ async function checkWeatherChanges() {
     }
 }
 
+// 실행 잠금 파일 경로
+const EXECUTION_LOCK_FILE = path.join(__dirname, '..', 'data', 'execution.lock');
+
+// 실행 잠금 확인 및 설정
+async function acquireExecutionLock(functionName, timeoutMs = 300000) { // 5분 타임아웃
+    try {
+        await fs.mkdir(path.dirname(EXECUTION_LOCK_FILE), { recursive: true });
+        
+        // 기존 잠금 파일 확인
+        try {
+            const lockData = await fs.readFile(EXECUTION_LOCK_FILE, 'utf8');
+            const lock = JSON.parse(lockData);
+            const lockAge = Date.now() - lock.timestamp;
+            
+            if (lock.function === functionName && lockAge < timeoutMs) {
+                console.warn(`⚠️ [${functionName}] 이미 실행 중입니다. 잠금 시간: ${new Date(lock.timestamp).toISOString()}`);
+                return false;
+            }
+        } catch (error) {
+            // 잠금 파일이 없거나 읽기 실패 = 실행 가능
+        }
+        
+        // 새 잠금 설정
+        const lockData = {
+            function: functionName,
+            timestamp: Date.now(),
+            executionId: `${functionName}-${Date.now()}`
+        };
+        
+        await fs.writeFile(EXECUTION_LOCK_FILE, JSON.stringify(lockData, null, 2));
+        console.log(`🔒 [${functionName}] 실행 잠금 설정: ${lockData.executionId}`);
+        return lockData.executionId;
+        
+    } catch (error) {
+        console.error(`실행 잠금 설정 실패:`, error);
+        return `${functionName}-${Date.now()}`; // 실패해도 실행은 계속
+    }
+}
+
+// 실행 잠금 해제
+async function releaseExecutionLock() {
+    try {
+        await fs.unlink(EXECUTION_LOCK_FILE);
+        console.log(`🔓 실행 잠금 해제`);
+    } catch (error) {
+        // 잠금 파일이 없어도 괜찮음
+    }
+}
+
 // 아침 브리핑 알림
 async function sendMorningBriefing() {
-    const executionId = `morning-${Date.now()}`;
+    const executionId = await acquireExecutionLock('morning_briefing');
+    
+    if (!executionId) {
+        console.log('아침 브리핑이 이미 실행 중이므로 종료');
+        return;
+    }
+    
     console.log(`🚀 [${executionId}] sendMorningBriefing 시작`);
     
     try {
@@ -891,6 +946,8 @@ async function sendMorningBriefing() {
         
     } catch (error) {
         console.error(`❌ [${executionId}] 아침 브리핑 오류:`, error);
+    } finally {
+        await releaseExecutionLock();
     }
 }
 
