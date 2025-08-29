@@ -210,6 +210,19 @@
             <div class="status-value" id="systemStatus">초기화 중...</div>
         </div>
         
+        <!-- GitHub Actions 모니터링 -->
+        <div class="status-card">
+            <div class="status-title">
+                <span>🚀</span>
+                <span>GitHub Actions 모니터링</span>
+            </div>
+            <div class="status-value">
+                <div>메시지 수신: <span id="githubMessageCount">0</span>개</div>
+                <div>마지막 수신: <span id="lastGithubMessage">-</span></div>
+                <button onclick="clearGithubMonitoring()" style="margin-top: 5px; padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 5px; cursor: pointer;">카운터 초기화</button>
+            </div>
+        </div>
+        
         <!-- 테스트 버튼들 (자주 사용하는 기능만) -->
         <button onclick="testMorningBriefing()" id="morningBtn" disabled>🌅 아침 브리핑 테스트</button>
         <button onclick="testEveningPrep()" id="eveningBtn" disabled>🌆 저녁 준비 테스트</button>
@@ -431,6 +444,52 @@
             }, 600);
         }
         
+        // GitHub Actions 모니터링 함수들
+        function updateGithubMonitoring(notification) {
+            const count = parseInt(localStorage.getItem('githubMessageCount') || '0') + 1;
+            localStorage.setItem('githubMessageCount', count.toString());
+            localStorage.setItem('lastGithubMessage', notification.timestamp);
+            
+            document.getElementById('githubMessageCount').textContent = count;
+            document.getElementById('lastGithubMessage').textContent = formatTimeAgo(notification.timestamp);
+            
+            log(`🚀 GitHub Actions 알림 #${count}: ${notification.title}`, 'success');
+        }
+        
+        function clearGithubMonitoring() {
+            localStorage.setItem('githubMessageCount', '0');
+            localStorage.removeItem('lastGithubMessage');
+            
+            document.getElementById('githubMessageCount').textContent = '0';
+            document.getElementById('lastGithubMessage').textContent = '-';
+            
+            log('GitHub Actions 카운터가 초기화되었습니다', 'info');
+        }
+        
+        function formatTimeAgo(timestamp) {
+            const now = new Date();
+            const time = new Date(timestamp);
+            const diffMs = now - time;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return '방금 전';
+            if (diffMins < 60) return `${diffMins}분 전`;
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours}시간 전`;
+            
+            return time.toLocaleString('ko-KR');
+        }
+        
+        function loadGithubMonitoring() {
+            const count = localStorage.getItem('githubMessageCount') || '0';
+            const lastMessage = localStorage.getItem('lastGithubMessage');
+            
+            document.getElementById('githubMessageCount').textContent = count;
+            document.getElementById('lastGithubMessage').textContent = 
+                lastMessage ? formatTimeAgo(lastMessage) : '-';
+        }
+        
         // Service Worker 메시지 리스너 (FCM 알림 저장용)
         function setupServiceWorkerMessageListener() {
             console.log('[MAIN] Service Worker 메시지 리스너 설정');
@@ -441,6 +500,16 @@
                 if (event.data && event.data.type === 'NOTIFICATION_RECEIVED') {
                     const notification = event.data.notification;
                     console.log('[MAIN] FCM 알림 데이터 처리:', notification);
+                    
+                    // GitHub Actions 메시지인지 확인
+                    if (notification.source === 'github-actions') {
+                        console.log('🚀 [MAIN] GitHub Actions 알림 수신됨!');
+                        console.log('🚀 [MAIN] ExecutionId:', notification.executionId);
+                        log(`GitHub Actions 알림 수신: ${notification.title}`, 'success');
+                        
+                        // GitHub Actions 카운터 업데이트
+                        updateGithubMonitoring(notification);
+                    }
                     
                     // 기존 히스토리 가져오기
                     const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
@@ -513,6 +582,9 @@
             // Service Worker 메시지 리스너 설정
             setupServiceWorkerMessageListener();
             
+            // GitHub Actions 모니터링 로드
+            loadGithubMonitoring();
+            
             // 테스트 데이터 추가 (최초 1회만)
             addTestNotificationData();
             
@@ -524,6 +596,9 @@
             
             // 5초마다 상태 업데이트
             setInterval(updateStatus, 5000);
+            
+            // 1분마다 GitHub Actions 모니터링 시간 업데이트
+            setInterval(loadGithubMonitoring, 60000);
         });
         
         // FCM 메시지 수신 처리 및 내역 저장

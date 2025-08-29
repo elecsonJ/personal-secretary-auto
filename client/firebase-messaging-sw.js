@@ -23,9 +23,19 @@ const messaging = firebase.messaging();
 
 // 백그라운드 메시지 처리
 messaging.onBackgroundMessage((payload) => {
+    const timestamp = new Date().toISOString();
     console.log('=== [firebase-messaging-sw.js] 백그라운드 메시지 수신 ===');
+    console.log('[TIMESTAMP]', timestamp);
     console.log('[FULL PAYLOAD]', JSON.stringify(payload, null, 2));
     console.log('[PAYLOAD KEYS]', Object.keys(payload || {}));
+    
+    // GitHub Actions 여부 감지
+    const isFromGitHub = payload.data?.executionId ? true : false;
+    console.log('[GITHUB_ACTIONS_MESSAGE]', isFromGitHub);
+    if (isFromGitHub) {
+        console.log('[EXECUTION_ID]', payload.data.executionId);
+        console.log('🚀 [GitHub Actions에서 발송된 메시지 감지됨!]');
+    }
     
     // payload.data 상세 분석
     console.log('[DATA EXISTS]', !!payload.data);
@@ -79,11 +89,17 @@ messaging.onBackgroundMessage((payload) => {
         title: notificationTitle,
         body: notificationBody,
         data: payload.data || {},
-        timestamp: new Date().toISOString(),
-        sent: true
+        timestamp: timestamp, // 일관된 timestamp 사용
+        sent: true,
+        source: isFromGitHub ? 'github-actions' : 'manual', // 메시지 출처 표시
+        executionId: payload.data?.executionId || null
     };
     
     console.log('[STORAGE] 메인 스레드로 알림 데이터 전송:', notificationData);
+    
+    if (isFromGitHub) {
+        console.log('🚀 [GitHub Actions 알림을 localStorage에 저장 시도]');
+    }
     
     // 모든 활성 클라이언트에게 메시지 전송
     self.clients.matchAll().then(clients => {

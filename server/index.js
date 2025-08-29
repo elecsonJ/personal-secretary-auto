@@ -636,6 +636,11 @@ async function sendPushNotification(title, body, data = {}) {
             };
             
             console.log(`📤 [${execId}] 전송할 FCM 메시지 데이터:`, messageData);
+            console.log(`🚀 [${execId}] GitHub Actions 실행 여부:`, !!data.executionId);
+            if (data.executionId) {
+                console.log(`🚀 [${execId}] GitHub Actions ExecutionId:`, data.executionId);
+                console.log(`🚀 [${execId}] 이 메시지는 GitHub Actions에서 발송됩니다!`);
+            }
             
             const message = {
                 // notification 페이로드 제거 - 중복 알림 방지
