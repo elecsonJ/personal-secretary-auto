@@ -24,6 +24,9 @@ const messaging = firebase.messaging();
 // 백그라운드 메시지 처리
 messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] 백그라운드 메시지 수신:', payload);
+    console.log('[DEBUG] payload.data:', payload.data);
+    console.log('[DEBUG] payload.data.title:', payload.data?.title);
+    console.log('[DEBUG] payload.data.body:', payload.data?.body);
     
     // data-only 페이로드에서 title, body 추출
     const notificationTitle = payload.data?.title || '개인 비서 알림';
