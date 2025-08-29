@@ -257,8 +257,17 @@ function parseWeatherData(items) {
     
     const currentRainItem = rainItems[0];
     const currentTempItem = tempItems[0];
-    const maxTempItem = maxTempItems[0];
-    const minTempItem = minTempItems[0];
+    const maxTempItem = maxTempItems.length > 0 ? maxTempItems[0] : null;
+    const minTempItem = minTempItems.length > 0 ? minTempItems[0] : null;
+    
+    // TMX, TMN이 없는 경우 TMP에서 최고/최저값 계산
+    let calculatedMaxTemp = null;
+    let calculatedMinTemp = null;
+    if (tempItems.length > 0) {
+        const temps = tempItems.map(item => parseInt(item.fcstValue));
+        calculatedMaxTemp = Math.max(...temps);
+        calculatedMinTemp = Math.min(...temps);
+    }
     
     // 강수 시간대 분석
     const rainPeriods = [];
@@ -303,8 +312,10 @@ function parseWeatherData(items) {
     return {
         rainProbability: currentRainItem ? `${currentRainItem.fcstValue}%` : '0%',
         temperature: currentTempItem ? `${currentTempItem.fcstValue}°C` : 'N/A',
-        maxTemperature: maxTempItem ? `${maxTempItem.fcstValue}°C` : null,
-        minTemperature: minTempItem ? `${minTempItem.fcstValue}°C` : null,
+        maxTemperature: maxTempItem ? `${maxTempItem.fcstValue}°C` : 
+                       calculatedMaxTemp ? `${calculatedMaxTemp}°C` : null,
+        minTemperature: minTempItem ? `${minTempItem.fcstValue}°C` : 
+                       calculatedMinTemp ? `${calculatedMinTemp}°C` : null,
         hasRain: currentRainItem ? parseInt(currentRainItem.fcstValue) > 30 : false,
         rainPeriods: rainPeriods,
         maxPrecipitation: maxPrecip,
@@ -837,41 +848,28 @@ async function sendEveningPrep() {
         await sendPushNotification('🗓️ 내일 일정', tomorrowMessage, { type: 'task_daily' });
         
         // 0.5초 후 남은 우선순위 작업 알림
-        setTimeout(async () => {
-            let remainingMessage = '🌆 오늘 남은 우선순위 작업';
-            if (highMiddleTasks.length === 0) {
-                remainingMessage += '\n\n우선순위 작업이 모두 완료되었습니다!\n내일을 위해 정리하고 푹 쉬세요! 🛌';
-            } else {
-                remainingMessage += `\n\n아직 ${highMiddleTasks.length}개의 우선순위 작업이 남아있습니다.\n내일을 위해 정리하고 푹 쉬세요! 🛌`;
-            }
-            
-            await sendPushNotification('🌆 오늘 남은 우선순위 작업', remainingMessage, { type: 'task_daily' });
-        }, 500);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        let remainingMessage = '🌆 오늘 남은 우선순위 작업';
+        if (highMiddleTasks.length === 0) {
+            remainingMessage += '\n\n우선순위 작업이 모두 완료되었습니다!\n내일을 위해 정리하고 푹 쉬세요! 🛌';
+        } else {
+            remainingMessage += `\n\n아직 ${highMiddleTasks.length}개의 우선순위 작업이 남아있습니다.\n내일을 위해 정리하고 푹 쉬세요! 🛌`;
+        }
+        
+        await sendPushNotification('🌆 오늘 남은 우선순위 작업', remainingMessage, { type: 'task_daily' });
         
     } catch (error) {
         console.error('저녁 준비 알림 오류:', error);
     }
 }
 
-// 크론 작업 설정
+// 크론 작업 설정 (GitHub Actions에서 대체하므로 비활성화)
 function setupCronJobs() {
-    // 3시간마다 날씨 변화 감지
-    cron.schedule('0 */3 * * *', () => {
-        console.log('날씨 변화 감지 실행:', new Date().toISOString());
-        checkWeatherChanges();
-    });
-    
-    // 매일 오전 7시 아침 브리핑
-    cron.schedule('0 7 * * *', () => {
-        console.log('아침 브리핑 실행:', new Date().toISOString());
-        sendMorningBriefing();
-    });
-    
-    // 매일 오후 9시 저녁 내일 준비
-    cron.schedule('0 21 * * *', () => {
-        console.log('저녁 준비 알림 실행:', new Date().toISOString());
-        sendEveningPrep();
-    });
+    console.log('크론 작업은 GitHub Actions에서 실행됩니다.');
+    // GitHub Actions 워크플로우가 모든 스케줄링을 담당
+    // - 2시간마다 날씨 변화 감지
+    // - 매일 오전 7시 아침 브리핑  
+    // - 매일 오후 9시 저녁 준비
 }
 
 // 서버 시작
@@ -890,10 +888,9 @@ if (require.main === module) {
                 lastWeatherCheck: lastWeatherCheck ? lastWeatherCheck.timestamp : null
             }));
         } else if (req.url === '/test-notifications') {
-            // 테스트용 엔드포인트
-            sendMorningBriefing();
+            // 테스트용 엔드포인트 (GitHub Actions에서 대체)
             res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Test notifications sent');
+            res.end('Use GitHub Actions "Run workflow" instead');
         } else {
             res.writeHead(404);
             res.end('Not Found');
