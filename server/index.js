@@ -579,6 +579,10 @@ function getMockNotionData() {
 
 // FCM 푸시 알림 전송 (멀티 기디) + 내역 저장
 async function sendPushNotification(title, body, data = {}) {
+    const pushId = `push-${Date.now()}`;
+    const execId = data.executionId || 'unknown';
+    
+    console.log(`🔔 [${execId}] [${pushId}] "${title}" 알림 전송 시작`);
     console.log('=== FCM 디버깅 정보 ===');
     console.log('FCM_TOKENS 개수:', FCM_TOKENS.length);
     console.log('고유 토큰 확인:', FCM_TOKENS.map((token, i) => 
@@ -637,7 +641,7 @@ async function sendPushNotification(title, body, data = {}) {
         }
     }
     
-    console.log(`총 ${FCM_TOKENS.length}개 기기에 알림 전송 완료`);
+    console.log(`✅ [${execId}] [${pushId}] 총 ${FCM_TOKENS.length}개 기기에 알림 전송 완료`);
     return results;
 }
 
@@ -719,6 +723,9 @@ async function checkWeatherChanges() {
 
 // 아침 브리핑 알림
 async function sendMorningBriefing() {
+    const executionId = `morning-${Date.now()}`;
+    console.log(`🚀 [${executionId}] sendMorningBriefing 시작`);
+    
     try {
         const weather = await getWeatherData();
         const { todayEvents, highMiddleTasks } = await getNotionData();
@@ -770,7 +777,8 @@ async function sendMorningBriefing() {
             weatherMessage = '날씨 정보 없음';
         }
         
-        await sendPushNotification('🌅 날씨 브리핑', weatherMessage, { type: 'weather_daily' });
+        console.log(`📧 [${executionId}] 날씨 브리핑 알림 전송`);
+        await sendPushNotification('🌅 날씨 브리핑', weatherMessage, { type: 'weather_daily', executionId });
         
         // 0.5초 대기 후 캘린더 알림
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -784,7 +792,8 @@ async function sendMorningBriefing() {
             });
         }
         
-        await sendPushNotification('📅 오늘 일정', calendarMessage, { type: 'task_daily' });
+        console.log(`📧 [${executionId}] 오늘 일정 알림 전송`);
+        await sendPushNotification('📅 오늘 일정', calendarMessage, { type: 'task_daily', executionId });
         
         // 0.5초 대기 후 우선순위 태스크 알림
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -798,7 +807,8 @@ async function sendMorningBriefing() {
             });
         }
         
-        await sendPushNotification('🎯 우선순위 태스크', taskMessage, { type: 'task_urgent' });
+        console.log(`📧 [${executionId}] 우선순위 태스크 알림 전송`);
+        await sendPushNotification('🎯 우선순위 태스크', taskMessage, { type: 'task_urgent', executionId });
         
         // 0.5초 대기 후 메인 뉴스
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -811,7 +821,8 @@ async function sendMorningBriefing() {
             ).join('\n');
         }
         
-        await sendPushNotification('📰 주요 뉴스', mainNewsMessage, { type: 'news_main' });
+        console.log(`📧 [${executionId}] 주요 뉴스 알림 전송`);
+        await sendPushNotification('📰 주요 뉴스', mainNewsMessage, { type: 'news_main', executionId });
         
         // 0.5초 대기 후 기술 뉴스
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -824,7 +835,8 @@ async function sendMorningBriefing() {
             ).join('\n');
         }
         
-        await sendPushNotification('🤖 기술 뉴스', techNewsMessage, { type: 'news_tech' });
+        console.log(`📧 [${executionId}] 기술 뉴스 알림 전송`);
+        await sendPushNotification('🤖 기술 뉴스', techNewsMessage, { type: 'news_tech', executionId });
         
         // 0.5초 대기 후 과학 뉴스
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -837,7 +849,8 @@ async function sendMorningBriefing() {
             ).join('\n');
         }
         
-        await sendPushNotification('🔬 과학 뉴스', scienceNewsMessage, { type: 'news_science' });
+        console.log(`📧 [${executionId}] 과학 뉴스 알림 전송`);
+        await sendPushNotification('🔬 과학 뉴스', scienceNewsMessage, { type: 'news_science', executionId });
         
         // 0.5초 대기 후 경제 뉴스
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -850,7 +863,8 @@ async function sendMorningBriefing() {
             ).join('\n');
         }
         
-        await sendPushNotification('💰 경제 뉴스', businessNewsMessage, { type: 'news_business' });
+        console.log(`📧 [${executionId}] 경제 뉴스 알림 전송`);
+        await sendPushNotification('💰 경제 뉴스', businessNewsMessage, { type: 'news_business', executionId });
         
         // 0.5초 대기 후 내일 일정 알림
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -870,10 +884,13 @@ async function sendMorningBriefing() {
             });
         }
         
-        await sendPushNotification('📅 내일 일정', tomorrowMessage, { type: 'task_daily' });
+        console.log(`📧 [${executionId}] 내일 일정 알림 전송`);
+        await sendPushNotification('📅 내일 일정', tomorrowMessage, { type: 'task_daily', executionId });
+        
+        console.log(`✅ [${executionId}] sendMorningBriefing 완료`);
         
     } catch (error) {
-        console.error('아침 브리핑 오류:', error);
+        console.error(`❌ [${executionId}] 아침 브리핑 오류:`, error);
     }
 }
 
