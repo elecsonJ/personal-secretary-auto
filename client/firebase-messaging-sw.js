@@ -23,20 +23,55 @@ const messaging = firebase.messaging();
 
 // 백그라운드 메시지 처리
 messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] 백그라운드 메시지 수신:', JSON.stringify(payload, null, 2));
-    console.log('[DEBUG] payload.data:', JSON.stringify(payload.data, null, 2));
-    console.log('[DEBUG] payload.data keys:', Object.keys(payload.data || {}));
-    console.log('[DEBUG] payload.data.title:', payload.data?.title);
-    console.log('[DEBUG] payload.data.body:', payload.data?.body);
-    console.log('[DEBUG] payload.data.title type:', typeof payload.data?.title);
-    console.log('[DEBUG] payload.data.body type:', typeof payload.data?.body);
+    console.log('=== [firebase-messaging-sw.js] 백그라운드 메시지 수신 ===');
+    console.log('[FULL PAYLOAD]', JSON.stringify(payload, null, 2));
+    console.log('[PAYLOAD KEYS]', Object.keys(payload || {}));
     
-    // data-only 페이로드에서 title, body 추출
-    const notificationTitle = payload.data?.title || '개인 비서 알림 (fallback)';
-    const notificationBody = payload.data?.body || '새로운 알림이 있습니다. (fallback)';
+    // payload.data 상세 분석
+    console.log('[DATA EXISTS]', !!payload.data);
+    console.log('[DATA CONTENT]', JSON.stringify(payload.data, null, 2));
+    console.log('[DATA KEYS]', Object.keys(payload.data || {}));
     
-    console.log('[DEBUG] 최종 title:', notificationTitle);
-    console.log('[DEBUG] 최종 body:', notificationBody);
+    // 각 필드별 상세 분석
+    if (payload.data) {
+        for (const [key, value] of Object.entries(payload.data)) {
+            console.log(`[DATA.${key.toUpperCase()}]`, value, `(${typeof value})`);
+        }
+    }
+    
+    // 다양한 접근 방법 시도
+    let notificationTitle = null;
+    let notificationBody = null;
+    
+    // 방법 1: 직접 접근
+    if (payload.data?.title) {
+        notificationTitle = payload.data.title;
+        console.log('[METHOD 1] title found:', notificationTitle);
+    }
+    
+    if (payload.data?.body) {
+        notificationBody = payload.data.body;
+        console.log('[METHOD 1] body found:', notificationBody);
+    }
+    
+    // 방법 2: hasOwnProperty 확인
+    if (payload.data && payload.data.hasOwnProperty('title')) {
+        notificationTitle = payload.data['title'];
+        console.log('[METHOD 2] title found:', notificationTitle);
+    }
+    
+    if (payload.data && payload.data.hasOwnProperty('body')) {
+        notificationBody = payload.data['body'];  
+        console.log('[METHOD 2] body found:', notificationBody);
+    }
+    
+    // fallback 설정
+    notificationTitle = notificationTitle || '개인 비서 알림 (fallback)';
+    notificationBody = notificationBody || '새로운 알림이 있습니다. (fallback)';
+    
+    console.log('[FINAL] title:', notificationTitle);
+    console.log('[FINAL] body:', notificationBody);
+    console.log('=== 메시지 처리 완료 ===');
     
     const notificationOptions = {
         body: notificationBody,
