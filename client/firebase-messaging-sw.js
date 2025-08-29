@@ -23,15 +23,23 @@ const messaging = firebase.messaging();
 
 // 백그라운드 메시지 처리
 messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] 백그라운드 메시지 수신:', payload);
-    console.log('[DEBUG] payload.data:', payload.data);
+    console.log('[firebase-messaging-sw.js] 백그라운드 메시지 수신:', JSON.stringify(payload, null, 2));
+    console.log('[DEBUG] payload.data:', JSON.stringify(payload.data, null, 2));
+    console.log('[DEBUG] payload.data keys:', Object.keys(payload.data || {}));
     console.log('[DEBUG] payload.data.title:', payload.data?.title);
     console.log('[DEBUG] payload.data.body:', payload.data?.body);
+    console.log('[DEBUG] payload.data.title type:', typeof payload.data?.title);
+    console.log('[DEBUG] payload.data.body type:', typeof payload.data?.body);
     
     // data-only 페이로드에서 title, body 추출
-    const notificationTitle = payload.data?.title || '개인 비서 알림';
+    const notificationTitle = payload.data?.title || '개인 비서 알림 (fallback)';
+    const notificationBody = payload.data?.body || '새로운 알림이 있습니다. (fallback)';
+    
+    console.log('[DEBUG] 최종 title:', notificationTitle);
+    console.log('[DEBUG] 최종 body:', notificationBody);
+    
     const notificationOptions = {
-        body: payload.data?.body || '새로운 알림이 있습니다.',
+        body: notificationBody,
         icon: '/icons/icon-192.png',
         badge: '/icons/icon-72.png',
         vibrate: [100, 50, 100],

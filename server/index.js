@@ -645,11 +645,14 @@ async function sendPushNotification(title, body, data = {}) {
             };
             
             const response = await admin.messaging().send(message);
-            console.log(`푸시 알림 전송 성공 (${token.substring(0, 20)}...):`, response);
+            console.log(`✅ 푸시 알림 전송 성공 (${token.substring(0, 10)}...${token.substring(token.length-5)}):`, response);
+            console.log(`📋 전송된 메시지:`, JSON.stringify(message, null, 2));
             results.push({ success: true, token: token.substring(0, 20), response });
             
         } catch (error) {
-            console.error(`푸시 알림 전송 실패 (${token.substring(0, 20)}...):`, error.message);
+            console.error(`❌ 푸시 알림 전송 실패 (${token.substring(0, 10)}...${token.substring(token.length-5)}):`, error.message);
+            console.error(`📋 실패한 메시지:`, JSON.stringify(message, null, 2));
+            console.error(`🔍 에러 상세:`, error);
             results.push({ success: false, token: token.substring(0, 20), error: error.message });
         }
     }
