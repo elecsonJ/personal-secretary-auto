@@ -25,9 +25,10 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] 백그라운드 메시지 수신:', payload);
     
-    const notificationTitle = payload.notification?.title || '개인 비서 알림';
+    // data-only 페이로드에서 title, body 추출
+    const notificationTitle = payload.data?.title || '개인 비서 알림';
     const notificationOptions = {
-        body: payload.notification?.body || '새로운 알림이 있습니다.',
+        body: payload.data?.body || '새로운 알림이 있습니다.',
         icon: '/icons/icon-192.png',
         badge: '/icons/icon-72.png',
         vibrate: [100, 50, 100],

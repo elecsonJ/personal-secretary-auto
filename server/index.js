@@ -628,11 +628,13 @@ async function sendPushNotification(title, body, data = {}) {
     for (const token of FCM_TOKENS) {
         try {
             const message = {
-                notification: {
+                // notification 페이로드 제거 - 중복 알림 방지
+                // FCM 자동 표시 없이 Service Worker에서만 처리
+                data: {
                     title: title,
-                    body: body
+                    body: body,
+                    ...data
                 },
-                data: data,
                 token: token
             };
             
