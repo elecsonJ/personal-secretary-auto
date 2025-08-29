@@ -179,10 +179,11 @@ function getAdaptiveThreshold(prevRain, currentRain) {
     return WEATHER_CHANGE_THRESHOLD;
 }
 
-// FCM 토큰들 (멀티 기기 지원)
+// FCM 토큰들 (멀티 기기 지원) - 임시로 FCM_TOKEN 포함
 const RAW_TOKENS = [
     process.env.FCM_TOKEN_MACBOOK,
-    process.env.FCM_TOKEN_IPHONE
+    process.env.FCM_TOKEN_IPHONE,
+    process.env.FCM_TOKEN // 임시로 추가 - FCM_TOKEN_IPHONE이 잘못된 경우
 ].filter(token => token && token !== 'temporary-token-will-be-replaced');
 
 // 토큰 중복 체크 및 제거

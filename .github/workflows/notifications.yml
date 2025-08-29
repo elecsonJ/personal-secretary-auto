@@ -46,6 +46,7 @@ jobs:
         echo "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" >> $GITHUB_ENV
         echo "FCM_TOKEN_MACBOOK=${{ secrets.FCM_TOKEN_MACBOOK }}" >> $GITHUB_ENV
         echo "FCM_TOKEN_IPHONE=${{ secrets.FCM_TOKEN_IPHONE }}" >> $GITHUB_ENV
+        echo "FCM_TOKEN=${{ secrets.FCM_TOKEN }}" >> $GITHUB_ENV
         echo "NYT_API_KEY=${{ secrets.NYT_API_KEY }}" >> $GITHUB_ENV
         echo "NOTION_API_KEY=${{ secrets.NOTION_API_KEY }}" >> $GITHUB_ENV
         echo "NOTION_CALENDAR_DB_ID=${{ secrets.NOTION_CALENDAR_DB_ID }}" >> $GITHUB_ENV
