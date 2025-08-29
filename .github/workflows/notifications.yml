@@ -43,7 +43,6 @@ jobs:
     - name: Set up environment variables
       run: |
         echo "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" >> $GITHUB_ENV
-        echo "FCM_TOKEN=${{ secrets.FCM_TOKEN }}" >> $GITHUB_ENV
         echo "FCM_TOKEN_MACBOOK=${{ secrets.FCM_TOKEN_MACBOOK }}" >> $GITHUB_ENV
         echo "FCM_TOKEN_IPHONE=${{ secrets.FCM_TOKEN_IPHONE }}" >> $GITHUB_ENV
         echo "NYT_API_KEY=${{ secrets.NYT_API_KEY }}" >> $GITHUB_ENV

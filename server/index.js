@@ -179,12 +179,11 @@ function getAdaptiveThreshold(prevRain, currentRain) {
     return WEATHER_CHANGE_THRESHOLD;
 }
 
-// FCM 토큰들 (멀티 기기 지원) - 중복 제거
-const FCM_TOKENS = [...new Set([
+// FCM 토큰들 (멀티 기기 지원)
+const FCM_TOKENS = [
     process.env.FCM_TOKEN_MACBOOK,
-    process.env.FCM_TOKEN_IPHONE,
-    process.env.FCM_TOKEN // 기존 호환성
-].filter(token => token && token !== 'temporary-token-will-be-replaced'))];
+    process.env.FCM_TOKEN_IPHONE
+].filter(token => token && token !== 'temporary-token-will-be-replaced');
 
 // 알림 내역 저장 (메모리 내 저장, 실제 환경에서는 DB 사용 권장)
 let notificationHistory = [];
@@ -575,8 +574,7 @@ async function sendPushNotification(title, body, data = {}) {
     console.log('환경 변수 체크:');
     console.log('- FCM_TOKEN_MACBOOK:', process.env.FCM_TOKEN_MACBOOK ? process.env.FCM_TOKEN_MACBOOK.substring(0, 10) + '...' : 'undefined');
     console.log('- FCM_TOKEN_IPHONE:', process.env.FCM_TOKEN_IPHONE ? process.env.FCM_TOKEN_IPHONE.substring(0, 10) + '...' : 'undefined');
-    console.log('- FCM_TOKEN:', process.env.FCM_TOKEN ? process.env.FCM_TOKEN.substring(0, 10) + '...' : 'undefined');
-    console.log('중복 제거 후 실제 전송될 토큰 수:', FCM_TOKENS.length);
+    console.log('실제 전송될 토큰 수:', FCM_TOKENS.length);
     console.log('=======================');
     
     // 알림 내역 저장
