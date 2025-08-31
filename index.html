@@ -540,6 +540,7 @@
                     // 기존 히스토리 가져오기
                     const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
                     console.log('[MAIN] 기존 히스토리 항목 수:', history.length);
+                    console.log('[MAIN] 기존 히스토리 내용:', history.slice(0, 3)); // 최근 3개만 로그
                     
                     // 중복 방지: 같은 timestamp의 알림이 이미 있는지 확인
                     const isDuplicate = history.some(item => 
@@ -630,34 +631,7 @@
             setInterval(loadGithubMonitoring, 60000);
         });
         
-        // FCM 메시지 수신 처리 및 내역 저장
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('message', (event) => {
-                if (event.data && event.data.type === 'FCM_MESSAGE') {
-                    log('FCM 메시지 수신: ' + event.data.title, 'success');
-                    
-                    // 알림 내역 저장
-                    const notification = {
-                        id: Date.now(),
-                        title: event.data.title,
-                        body: event.data.body,
-                        data: event.data.data || {},
-                        timestamp: new Date().toISOString(),
-                        sent: true
-                    };
-                    
-                    const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
-                    history.unshift(notification);
-                    
-                    // 최대 100개까지만 보관
-                    if (history.length > 100) {
-                        history.splice(100);
-                    }
-                    
-                    localStorage.setItem('notificationHistory', JSON.stringify(history));
-                }
-            });
-        }
+        // 이 리스너는 제거됨 - Service Worker에서 NOTIFICATION_RECEIVED 타입으로 처리
     </script>
 </body>
 </html>

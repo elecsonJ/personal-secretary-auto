@@ -985,6 +985,48 @@ async function sendMorningBriefing(githubExecutionId = null) {
     }
 }
 
+// 저녁 브리핑 알림 (오후 7시)
+async function sendEveningBriefing(githubExecutionId = null) {
+    try {
+        if (githubExecutionId) {
+            console.log(`🚀 GitHub Actions Execution ID: ${githubExecutionId}`);
+        }
+        
+        const { todayEvents, highMiddleTasks } = await getNotionData();
+        
+        // 남은 일정 확인
+        const now = new Date();
+        const remainingEvents = todayEvents.filter(event => {
+            if (event.time) {
+                const eventTime = new Date(`${now.toDateString()} ${event.time}`);
+                return eventTime > now;
+            }
+            return false;
+        });
+        
+        let briefingMessage = '🌆 오늘 남은 일정';
+        if (remainingEvents.length === 0) {
+            briefingMessage += '\n\n오늘 남은 일정이 없습니다 😌\n좋은 저녁 시간 보내세요!';
+        } else {
+            briefingMessage += '\n\n';
+            remainingEvents.forEach((event, index) => {
+                const emoji = ['📅', '⏰', '📝', '💼', '🎯'][index % 5];
+                briefingMessage += `${emoji} ${event.name}`;
+                if (event.time) briefingMessage += ` (${event.time})`;
+                briefingMessage += index < remainingEvents.length - 1 ? '\n' : '';
+            });
+        }
+        
+        await sendPushNotification('🌆 저녁 브리핑', briefingMessage, { 
+            type: 'evening_briefing', 
+            executionId: githubExecutionId 
+        });
+        
+    } catch (error) {
+        console.error('저녁 브리핑 알림 오류:', error);
+    }
+}
+
 // 저녁 내일 준비 알림
 async function sendEveningPrep(githubExecutionId = null) {
     try {
@@ -1080,6 +1122,7 @@ module.exports = {
     sendPushNotification,
     checkWeatherChanges,
     sendMorningBriefing,
+    sendEveningBriefing,
     sendEveningPrep,
     getWeatherData
 };
