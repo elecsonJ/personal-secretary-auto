@@ -406,12 +406,17 @@ async function getNotionData() {
     }
     
     try {
-        // 한국 시간 기준으로 오늘 날짜 계산
+        // 한국 시간 기준으로 오늘과 내일 날짜 계산
         const koreaTime = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
         const today = koreaTime.toISOString().slice(0, 10);
-        console.log(`Notion API 호출 시작 - 오늘 날짜 (KST): ${today}`);
         
-        // 1. 월간 데이터베이스에서 오늘 일정 가져오기
+        const tomorrow = new Date(koreaTime);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().slice(0, 10);
+        
+        console.log(`Notion API 호출 시작 - 오늘 날짜 (KST): ${today}, 내일 날짜: ${tomorrowStr}`);
+        
+        // 1. 월간 데이터베이스에서 오늘과 내일 일정 가져오기
         const calendarResponse = await fetch(`https://api.notion.com/v1/databases/${NOTION_CALENDAR_DB_ID}/query`, {
             method: 'POST',
             headers: {
@@ -421,11 +426,17 @@ async function getNotionData() {
             },
             body: JSON.stringify({
                 filter: {
-                    and: [
+                    or: [
                         {
                             property: '날짜', // 날짜 속성 이름 (한글)
                             date: {
-                                equals: today  // 오늘 일정만
+                                equals: today  // 오늘 일정
+                            }
+                        },
+                        {
+                            property: '날짜', // 날짜 속성 이름 (한글)
+                            date: {
+                                equals: tomorrowStr  // 내일 일정
                             }
                         }
                     ]
@@ -451,20 +462,10 @@ async function getNotionData() {
             },
             body: JSON.stringify({
                 filter: {
-                    or: [
-                        {
-                            property: 'Status', // 상태 속성 이름 (실제로는 Status)
-                            status: {
-                                equals: 'HIGH'
-                            }
-                        },
-                        {
-                            property: 'Status',
-                            status: {
-                                equals: 'Middle'
-                            }
-                        }
-                    ]
+                    property: 'Status', // 상태 속성 이름 (실제로는 Status)
+                    status: {
+                        equals: 'HIGH'
+                    }
                 }
             })
         });
@@ -493,7 +494,10 @@ async function getNotionData() {
             type: 'event'
         })) || [];
         
-        const highMiddleTasks = tasksData.results?.map(page => ({
+        const highMiddleTasks = tasksData.results?.filter(page => {
+            const priority = page.properties.Status?.status?.name || 'Unknown';
+            return priority === 'HIGH';
+        }).map(page => ({
             name: page.properties.Name?.title?.[0]?.plain_text || '제목 없음',
             priority: page.properties.Status?.status?.name || 'Unknown' // status 속성 사용
         })) || [];
@@ -563,23 +567,32 @@ async function getTomorrowEvents(tomorrowDate) {
 
 // 노션 모의 데이터 (fallback용)
 function getMockNotionData() {
-    const today = new Date().toISOString().slice(0, 10);
+    const koreaTime = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+    const today = koreaTime.toISOString().slice(0, 10);
     
-    // 캘린더 이벤트
+    const tomorrow = new Date(koreaTime);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().slice(0, 10);
+    
+    // 캘린더 이벤트 (오늘과 내일 포함)
     const calendarEvents = [
-        { name: '회식?', date: '2025-08-27', type: 'social' },
-        { name: 'AI보안특강', date: '2025-09-03', type: 'lecture' }
+        { name: '회식?', date: today, type: 'social' },
+        { name: 'AI보안특강', date: tomorrowStr, type: 'lecture' },
+        { name: '팀 미팅', date: tomorrowStr, type: 'meeting' }
     ];
     
     // 우선순위 태스크
     const priorityTasks = [
         { name: '블로그수익화', status: 'Middle', priority: 'Middle' },
-        { name: '백준17352유니온파인드구현', status: 'low', priority: 'low' }
+        { name: '백준17352유니온파인드구현', status: 'low', priority: 'low' },
+        { name: '포트폴리오 정리', status: 'HIGH', priority: 'HIGH' },
+        { name: '면접 준비', status: 'HIGH', priority: 'HIGH' }
     ];
     
-    const todayEvents = calendarEvents.filter(event => event.date === today);
+    // 오늘과 내일 일정 모두 반환 (필터링은 사용하는 곳에서)
+    const todayEvents = calendarEvents;
     const highMiddleTasks = priorityTasks.filter(task => 
-        task.priority === 'HIGH' || task.priority === 'Middle'
+        task.priority === 'HIGH'
     );
     
     return { todayEvents, highMiddleTasks };
@@ -1005,32 +1018,48 @@ async function sendEveningBriefing(githubExecutionId = null) {
             console.log(`🚀 GitHub Actions Execution ID: ${githubExecutionId}`);
         }
         
+        // 한국 시간 기준으로 내일 날짜 계산
+        const koreaTime = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+        const tomorrow = new Date(koreaTime);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowDateStr = tomorrow.toISOString().slice(0, 10);
+        
+        console.log(`내일 날짜 (KST): ${tomorrowDateStr}`);
+        
+        // 내일 일정과 HIGH 우선순위 태스크 가져오기
         const { todayEvents, highMiddleTasks } = await getNotionData();
         
-        // 남은 일정 확인
-        const now = new Date();
-        const remainingEvents = todayEvents.filter(event => {
-            if (event.time) {
-                const eventTime = new Date(`${now.toDateString()} ${event.time}`);
-                return eventTime > now;
-            }
-            return false;
-        });
+        // 내일 일정 필터링 (모든 일정 데이터에서 내일 날짜와 매칭)
+        const tomorrowEvents = todayEvents.filter(event => event.date === tomorrowDateStr);
         
-        let briefingMessage = '🌆 오늘 남은 일정';
-        if (remainingEvents.length === 0) {
-            briefingMessage += '\n\n오늘 남은 일정이 없습니다 😌\n좋은 저녁 시간 보내세요!';
-        } else {
-            briefingMessage += '\n\n';
-            remainingEvents.forEach((event, index) => {
-                const emoji = ['📅', '⏰', '📝', '💼', '🎯'][index % 5];
+        let briefingMessage = '🌅 내일 준비';
+        
+        // 내일 일정 추가
+        if (tomorrowEvents.length > 0) {
+            briefingMessage += '\n\n📅 내일 일정:\n';
+            tomorrowEvents.forEach((event, index) => {
+                const emoji = ['📝', '💼', '🎯', '⏰', '📞'][index % 5];
                 briefingMessage += `${emoji} ${event.name}`;
                 if (event.time) briefingMessage += ` (${event.time})`;
-                briefingMessage += index < remainingEvents.length - 1 ? '\n' : '';
+                briefingMessage += index < tomorrowEvents.length - 1 ? '\n' : '';
+            });
+        } else {
+            briefingMessage += '\n\n📅 내일 일정이 없습니다';
+        }
+        
+        // HIGH 우선순위 태스크 추가
+        if (highMiddleTasks.length > 0) {
+            briefingMessage += '\n\n🎯 우선 처리할 일:\n';
+            highMiddleTasks.forEach((task, index) => {
+                const emoji = ['🔥', '⚡', '🎯', '💪', '🚀'][index % 5];
+                briefingMessage += `${emoji} ${task.name}`;
+                briefingMessage += index < highMiddleTasks.length - 1 ? '\n' : '';
             });
         }
         
-        await sendPushNotification('🌆 저녁 브리핑', briefingMessage, { 
+        briefingMessage += '\n\n좋은 저녁 보내시고 내일도 화이팅! 💪';
+        
+        await sendPushNotification('🌅 저녁 브리핑', briefingMessage, { 
             type: 'evening_briefing', 
             executionId: githubExecutionId 
         });
@@ -1137,5 +1166,6 @@ module.exports = {
     sendMorningBriefing,
     sendEveningBriefing,
     sendEveningPrep,
-    getWeatherData
+    getWeatherData,
+    getNotionData
 };
