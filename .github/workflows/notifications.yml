@@ -76,11 +76,11 @@ jobs:
         
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
           echo "action=${{ github.event.inputs.notification_type }}" >> $GITHUB_OUTPUT
-        elif [ "$HOUR" = "07" ] && [ "$MINUTE" -lt "15" ]; then
+        elif [ "$HOUR" = "07" ] && [ "$MINUTE" -lt "30" ]; then
           echo "action=morning_briefing" >> $GITHUB_OUTPUT
-        elif [ "$HOUR" = "19" ] && [ "$MINUTE" -lt "15" ]; then
+        elif [ "$HOUR" = "19" ] && [ "$MINUTE" -lt "30" ]; then
           echo "action=evening_briefing" >> $GITHUB_OUTPUT
-        elif [ "$HOUR" = "21" ] && [ "$MINUTE" -lt "15" ]; then
+        elif [ "$HOUR" = "21" ] && [ "$MINUTE" -lt "30" ]; then
           echo "action=evening_prep" >> $GITHUB_OUTPUT
         else
           echo "action=weather_check" >> $GITHUB_OUTPUT

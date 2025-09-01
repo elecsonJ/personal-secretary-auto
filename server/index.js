@@ -205,11 +205,14 @@ let notificationHistory = [];
 // 날씨 API 호출
 async function getWeatherData() {
     try {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const hour = String(now.getHours()).padStart(2, '0');
+        // 한국 시간 기준으로 계산
+        const koreaTime = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+        const year = koreaTime.getFullYear();
+        const month = String(koreaTime.getMonth() + 1).padStart(2, '0');
+        const day = String(koreaTime.getDate()).padStart(2, '0');
+        const hour = String(koreaTime.getHours()).padStart(2, '0');
+        
+        console.log(`날씨 API 호출 - 한국시간: ${year}-${month}-${day} ${hour}:00`);
         
         // 기상청 API 업데이트 시간
         const availableHours = ['02', '05', '08', '11', '14', '17', '20', '23'];
@@ -224,9 +227,12 @@ async function getWeatherData() {
         
         let baseDate = `${year}${month}${day}`;
         if (hour < '02') {
-            const yesterday = new Date(now);
+            const yesterday = new Date(koreaTime);
             yesterday.setDate(yesterday.getDate() - 1);
-            baseDate = yesterday.toISOString().slice(0, 10).replace(/-/g, '');
+            const yesterdayYear = yesterday.getFullYear();
+            const yesterdayMonth = String(yesterday.getMonth() + 1).padStart(2, '0');
+            const yesterdayDay = String(yesterday.getDate()).padStart(2, '0');
+            baseDate = `${yesterdayYear}${yesterdayMonth}${yesterdayDay}`;
             baseTime = '23';
         }
         
@@ -400,8 +406,10 @@ async function getNotionData() {
     }
     
     try {
-        const today = new Date().toISOString().slice(0, 10);
-        console.log(`Notion API 호출 시작 - 오늘 날짜: ${today}`);
+        // 한국 시간 기준으로 오늘 날짜 계산
+        const koreaTime = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+        const today = koreaTime.toISOString().slice(0, 10);
+        console.log(`Notion API 호출 시작 - 오늘 날짜 (KST): ${today}`);
         
         // 1. 월간 데이터베이스에서 오늘 일정 가져오기
         const calendarResponse = await fetch(`https://api.notion.com/v1/databases/${NOTION_CALENDAR_DB_ID}/query`, {
@@ -813,6 +821,11 @@ async function sendMorningBriefing(githubExecutionId = null) {
     
     try {
         const weather = await getWeatherData();
+        console.log(`[${executionId}] 날씨 데이터 수신:`, weather ? '성공' : '실패');
+        if (!weather) {
+            console.error(`[${executionId}] 날씨 API 실패 - getWeatherData가 null 반환`);
+        }
+        
         const { todayEvents, highMiddleTasks } = await getNotionData();
         const topStories = await getNYTTopStories();
         
