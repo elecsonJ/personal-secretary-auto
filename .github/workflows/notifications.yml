@@ -9,8 +9,6 @@ on:
     - cron: '0 22 * * *'  
     # 매일 오후 7시 저녁 브리핑 (한국시간 오후 7시 = UTC 당일 10시)
     - cron: '0 10 * * *'
-    # 매일 오후 9시 저녁 준비 (한국시간 오후 9시 = UTC 당일 12시)
-    - cron: '0 12 * * *'
   
   # 수동 실행 가능
   workflow_dispatch:
@@ -24,7 +22,6 @@ on:
         - weather_check
         - morning_briefing
         - evening_briefing
-        - evening_prep
         - test_all
 
 jobs:
@@ -80,8 +77,6 @@ jobs:
           echo "action=morning_briefing" >> $GITHUB_OUTPUT
         elif [ "$HOUR" = "19" ] && [ "$MINUTE" -lt "30" ]; then
           echo "action=evening_briefing" >> $GITHUB_OUTPUT
-        elif [ "$HOUR" = "21" ] && [ "$MINUTE" -lt "30" ]; then
-          echo "action=evening_prep" >> $GITHUB_OUTPUT
         else
           echo "action=weather_check" >> $GITHUB_OUTPUT
         fi
@@ -137,29 +132,12 @@ jobs:
         });
         "
     
-    - name: Send evening prep
-      if: steps.determine_action.outputs.action == 'evening_prep'
-      run: |
-        cd server
-        node -e "
-        const { sendEveningPrep } = require('./index.js');
-        const executionId = 'github-actions-${{ github.run_id }}-${{ github.run_number }}';
-        console.log('GitHub Actions Execution ID:', executionId);
-        sendEveningPrep(executionId).then(() => {
-          console.log('저녁 준비 알림 전송 완료');
-          process.exit(0);
-        }).catch(err => {
-          console.error('저녁 준비 알림 실패:', err);
-          process.exit(1);
-        });
-        "
-    
     - name: Test all notifications
       if: steps.determine_action.outputs.action == 'test_all'
       run: |
         cd server
         node -e "
-        const { sendMorningBriefing, sendEveningBriefing, sendEveningPrep, checkWeatherChanges } = require('./index.js');
+        const { sendMorningBriefing, sendEveningBriefing, checkWeatherChanges } = require('./index.js');
         const executionId = 'github-actions-${{ github.run_id }}-${{ github.run_number }}';
         console.log('GitHub Actions Execution ID:', executionId);
         
@@ -178,11 +156,6 @@ jobs:
           
           await sendEveningBriefing(executionId);
           console.log('저녁 브리핑 완료');
-          
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          
-          await sendEveningPrep(executionId);
-          console.log('저녁 준비 완료');
           
           console.log('모든 테스트 완료');
         }
