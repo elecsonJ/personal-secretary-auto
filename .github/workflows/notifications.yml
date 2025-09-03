@@ -132,6 +132,7 @@ jobs:
         });
         "
     
+    
     - name: Test all notifications
       if: steps.determine_action.outputs.action == 'test_all'
       run: |
