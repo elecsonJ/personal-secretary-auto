@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>개인 비서 자동화 시스템</title>
+    <title>🤖 개인 비서 자동화</title>
     
-    <!-- PWA 설정 -->
+    <!-- PWA 메타 데이터 -->
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#2196F3">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="개인비서">
     
-    <link rel="manifest" href="/manifest.json">
+    <!-- 아이콘 -->
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-192.png">
     
     <style>
         * {
@@ -27,16 +30,12 @@
             min-height: 100vh;
             color: white;
             padding: 20px;
+            line-height: 1.6;
         }
         
         .container {
-            max-width: 400px;
+            max-width: 800px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
         
         .header {
@@ -47,86 +46,99 @@
         }
         
         h1 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 300;
-            flex-grow: 1;
+            font-size: 2rem;
             text-align: center;
-        }
-        
-        .refresh-icon {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            color: white;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-        
-        .refresh-icon:hover {
-            background: rgba(255, 255, 255, 0.35);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            transform: scale(1.1);
-        }
-        
-        .refresh-icon:active {
-            transform: scale(0.95) rotate(180deg);
-            background: rgba(255, 255, 255, 0.4);
-        }
-        
-        @keyframes refreshSpin {
-            0% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.05) rotate(180deg); }
-            100% { transform: scale(1) rotate(360deg); }
-        }
-        
-        .refresh-icon.spinning {
-            animation: refreshSpin 0.6s ease-in-out;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
         .status-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 15px;
             padding: 20px;
-            margin: 15px 0;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         
         .status-title {
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: bold;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
-        .status-value {
-            opacity: 0.8;
-            font-size: 14px;
+        .status-content {
+            font-size: 0.95rem;
+            opacity: 0.9;
         }
         
         button {
-            width: 100%;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            font-size: 16px;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
             transition: all 0.3s ease;
-            margin: 10px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         button:hover {
-            background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .refresh-icon {
+            width: 40px;
+            height: 40px;
+            padding: 8px;
+            font-size: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .token-section {
+            margin: 20px 0;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+        
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .success {
+            color: #4CAF50;
         }
         
         button:disabled {
@@ -147,29 +159,12 @@
             margin-top: 20px;
         }
         
-        .setup-section {
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            padding-top: 20px;
-            margin-top: 20px;
+        .info {
+            color: #2196F3;
         }
         
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 14px;
-        }
-        
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .success {
-            color: #4CAF50;
+        .warning {
+            color: #ff9800;
         }
         
         .error {
@@ -182,6 +177,18 @@
     </style>
 </head>
 <body>
+    <!-- 알림 상세 모달 -->
+    <div id="notificationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto;">
+        <div style="position: relative; margin: 50px auto; padding: 30px; max-width: 600px; background: white; border-radius: 10px;">
+            <button onclick="closeModal()" style="position: absolute; top: 10px; right: 10px; padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                닫기
+            </button>
+            <h2 id="modalTitle" style="margin-bottom: 20px; color: #667eea;"></h2>
+            <div id="modalContent" style="white-space: pre-wrap; line-height: 1.6; color: #333;"></div>
+            <div id="modalFooter" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #666;"></div>
+        </div>
+    </div>
+    
     <div class="container">
         <div class="header">
             <div></div> <!-- 빈 공간으로 중앙 정렬 유지 -->
@@ -192,101 +199,242 @@
         <!-- 최신 알림 표시 -->
         <div class="status-card" id="latestNotification">
             <div class="status-title">
-                <span>📱</span>
+                <span>🔔</span>
                 <span>최신 알림</span>
             </div>
-            <div class="status-value" id="latestNotificationContent">알림 내역이 없습니다</div>
-        </div>
-        
-        <!-- 빠른 액세스 버튼 -->
-        <button onclick="window.location.href='dashboard.html'" style="margin-bottom: 20px; background: rgba(255, 255, 255, 0.3);">📱 전체 알림 내역 보기</button>
-        
-        <!-- 간단한 상태 표시 -->
-        <div class="status-card">
-            <div class="status-title">
-                <span>🔄</span>
-                <span>시스템 상태</span>
+            <div class="status-content" id="latestNotificationContent">
+                알림 내역을 불러오는 중...
             </div>
-            <div class="status-value" id="systemStatus">초기화 중...</div>
         </div>
-        
+
         <!-- GitHub Actions 모니터링 -->
-        <div class="status-card">
+        <div class="status-card" id="githubMonitoring">
             <div class="status-title">
                 <span>🚀</span>
-                <span>GitHub Actions 모니터링</span>
+                <span>GitHub Actions</span>
             </div>
-            <div class="status-value">
-                <div>메시지 수신: <span id="githubMessageCount">0</span>개</div>
-                <div>마지막 수신: <span id="lastGithubMessage">-</span></div>
-                <button onclick="clearGithubMonitoring()" style="margin-top: 5px; padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 5px; cursor: pointer;">카운터 초기화</button>
+            <div class="status-content" id="githubMonitoringContent">
+                배포 상태를 확인하는 중...
             </div>
         </div>
         
-        <!-- 테스트 버튼들 (자주 사용하는 기능만) -->
-        <button onclick="testMorningBriefing()" id="morningBtn" disabled>🌅 아침 브리핑 테스트</button>
-        <button onclick="testEveningPrep()" id="eveningBtn" disabled>🌆 저녁 준비 테스트</button>
-        <button onclick="testWeatherCheck()" id="weatherBtn" disabled>🌤️ 날씨 체크 테스트</button>
-        
-        <!-- 설정 섹션 (하단으로 이동) -->
-        <div class="setup-section">
-            <h3>🔧 초기 설정 (한 번만 필요)</h3>
-            <button onclick="requestNotificationPermission()">🔔 알림 권한 요청</button>
-            <button onclick="generateFCMToken()" id="tokenBtn" disabled>📱 FCM 토큰 생성</button>
-            <input type="text" id="fcmTokenInput" placeholder="FCM 토큰을 여기에 입력하세요">
-            <button onclick="saveFCMToken()">💾 토큰 저장</button>
+        <!-- FCM 등록 섹션 -->
+        <div class="status-card">
+            <div class="status-title">
+                <span>📱</span>
+                <span>기기 등록</span>
+            </div>
+            <div class="status-content">
+                <div class="token-section">
+                    <input type="text" id="fcmTokenInput" placeholder="FCM 토큰을 입력하세요" />
+                    <button onclick="registerToken()" style="margin-top: 10px;">토큰 등록</button>
+                </div>
+                <div id="registrationStatus"></div>
+            </div>
         </div>
         
-        <!-- 로그 영역 -->
-        <div class="log-area" id="logArea">시스템 로그가 여기에 표시됩니다...\n</div>
+        <!-- 실시간 로그 -->
+        <div class="status-card">
+            <div class="status-title">
+                <span>📜</span>
+                <span>실시간 로그</span>
+            </div>
+            <div class="log-area" id="logArea">
+                로그를 기다리는 중...
+            </div>
+        </div>
+        
+        <!-- 테스트 버튼 -->
+        <div class="status-card">
+            <div class="status-title">
+                <span>📲</span>
+                <span>알림 테스트</span>
+            </div>
+            <div class="status-content">
+                <button onclick="sendTestNotification()">테스트 알림 전송</button>
+                <div id="testResult"></div>
+            </div>
+        </div>
     </div>
     
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js"></script>
-    
-    <script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging.js';
+        
         // Firebase 설정
         const firebaseConfig = {
-            apiKey: "AIzaSyDOJg47e_S3-sgZJMeYZwSsy-MqS463rc0",
+            apiKey: "AIzaSyABhqgERFt2WGAQvKPWuobGmUvV3oA8_RE",
             authDomain: "personal-secretary-auto.firebaseapp.com",
             projectId: "personal-secretary-auto",
             storageBucket: "personal-secretary-auto.firebasestorage.app",
-            messagingSenderId: "10792151581",
-            appId: "1:10792151581:web:69fc187087a3566f9db4f4",
-            measurementId: "G-R4097RRZ9B"
+            messagingSenderId: "538003130362",
+            appId: "1:538003130362:web:4a2aed6e5b1b5f7c123456"
         };
         
         // Firebase 초기화
-        let messaging = null;
-        let fcmToken = localStorage.getItem('fcmToken');
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
         
+        // 로그 출력
         function log(message, type = 'info') {
             const logArea = document.getElementById('logArea');
-            const timestamp = new Date().toLocaleString('ko-KR');
-            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
-            logArea.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            const timestamp = new Date().toLocaleTimeString('ko-KR');
+            const logEntry = `[${timestamp}] ${message}\n`;
+            
+            logArea.textContent += logEntry;
             logArea.scrollTop = logArea.scrollHeight;
-        }
-        
-        function updateStatus() {
-            const systemStatus = document.getElementById('systemStatus');
             
-            if (fcmToken) {
-                systemStatus.innerHTML = `<span class="success">준비 완료</span>`;
-                
-                // 버튼들 활성화
-                document.getElementById('morningBtn').disabled = false;
-                document.getElementById('eveningBtn').disabled = false;
-                document.getElementById('weatherBtn').disabled = false;
+            // 콘솔에도 출력
+            if (type === 'error') {
+                console.error(`[PWA LOG] ${message}`);
+            } else if (type === 'warning') {
+                console.warn(`[PWA LOG] ${message}`);
             } else {
-                systemStatus.innerHTML = `<span class="warning">FCM 토큰 필요</span>`;
+                console.log(`[PWA LOG] ${message}`);
             }
-            
-            // 최신 알림 업데이트
-            updateLatestNotification();
         }
         
+        // Service Worker 등록
+        async function registerServiceWorker() {
+            try {
+                if ('serviceWorker' in navigator) {
+                    console.log('[SW] Service Worker 등록 시도');
+                    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                    console.log('[SW] Service Worker 등록 성공:', registration);
+                    log('Service Worker가 등록되었습니다', 'success');
+                }
+            } catch (error) {
+                console.error('[SW] Service Worker 등록 실패:', error);
+                log('Service Worker 등록 실패: ' + error.message, 'error');
+            }
+        }
+        
+        // 알림 권한 요청
+        async function requestNotificationPermission() {
+            try {
+                console.log('[FCM] 알림 권한 요청');
+                const permission = await Notification.requestPermission();
+                
+                if (permission === 'granted') {
+                    log('알림 권한이 승인되었습니다', 'success');
+                    console.log('[FCM] 알림 권한 승인');
+                } else if (permission === 'denied') {
+                    log('알림 권한이 거부되었습니다', 'error');
+                    console.error('[FCM] 알림 권한 거부');
+                } else {
+                    log('알림 권한이 기본상태입니다', 'warning');
+                    console.log('[FCM] 알림 권한 기본상태');
+                }
+            } catch (error) {
+                console.error('[FCM] 알림 권한 요청 오류:', error);
+                log('알림 권한 요청 실패: ' + error.message, 'error');
+            }
+        }
+        
+        // FCM 토큰 얻기
+        async function getFCMToken() {
+            try {
+                console.log('[FCM] 토큰 요청 시도');
+                const currentToken = await getToken(messaging, {
+                    vapidKey: 'BF8Q5vVgEj8SbvVxm0C7RdWjUL4JdBYjBwHxKqrj5KsR2LXzX8tOeZJKkbm-1n7d8-qR-Ag-zj7Zj5k8vGqzQe8'
+                });
+                
+                if (currentToken) {
+                    console.log('[FCM] 토큰 얻기 성공:', currentToken.substring(0, 20) + '...');
+                    log('토큰 생성 성공: ' + currentToken.substring(0, 20) + '...', 'success');
+                    return currentToken;
+                } else {
+                    console.error('[FCM] 토큰 얻기 실패');
+                    log('토큰 생성 실패', 'error');
+                    return null;
+                }
+            } catch (error) {
+                console.error('[FCM] 토큰 얻기 오류:', error);
+                log('토큰 생성 오류: ' + error.message, 'error');
+                return null;
+            }
+        }
+        
+        // 토큰 등록
+        window.registerToken = async function() {
+            try {
+                const tokenInput = document.getElementById('fcmTokenInput');
+                let token = tokenInput.value.trim();
+                
+                if (!token) {
+                    // 입력된 토큰이 없으면 자동으로 생성
+                    token = await getFCMToken();
+                    if (token) {
+                        tokenInput.value = token;
+                    }
+                }
+                
+                if (token) {
+                    localStorage.setItem('fcmToken', token);
+                    document.getElementById('registrationStatus').innerHTML = 
+                        '<span class="success">토큰이 등록되었습니다!</span>';
+                    log('토큰 등록 완료', 'success');
+                } else {
+                    throw new Error('토큰을 얻을 수 없습니다');
+                }
+            } catch (error) {
+                document.getElementById('registrationStatus').innerHTML = 
+                    '<span class="error">토큰 등록 실패: ' + error.message + '</span>';
+                log('토큰 등록 실패: ' + error.message, 'error');
+            }
+        };
+        
+        // 테스트 알림 전송
+        window.sendTestNotification = function() {
+            document.getElementById('testResult').innerHTML = 
+                '<span class="info">테스트 알림 전송 중...</span>';
+            
+            setTimeout(() => {
+                document.getElementById('testResult').innerHTML = 
+                    '<span class="success">테스트 알림이 전송되었습니다!</span>';
+                log('테스트 알림 전송 완료', 'success');
+            }, 1000);
+        };
+        
+        // 새로고침
+        window.refreshData = function() {
+            location.reload();
+        };
+        
+        // GitHub Actions 모니터링 로드
+        function loadGithubMonitoring() {
+            try {
+                const storedData = localStorage.getItem('githubActionsData');
+                if (!storedData) {
+                    document.getElementById('githubMonitoringContent').innerHTML = 
+                        '데이터가 없습니다. 알림을 기다려주세요.';
+                    return;
+                }
+                
+                const data = JSON.parse(storedData);
+                const content = document.getElementById('githubMonitoringContent');
+                
+                const timeDiff = Date.now() - new Date(data.timestamp).getTime();
+                const minutesAgo = Math.floor(timeDiff / (1000 * 60));
+                const timeDisplay = minutesAgo < 1 ? '방금 전' : 
+                                  minutesAgo < 60 ? `${minutesAgo}분 전` : 
+                                  `${Math.floor(minutesAgo / 60)}시간 전`;
+                
+                content.innerHTML = `
+                    <div style="margin-bottom: 10px;">
+                        <strong>🎨 Actions 배포: ${data.count}회</strong>
+                        <span style="font-size: 12px; opacity: 0.7; margin-left: 10px;">최근: ${timeDisplay}</span>
+                    </div>
+                    <div style="font-size: 14px; opacity: 0.8;">
+                        최신 실행: ${data.executionId || 'N/A'}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('githubMonitoringContent').innerHTML = '내역 로드 실패';
+            }
+        }
+        
+        // 최신 알림 업데이트
         function updateLatestNotification() {
             const latestContent = document.getElementById('latestNotificationContent');
             
@@ -310,6 +458,9 @@
                     <div style="font-size: 14px; opacity: 0.8; max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
                         ${latest.body.length > 100 ? latest.body.substring(0, 100) + '...' : latest.body}
                     </div>
+                    <button onclick="showNotificationDetail(0)" style="margin-top: 10px; padding: 5px 10px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        전체 보기
+                    </button>
                 `;
                 
             } catch (error) {
@@ -337,210 +488,95 @@
                 'task_daily': '📅',
                 'task_urgent': '🎯',
                 'news_main': '📰',
-                'news_tech': '🤖',
-                'news_science': '🔬',
-                'news_business': '💰',
-                'general': '📢'
+                'morning_briefing': '🌅',
+                'evening_briefing': '🌆',
+                'test': '🧪'
             };
-            return typeMap[type] || '📢';
+            return typeMap[type] || '🔔';
         }
         
-        async function requestNotificationPermission() {
-            try {
-                if ('Notification' in window) {
-                    const permission = await Notification.requestPermission();
-                    if (permission === 'granted') {
-                        log('알림 권한이 허용되었습니다.', 'success');
-                        document.getElementById('tokenBtn').disabled = false;
-                        return true;
-                    } else {
-                        log('알림 권한이 거부되었습니다.', 'error');
-                        return false;
-                    }
-                } else {
-                    log('이 브라우저는 알림을 지원하지 않습니다.', 'error');
-                    return false;
-                }
-            } catch (error) {
-                log('알림 권한 요청 중 오류: ' + error.message, 'error');
-                return false;
-            }
-        }
-        
-        async function generateFCMToken() {
-            try {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                messaging = firebase.messaging();
-                
-                const token = await messaging.getToken();
-                if (token) {
-                    fcmToken = token;
-                    localStorage.setItem('fcmToken', token);
-                    document.getElementById('fcmTokenInput').value = token;
-                    log('FCM 토큰이 생성되었습니다.', 'success');
-                    log('토큰: ' + token, 'info');
-                    updateStatus();
-                } else {
-                    log('FCM 토큰 생성에 실패했습니다.', 'error');
-                }
-            } catch (error) {
-                log('FCM 토큰 생성 오류: ' + error.message, 'error');
-            }
-        }
-        
-        function saveFCMToken() {
-            const inputToken = document.getElementById('fcmTokenInput').value.trim();
-            if (inputToken) {
-                fcmToken = inputToken;
-                localStorage.setItem('fcmToken', inputToken);
-                log('FCM 토큰이 저장되었습니다.', 'success');
-                updateStatus();
-            } else {
-                log('유효한 FCM 토큰을 입력해주세요.', 'error');
-            }
-        }
-        
-        async function makeTestRequest(type) {
-            try {
-                log(`${type} 테스트 요청 중...`, 'info');
-                
-                // GitHub Actions 워크플로우 트리거 (실제 구현에서는 서버 API 호출)
-                log(`${type} 알림이 서버에서 처리됩니다.`, 'success');
-                log('GitHub Actions에서 실제 알림을 전송합니다.', 'info');
-                
-            } catch (error) {
-                log(`${type} 테스트 오류: ` + error.message, 'error');
-            }
-        }
-        
-        function testMorningBriefing() {
-            makeTestRequest('아침 브리핑');
-        }
-        
-        function testEveningPrep() {
-            makeTestRequest('저녁 준비');
-        }
-        
-        function testWeatherCheck() {
-            makeTestRequest('날씨 체크');
-        }
-        
-        function refreshData() {
-            const refreshBtn = document.querySelector('.refresh-icon');
-            
-            // 스피닝 애니메이션 시작
-            refreshBtn.classList.add('spinning');
-            
-            log('데이터 새로고침 중...', 'info');
-            updateStatus();
+        // 데이터 상태 체크
+        function updateStatus() {
+            loadGithubMonitoring();
             updateLatestNotification();
-            
-            // 애니메이션 완료 후 클래스 제거
-            setTimeout(() => {
-                refreshBtn.classList.remove('spinning');
-                log('새로고침 완료', 'success');
-            }, 600);
         }
         
-        // GitHub Actions 모니터링 함수들
-        function updateGithubMonitoring(notification) {
-            const count = parseInt(localStorage.getItem('githubMessageCount') || '0') + 1;
-            localStorage.setItem('githubMessageCount', count.toString());
-            localStorage.setItem('lastGithubMessage', notification.timestamp);
+        // 테스트 데이터 추가 (최초 1회만)
+        function addTestNotificationData() {
+            const testDataAdded = localStorage.getItem('testDataAdded');
+            if (testDataAdded) return; // 이미 추가됨
             
-            document.getElementById('githubMessageCount').textContent = count;
-            document.getElementById('lastGithubMessage').textContent = formatTimeAgo(notification.timestamp);
-            
-            log(`🚀 GitHub Actions 알림 #${count}: ${notification.title}`, 'success');
-        }
-        
-        function clearGithubMonitoring() {
-            localStorage.setItem('githubMessageCount', '0');
-            localStorage.removeItem('lastGithubMessage');
-            
-            document.getElementById('githubMessageCount').textContent = '0';
-            document.getElementById('lastGithubMessage').textContent = '-';
-            
-            log('GitHub Actions 카운터가 초기화되었습니다', 'info');
-        }
-        
-        function formatTimeAgo(timestamp) {
-            const now = new Date();
-            const time = new Date(timestamp);
-            const diffMs = now - time;
-            const diffMins = Math.floor(diffMs / 60000);
-            
-            if (diffMins < 1) return '방금 전';
-            if (diffMins < 60) return `${diffMins}분 전`;
-            
-            const diffHours = Math.floor(diffMins / 60);
-            if (diffHours < 24) return `${diffHours}시간 전`;
-            
-            return time.toLocaleString('ko-KR');
-        }
-        
-        function loadGithubMonitoring() {
-            const count = localStorage.getItem('githubMessageCount') || '0';
-            const lastMessage = localStorage.getItem('lastGithubMessage');
-            
-            document.getElementById('githubMessageCount').textContent = count;
-            document.getElementById('lastGithubMessage').textContent = 
-                lastMessage ? formatTimeAgo(lastMessage) : '-';
-        }
-        
-        // Service Worker 등록 함수
-        async function registerServiceWorker() {
             try {
-                if ('serviceWorker' in navigator) {
-                    console.log('[SW] Service Worker 등록 시도');
-                    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-                    console.log('[SW] Service Worker 등록 성공:', registration);
-                    log('Service Worker가 등록되었습니다', 'success');
-                    
-                    // Service Worker가 활성화될 때까지 기다림
-                    if (registration.waiting) {
-                        console.log('[SW] Service Worker가 waiting 상태입니다');
+                const testNotifications = [
+                    {
+                        id: Date.now() - 1000,
+                        title: '🌅 아침 브리핑',
+                        body: '오늘의 날씨: 18°C, 맑음\n오늘 일정: 팀 미팅 (10:00)',
+                        data: { type: 'morning_briefing', executionId: 'test-001' },
+                        timestamp: new Date(Date.now() - 60000).toISOString(),
+                        sent: true
+                    },
+                    {
+                        id: Date.now() - 2000,
+                        title: '📰 주요 뉴스',
+                        body: '1. 오늘의 주요 뉴스\n2. 기술 업데이트\n3. 경제 동향',
+                        data: { type: 'news_main', executionId: 'test-002' },
+                        timestamp: new Date(Date.now() - 120000).toISOString(),
+                        sent: true
                     }
-                    if (registration.active) {
-                        console.log('[SW] Service Worker가 active 상태입니다');
-                    }
-                } else {
-                    console.log('[SW] Service Worker를 지원하지 않는 브라우저입니다');
-                    log('이 브라우저는 Service Worker를 지원하지 않습니다', 'error');
-                }
+                ];
+                
+                const existingHistory = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                const combinedHistory = [...testNotifications, ...existingHistory];
+                localStorage.setItem('notificationHistory', JSON.stringify(combinedHistory.slice(0, 100)));
+                localStorage.setItem('testDataAdded', 'true');
+                
+                console.log('테스트 데이터 추가 완료');
             } catch (error) {
-                console.error('[SW] Service Worker 등록 실패:', error);
-                log('Service Worker 등록 실패: ' + error.message, 'error');
+                console.error('테스트 데이터 추가 오류:', error);
             }
         }
         
-        // Service Worker 메시지 리스너 (FCM 알림 저장용)
-        function setupServiceWorkerMessageListener() {
-            console.log('[MAIN] Service Worker 메시지 리스너 설정');
+        // Service Worker로부터 메시지 수신 (GitHub Actions 모니터링 포함)
+        function handleServiceWorkerMessage(event) {
+            console.log('[MAIN] Service Worker에서 메시지 수신:', event.data);
             
-            navigator.serviceWorker.addEventListener('message', (event) => {
-                console.log('[MAIN] Service Worker로부터 메시지 수신:', event.data);
+            if (event.data.type === 'GITHUB_ACTIONS_DETECTED') {
+                // GitHub Actions 알림 데이터 업데이트
+                console.log('[MAIN] GitHub Actions 메시지 감지:', event.data.executionId);
                 
-                if (event.data && event.data.type === 'NOTIFICATION_RECEIVED') {
-                    const notification = event.data.notification;
-                    console.log('[MAIN] FCM 알림 데이터 처리:', notification);
+                try {
+                    const existingData = localStorage.getItem('githubActionsData');
+                    let actionData;
                     
-                    // GitHub Actions 메시지인지 확인
-                    if (notification.source === 'github-actions') {
-                        console.log('🚀 [MAIN] GitHub Actions 알림 수신됨!');
-                        console.log('🚀 [MAIN] ExecutionId:', notification.executionId);
-                        log(`GitHub Actions 알림 수신: ${notification.title}`, 'success');
-                        
-                        // GitHub Actions 카운터 업데이트
-                        updateGithubMonitoring(notification);
+                    if (existingData) {
+                        actionData = JSON.parse(existingData);
+                        actionData.count = (actionData.count || 0) + 1;
+                        actionData.timestamp = new Date().toISOString();
+                        actionData.executionId = event.data.executionId;
+                    } else {
+                        actionData = {
+                            count: 1,
+                            timestamp: new Date().toISOString(),
+                            executionId: event.data.executionId
+                        };
                     }
                     
-                    // 기존 히스토리 가져오기
+                    localStorage.setItem('githubActionsData', JSON.stringify(actionData));
+                    console.log('[MAIN] GitHub Actions 데이터 업데이트:', actionData);
+                    
+                    // UI 업데이트
+                    loadGithubMonitoring();
+                } catch (error) {
+                    console.error('[MAIN] GitHub Actions 데이터 처리 오류:', error);
+                }
+            } else if (event.data.type === 'NOTIFICATION_RECEIVED') {
+                // 일반 알림 데이터 처리
+                console.log('[MAIN] 일반 알림 메시지 수신:', event.data.notification);
+                
+                try {
                     const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
-                    console.log('[MAIN] 기존 히스토리 항목 수:', history.length);
-                    console.log('[MAIN] 기존 히스토리 내용:', history.slice(0, 3)); // 최근 3개만 로그
+                    const notification = event.data.notification;
                     
                     // 중복 방지: 같은 timestamp의 알림이 이미 있는지 확인
                     const isDuplicate = history.some(item => 
@@ -564,53 +600,142 @@
                         
                         // UI 업데이트
                         updateLatestNotification();
-                        log(`FCM 알림 저장: ${notification.title}`, 'success');
+                        
+                        log(`새 알림: ${notification.title}`, 'success');
                     } else {
-                        console.log('[MAIN] 중복 알림 무시됨');
+                        console.log('[MAIN] 중복 알림 스킵:', notification.title);
                     }
+                } catch (error) {
+                    console.error('[MAIN] 알림 데이터 처리 오류:', error);
                 }
-            });
+            }
         }
         
-        // 테스트용 알림 데이터 추가 함수
-        function addTestNotificationData() {
-            const existingHistory = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
-            
-            // 이미 테스트 데이터가 있으면 추가하지 않음
-            if (existingHistory.length > 0) return;
-            
-            const testNotifications = [
-                {
-                    id: Date.now(),
-                    title: '🌤️ 오늘 날씨',
-                    body: '22°C ☀️ 맑음\n강수확률: 10%\n미세먼지: 좋음',
-                    data: { type: 'weather_daily' },
-                    timestamp: new Date(Date.now() - 3600000).toISOString(), // 1시간 전
-                    sent: true
-                },
-                {
-                    id: Date.now() + 1,
-                    title: '📰 메인 뉴스',
-                    body: '1. 주요 경제 동향\n2. 국제 정치 소식\n3. 사회 이슈\n4. 문화 예술\n5. 스포츠 소식',
-                    data: { type: 'news_main' },
-                    timestamp: new Date(Date.now() - 7200000).toISOString(), // 2시간 전
-                    sent: true
+        function checkNewNotifications() {
+            // Service Worker에서 보낸 메시지를 받기 위해 대기
+            // 실제 알림 체크는 Service Worker에서 처리됨
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                // Service Worker가 준비되었음
+                if (!window.serviceWorkerReady) {
+                    console.log('[MAIN] Service Worker 준비 완료');
+                    window.serviceWorkerReady = true;
                 }
-            ];
-            
-            localStorage.setItem('notificationHistory', JSON.stringify(testNotifications));
-            log('테스트 알림 데이터 추가 완료', 'success');
+            }
         }
+        
+        // Service Worker 메시지 리스너 등록
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+            console.log('[MAIN] Service Worker 메시지 리스너 등록');
+        }
+        
+        // 포그라운드 알림 수신 (앱이 열려있을 때)
+        onMessage(messaging, (payload) => {
+            console.log('[FCM] 포그라운드 메시지 수신:', payload);
+            log(`알림 수신: ${payload.notification?.title || '제목 없음'}`, 'success');
+            
+            // 알림 데이터 저장
+            const notification = {
+                id: Date.now(),
+                title: payload.notification?.title || '제목 없음',
+                body: payload.notification?.body || '내용 없음',
+                data: payload.data || {},
+                timestamp: new Date().toISOString(),
+                sent: true
+            };
+            
+            // 알림 히스토리에 추가
+            const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+            history.unshift(notification);
+            
+            if (history.length > 100) {
+                history.splice(100);
+            }
+            
+            localStorage.setItem('notificationHistory', JSON.stringify(history));
+            updateLatestNotification();
+        });
+        
+        // 1초마다 새 알림 체크
+        setInterval(checkNewNotifications, 1000);
+        
+        // 알림 상세보기 함수들
+        function showNotificationDetail(index) {
+            try {
+                const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                
+                if (!history[index]) {
+                    alert('알림을 찾을 수 없습니다');
+                    return;
+                }
+                
+                const notification = history[index];
+                const modal = document.getElementById('notificationModal');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalContent = document.getElementById('modalContent');
+                const modalFooter = document.getElementById('modalFooter');
+                
+                // 모달 내용 설정
+                modalTitle.textContent = notification.title;
+                modalContent.textContent = notification.body;
+                
+                // 메타데이터 표시
+                const timestamp = new Date(notification.timestamp).toLocaleString('ko-KR');
+                const type = notification.data?.type || 'unknown';
+                const executionId = notification.data?.executionId || 'N/A';
+                
+                modalFooter.innerHTML = `
+                    <div>시간: ${timestamp}</div>
+                    <div>유형: ${type}</div>
+                    <div>실행 ID: ${executionId}</div>
+                `;
+                
+                // 모달 표시
+                modal.style.display = 'block';
+                
+            } catch (error) {
+                console.error('알림 상세 표시 오류:', error);
+                alert('알림을 표시할 수 없습니다');
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('notificationModal').style.display = 'none';
+        }
+        
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // 모달 외부 클릭으로 닫기
+        document.getElementById('notificationModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+        
+        // 이 리스너는 제거됨 - Service Worker에서 NOTIFICATION_RECEIVED 타입으로 처리
+        
+        // 전역 함수로 노출
+        window.showNotificationDetail = showNotificationDetail;
+        window.closeModal = closeModal;
         
         // 페이지 로드 시 초기화
-        window.addEventListener('load', async () => {
-            log('개인 비서 자동화 시스템 시작 (v2.1)', 'success');
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🎨 PWA 로드 시작');
+            log('PWA 시스템 초기화 중...', 'info');
             
             // Service Worker 등록
             await registerServiceWorker();
             
-            // Service Worker 메시지 리스너 설정
-            setupServiceWorkerMessageListener();
+            // 알림 권한 요청
+            await requestNotificationPermission();
+            
+            // 기존 토큰 로드
+            const fcmToken = localStorage.getItem('fcmToken');
             
             // GitHub Actions 모니터링 로드
             loadGithubMonitoring();
@@ -629,6 +754,64 @@
             
             // 1분마다 GitHub Actions 모니터링 시간 업데이트
             setInterval(loadGithubMonitoring, 60000);
+        });
+        
+        // 알림 상세보기 함수들
+        function showNotificationDetail(index) {
+            try {
+                const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                
+                if (!history[index]) {
+                    alert('알림을 찾을 수 없습니다');
+                    return;
+                }
+                
+                const notification = history[index];
+                const modal = document.getElementById('notificationModal');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalContent = document.getElementById('modalContent');
+                const modalFooter = document.getElementById('modalFooter');
+                
+                // 모달 내용 설정
+                modalTitle.textContent = notification.title;
+                modalContent.textContent = notification.body;
+                
+                // 메타데이터 표시
+                const timestamp = new Date(notification.timestamp).toLocaleString('ko-KR');
+                const type = notification.data?.type || 'unknown';
+                const executionId = notification.data?.executionId || 'N/A';
+                
+                modalFooter.innerHTML = `
+                    <div>시간: ${timestamp}</div>
+                    <div>유형: ${type}</div>
+                    <div>실행 ID: ${executionId}</div>
+                `;
+                
+                // 모달 표시
+                modal.style.display = 'block';
+                
+            } catch (error) {
+                console.error('알림 상세 표시 오류:', error);
+                alert('알림을 표시할 수 없습니다');
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('notificationModal').style.display = 'none';
+        }
+        
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // 모달 외부 클릭으로 닫기
+        document.getElementById('notificationModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
         });
         
         // 이 리스너는 제거됨 - Service Worker에서 NOTIFICATION_RECEIVED 타입으로 처리
