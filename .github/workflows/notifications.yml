@@ -6,9 +6,13 @@ on:
     # UTC: 1,3,5,7,9,11,13,15,17,19,21,23시 = KST: 10,12,14,16,18,20,22,0,2,4,6,8시
     - cron: '0 1,3,5,7,9,11,13,15,17,19,21,23 * * *'
     # 매일 오전 7시 아침 브리핑 (한국시간 오전 7시 = UTC 전날 22시)
-    - cron: '0 22 * * *'  
+    - cron: '0 22 * * *'
+    # 아침 브리핑 백업 (5분 후)
+    - cron: '5 22 * * *'  
     # 매일 오후 7시 저녁 브리핑 (한국시간 오후 7시 = UTC 당일 10시)
     - cron: '0 10 * * *'
+    # 저녁 브리핑 백업 (5분 후)
+    - cron: '5 10 * * *'
   
   # 수동 실행 가능
   workflow_dispatch:
@@ -75,10 +79,13 @@ jobs:
           echo "action=${{ github.event.inputs.notification_type }}" >> $GITHUB_OUTPUT
         elif [ "$HOUR" = "07" ] && [ "$MINUTE" -lt "30" ]; then
           echo "action=morning_briefing" >> $GITHUB_OUTPUT
+          echo "Morning briefing time detected"
         elif [ "$HOUR" = "19" ] && [ "$MINUTE" -lt "30" ]; then
           echo "action=evening_briefing" >> $GITHUB_OUTPUT
+          echo "Evening briefing time detected"
         else
           echo "action=weather_check" >> $GITHUB_OUTPUT
+          echo "Weather check time"
         fi
     
     - name: Run weather check
