@@ -3,17 +3,54 @@ const axios = require('axios');
 const fs = require('fs').promises;
 const path = require('path');
 
+// Firebase Admin SDK 초기화
 if (!admin.apps.length) {
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (!serviceAccountJson) {
-    throw new Error('FIREBASE_SERVICE_ACCOUNT 환경 변수가 설정되지 않았습니다.');
+    console.warn('⚠️  FIREBASE_SERVICE_ACCOUNT 환경 변수가 설정되지 않았습니다. FCM 알림이 비활성화됩니다.');
+  } else {
+    try {
+      console.log('Firebase 서비스 계정 초기화 중...');
+      console.log('서비스 계정 JSON 길이:', serviceAccountJson.length);
+      console.log('JSON 시작 부분:', serviceAccountJson.substring(0, 50) + '...');
+      
+      let serviceAccount;
+      
+      // JSON 형태인지 확인 후 파싱
+      if (serviceAccountJson.trim().startsWith('{')) {
+        // 이미 JSON 형태인 경우
+        serviceAccount = JSON.parse(serviceAccountJson);
+      } else {
+        // Base64 인코딩된 경우 디코딩 시도
+        console.log('Base64 디코딩 시도...');
+        try {
+          const decoded = Buffer.from(serviceAccountJson, 'base64').toString('utf-8');
+          serviceAccount = JSON.parse(decoded);
+        } catch (decodeError) {
+          console.error('Base64 디코딩 실패:', decodeError.message);
+          // 원본 그대로 파싱 시도
+          serviceAccount = JSON.parse(serviceAccountJson);
+        }
+      }
+      
+      // private_key의 \\n을 실제 줄바꿈으로 변환
+      if (serviceAccount.private_key) {
+        serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+      }
+      
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        projectId: serviceAccount.project_id
+      });
+      
+      console.log('✅ Firebase Admin SDK 초기화 완료');
+      
+    } catch (error) {
+      console.error('❌ Firebase 초기화 실패:', error.message);
+      console.error('환경변수 내용 (처음 100자):', serviceAccountJson ? serviceAccountJson.substring(0, 100) + '...' : 'undefined');
+      console.warn('⚠️  Firebase 초기화에 실패했습니다. FCM 알림이 비활성화됩니다.');
+    }
   }
-  
-  const serviceAccount = JSON.parse(serviceAccountJson);
-  
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  });
 }
 
 const WEATHER_API_URL = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst';
@@ -319,6 +356,12 @@ const getHighPriorityTasks = async () => {
 const sendPushNotification = async (title, body, data = {}) => {
   const results = [];
   
+  // Firebase가 초기화되지 않은 경우 시뮬레이션
+  if (!admin.apps.length) {
+    console.log('🔔 FCM 알림 시뮬레이션 (Firebase 미초기화):', { title, body, data });
+    return [{ device: 'simulation', success: false, reason: 'Firebase not initialized' }];
+  }
+  
   for (const [device, token] of Object.entries(fcmTokens)) {
     if (!token) {
       console.log(`${device} FCM 토큰이 설정되지 않았습니다.`);
@@ -344,12 +387,18 @@ const sendPushNotification = async (title, body, data = {}) => {
       };
       
       const response = await admin.messaging().send(message);
-      console.log(`${device} 알림 전송 성공:`, response);
+      console.log(`✅ ${device} 알림 전송 성공:`, response);
       results.push({ device, success: true, response });
     } catch (error) {
-      console.error(`${device} 알림 전송 실패:`, error);
+      console.error(`❌ ${device} 알림 전송 실패:`, error.message);
       results.push({ device, success: false, error: error.message });
     }
+  }
+  
+  // 토큰이 없는 경우에도 시뮬레이션 메시지 표시
+  if (results.length === 0) {
+    console.log('🔔 FCM 알림 시뮬레이션 (토큰 없음):', { title, body, data });
+    return [{ device: 'simulation', success: false, reason: 'No FCM tokens configured' }];
   }
   
   return results;
