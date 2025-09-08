@@ -91,9 +91,13 @@ const loadPreviousWeatherState = async () => {
 const saveWeatherState = async (weatherData) => {
   try {
     await ensureDataDir();
-    await fs.writeFile(WEATHER_STATE_FILE, JSON.stringify(weatherData, null, 2));
+    const jsonData = JSON.stringify(weatherData, null, 2);
+    await fs.writeFile(WEATHER_STATE_FILE, jsonData);
+    console.log(`✅ 날씨 상태 저장 성공: ${WEATHER_STATE_FILE}`);
+    console.log(`📁 파일 크기: ${jsonData.length} bytes`);
   } catch (error) {
-    console.error('날씨 상태 저장 실패:', error);
+    console.error('❌ 날씨 상태 저장 실패:', error);
+    console.error('파일 경로:', WEATHER_STATE_FILE);
   }
 };
 
@@ -409,6 +413,11 @@ const checkWeatherChanges = async (executionId) => {
     console.log(`[${executionId}] 날씨 변화 확인 시작...`);
     
     const currentWeather = await getCurrentWeather();
+    if (!currentWeather) {
+      console.error(`[${executionId}] 날씨 데이터를 가져올 수 없습니다 - 함수 종료`);
+      return;
+    }
+    
     const previousState = await loadPreviousWeatherState();
     
     let shouldNotify = false;

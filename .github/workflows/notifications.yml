@@ -187,8 +187,19 @@ jobs:
         "
     
     # 날씨 데이터 저장 (다음 실행을 위해)
+    - name: Check if weather data exists
+      id: check_weather_data
+      run: |
+        if [ -f "./data/weather-state.json" ]; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "✅ weather-state.json 파일 발견"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "ℹ️ weather-state.json 파일 없음 - 첫 실행이거나 생성되지 않음"
+        fi
+    
     - name: Save weather data
-      if: always()
+      if: steps.check_weather_data.outputs.exists == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: weather-data
