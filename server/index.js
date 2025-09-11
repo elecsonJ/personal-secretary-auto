@@ -360,17 +360,41 @@ const getHighPriorityTasks = async () => {
 const sendPushNotification = async (title, body, data = {}) => {
   const results = [];
   
-  // Firebase가 초기화되지 않은 경우 시뮬레이션
-  if (!admin.apps.length) {
+  // Firebase Admin SDK 사용 가능 여부 확인
+  let isFirebaseReady = false;
+  try {
+    await admin.messaging().send({
+      token: 'test-dry-run-token',
+      notification: { title: 'test', body: 'test' },
+      dryRun: true
+    });
+    isFirebaseReady = true;
+  } catch (error) {
+    if (error.code === 'messaging/registration-token-not-registered' || 
+        error.code === 'messaging/invalid-registration-token') {
+      isFirebaseReady = true; // Firebase는 정상, 토큰만 잘못됨
+    } else {
+      console.error('🔥 Firebase Messaging 초기화 확인 실패:', error.message);
+      isFirebaseReady = false;
+    }
+  }
+  
+  if (!isFirebaseReady) {
     console.log('🔔 FCM 알림 시뮬레이션 (Firebase 미초기화):', { title, body, data });
     return [{ device: 'simulation', success: false, reason: 'Firebase not initialized' }];
   }
   
+  console.log('🔥 Firebase Messaging 초기화 확인됨');
+  
   for (const [device, token] of Object.entries(fcmTokens)) {
-    if (!token) {
-      console.log(`${device} FCM 토큰이 설정되지 않았습니다.`);
+    if (!token || token.startsWith('test-token-')) {
+      console.log(`❌ ${device} FCM 토큰이 설정되지 않았거나 테스트 토큰입니다: ${token}`);
+      results.push({ device, success: false, reason: 'Invalid or test token' });
       continue;
     }
+    
+    console.log(`📱 ${device}로 알림 전송 시도...`);
+    console.log(`🔑 토큰 (앞 20자): ${token.substring(0, 20)}...`);
     
     try {
       const message = {
@@ -390,19 +414,21 @@ const sendPushNotification = async (title, body, data = {}) => {
         }
       };
       
+      console.log(`📤 ${device} 메시지 전송 중...`);
       const response = await admin.messaging().send(message);
       console.log(`✅ ${device} 알림 전송 성공:`, response);
       results.push({ device, success: true, response });
     } catch (error) {
       console.error(`❌ ${device} 알림 전송 실패:`, error.message);
-      results.push({ device, success: false, error: error.message });
+      console.error(`❌ 오류 코드:`, error.code);
+      console.error(`❌ 전체 오류:`, error);
+      results.push({ device, success: false, error: error.message, code: error.code });
     }
   }
   
   // 토큰이 없는 경우에도 시뮬레이션 메시지 표시
-  if (results.length === 0) {
-    console.log('🔔 FCM 알림 시뮬레이션 (토큰 없음):', { title, body, data });
-    return [{ device: 'simulation', success: false, reason: 'No FCM tokens configured' }];
+  if (results.length === 0 || results.every(r => !r.success)) {
+    console.log('🔔 FCM 알림 전송 실패 또는 토큰 없음:', { title, body, data });
   }
   
   return results;
