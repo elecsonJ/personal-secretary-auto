@@ -19,15 +19,25 @@ if (!admin.apps.length) {
       // JSON 형태인지 확인 후 파싱
       if (serviceAccountJson.trim().startsWith('{')) {
         // 이미 JSON 형태인 경우
+        console.log('JSON 형태로 직접 파싱...');
         serviceAccount = JSON.parse(serviceAccountJson);
       } else {
         // Base64 인코딩된 경우 디코딩 시도
         console.log('Base64 디코딩 시도...');
         try {
-          const decoded = Buffer.from(serviceAccountJson, 'base64').toString('utf-8');
-          serviceAccount = JSON.parse(decoded);
+          const decoded = Buffer.from(serviceAccountJson.trim(), 'base64').toString('utf-8');
+          console.log('디코딩된 내용 (처음 100자):', decoded.substring(0, 100) + '...');
+          
+          // 디코딩된 내용이 JSON인지 확인
+          if (decoded.trim().startsWith('{')) {
+            serviceAccount = JSON.parse(decoded);
+            console.log('✅ Base64 디코딩 및 JSON 파싱 성공');
+          } else {
+            throw new Error('디코딩된 내용이 JSON 형태가 아닙니다');
+          }
         } catch (decodeError) {
           console.error('Base64 디코딩 실패:', decodeError.message);
+          console.log('원본 JSON으로 직접 파싱 시도...');
           // 원본 그대로 파싱 시도
           serviceAccount = JSON.parse(serviceAccountJson);
         }
