@@ -97,7 +97,8 @@ if (!admin.apps.length) {
 }
 
 const WEATHER_API_URL = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst';
-const SERVICE_KEY = 'DecGaYFaJhEcm%2BWE4VqPKFPH2R9Ja6eI7w3OL2fgZCUMGDgJRjl%2BgRqkv%2Fx34vn0OJXTz26K3ywHvfFl4EfB4w%3D%3D';
+// 기존 서비스 키가 만료되었으므로 fallback 처리
+const SERVICE_KEY = process.env.WEATHER_API_KEY || 'DecGaYFaJhEcm%2BWE4VqPKFPH2R9Ja6eI7w3OL2fgZCUMGDgJRjl%2BgRqkv%2Fx34vn0OJXTz26K3ywHvfFl4EfB4w%3D%3D';
 
 const NYT_API_KEY = process.env.NYT_API_KEY;
 
@@ -238,6 +239,12 @@ const getCurrentWeather = async () => {
     // 전체 응답 구조 디버깅
     console.log('🔍 전체 응답 데이터:', JSON.stringify(response.data, null, 2).substring(0, 500) + '...');
     
+    // XML 응답인 경우 (서비스 키 오류)
+    if (typeof response.data === 'string' && response.data.includes('SERVICE_KEY_IS_NOT_REGISTERED_ERROR')) {
+      console.error('❌ 날씨 API 서비스 키 오류: 키가 등록되지 않았거나 만료됨');
+      throw new Error('날씨 API 서비스 키가 만료되었습니다. 관리자에게 문의하세요.');
+    }
+    
     if (response.data.response?.header?.resultCode !== '00') {
       console.error('❌ 날씨 API 오류:', response.data.response?.header);
       throw new Error(`날씨 API 오류: ${response.data.response?.header?.resultMsg || '알 수 없는 오류'}`);
@@ -308,28 +315,51 @@ const getTodayEvents = async (dateStr) => {
     
     console.log('📅 오늘 일정 조회 시작:', { dateStr, dbId: NOTION_CALENDAR_DB_ID.substring(0, 8) + '...' });
     
-    const response = await axios.post(
-      `https://api.notion.com/v1/databases/${NOTION_CALENDAR_DB_ID}/query`,
-      {
-        filter: {
-          property: 'date', // 소문자로 시도
-          date: {
-            equals: dateStr
+    // 여러 가능한 속성명으로 시도 (Date, date, 날짜 등)
+    const possibleDateProps = ['Date', 'date', '날짜', 'Created time', 'created_time'];
+    let response;
+    let usedProperty = null;
+    
+    for (const prop of possibleDateProps) {
+      try {
+        console.log(`📅 ${prop} 속성으로 시도 중...`);
+        response = await axios.post(
+          `https://api.notion.com/v1/databases/${NOTION_CALENDAR_DB_ID}/query`,
+          {
+            filter: {
+              property: prop,
+              date: {
+                equals: dateStr
+              }
+            }
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${NOTION_API_KEY}`,
+              'Notion-Version': '2022-06-28',
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${NOTION_API_KEY}`,
-          'Notion-Version': '2022-06-28',
-          'Content-Type': 'application/json'
-        }
+        );
+        
+        usedProperty = prop;
+        console.log(`✅ ${prop} 속성으로 성공!`);
+        break;
+      } catch (error) {
+        console.log(`❌ ${prop} 속성 실패:`, error.response?.data?.message || error.message);
+        continue;
       }
-    );
+    }
+    
+    if (!response) {
+      console.error('❌ 모든 날짜 속성 시도 실패 - 일정 조회 포기');
+      return [];
+    }
     
     console.log('✅ Notion 일정 API 응답 성공:', { 
       status: response.status, 
-      resultCount: response.data?.results?.length || 0 
+      resultCount: response.data?.results?.length || 0,
+      usedProperty: usedProperty
     });
     
     return response.data.results.map(page => {
