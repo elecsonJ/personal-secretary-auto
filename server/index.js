@@ -29,11 +29,21 @@ if (!admin.apps.length) {
           console.log('디코딩된 내용 (처음 100자):', decoded.substring(0, 100) + '...');
           console.log('디코딩된 내용 (167번째 주변):', decoded.substring(160, 180));
           
-          // 불필요한 문자 제거 및 정리
-          const cleanedJson = decoded
-            .replace(/\r\n/g, '\n')  // Windows 줄바꿈 정리
-            .replace(/\r/g, '\n')    // Mac 줄바꿈 정리
-            .trim();                 // 앞뒤 공백 제거
+          // private_key 내부 줄바꿈을 \\n으로 이스케이프 처리
+          let cleanedJson = decoded.trim();
+          
+          // private_key 영역에서 실제 줄바꿈을 \\n으로 변환
+          const privateKeyRegex = /"private_key":\s*"(-----BEGIN PRIVATE KEY-----[\s\S]*?-----END PRIVATE KEY-----)"/;
+          const match = cleanedJson.match(privateKeyRegex);
+          
+          if (match) {
+            const originalKey = match[1];
+            const escapedKey = originalKey
+              .replace(/\n/g, '\\n')
+              .replace(/\r/g, '\\n');
+            cleanedJson = cleanedJson.replace(originalKey, escapedKey);
+            console.log('🔑 private_key 줄바꿈 문자 이스케이프 처리 완료');
+          }
           
           // 디코딩된 내용이 JSON인지 확인
           if (cleanedJson.startsWith('{')) {
