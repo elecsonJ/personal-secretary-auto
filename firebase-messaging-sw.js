@@ -75,13 +75,35 @@ messaging.onBackgroundMessage((payload) => {
         console.log('[METHOD 2] body found:', notificationBody);
     }
     
-    // fallback 설정
-    notificationTitle = notificationTitle || '개인 비서 알림 (fallback)';
-    notificationBody = notificationBody || '새로운 알림이 있습니다. (fallback)';
+    // fallback 설정 (기본값 제거 - 서버에서 전송한 내용만 사용)
+    if (!notificationTitle || !notificationBody) {
+        console.log('[WARNING] 알림 제목 또는 내용이 없어서 알림을 표시하지 않습니다.');
+        return; // 알림을 표시하지 않음
+    }
     
     console.log('[FINAL] title:', notificationTitle);
     console.log('[FINAL] body:', notificationBody);
     console.log('=== 메시지 처리 완료 ===');
+    
+    // 알림 히스토리에 저장
+    try {
+        const notifications = JSON.parse(localStorage.getItem('fcm_notifications') || '[]');
+        const newNotification = {
+            id: Date.now(),
+            title: notificationTitle,
+            body: notificationBody,
+            time: new Date().toISOString(),
+            timestamp: Date.now()
+        };
+        
+        notifications.unshift(newNotification);
+        if (notifications.length > 50) notifications.splice(50);
+        
+        localStorage.setItem('fcm_notifications', JSON.stringify(notifications));
+        console.log('[HISTORY] 알림 히스토리에 저장됨');
+    } catch (error) {
+        console.log('[HISTORY] 히스토리 저장 실패:', error);
+    }
     
     // 메인 스레드로 알림 데이터 전송 (localStorage 저장용)
     const notificationData = {

@@ -59,6 +59,7 @@ jobs:
         echo "NOTION_API_KEY=${{ secrets.NOTION_API_KEY }}" >> $GITHUB_ENV
         echo "NOTION_CALENDAR_DB_ID=${{ secrets.NOTION_CALENDAR_DB_ID }}" >> $GITHUB_ENV
         echo "NOTION_TASKS_DB_ID=${{ secrets.NOTION_TASKS_DB_ID }}" >> $GITHUB_ENV
+        echo "WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}" >> $GITHUB_ENV
     
     # 데이터 디렉토리 생성
     - name: Create data directory
