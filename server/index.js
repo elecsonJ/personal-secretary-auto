@@ -2,6 +2,7 @@ const admin = require('firebase-admin');
 const axios = require('axios');
 const fs = require('fs').promises;
 const path = require('path');
+const express = require('express');
 
 // Firebase Admin SDK 초기화
 if (!admin.apps.length) {
@@ -113,6 +114,7 @@ const NOTION_TASKS_DB_ID = process.env.NOTION_TASKS_DB_ID;
 
 const DATA_DIR = path.join(__dirname, '../data');
 const WEATHER_STATE_FILE = path.join(DATA_DIR, 'weather-state.json');
+const NOTIFICATION_HISTORY_FILE = path.join(DATA_DIR, 'notification-history.json');
 
 const ensureDataDir = async () => {
   try {
@@ -142,6 +144,59 @@ const saveWeatherState = async (weatherData) => {
   } catch (error) {
     console.error('❌ 날씨 상태 저장 실패:', error);
     console.error('파일 경로:', WEATHER_STATE_FILE);
+  }
+};
+
+const saveNotificationHistory = async (title, body, type = 'personal_secretary', executionId = '') => {
+  try {
+    await ensureDataDir();
+    
+    // 기존 히스토리 로드
+    let history = [];
+    try {
+      const data = await fs.readFile(NOTIFICATION_HISTORY_FILE, 'utf-8');
+      history = JSON.parse(data);
+    } catch (error) {
+      console.log('📝 새로운 알림 히스토리 파일 생성');
+    }
+    
+    // 새 알림 추가
+    const newNotification = {
+      id: Date.now(),
+      title: title,
+      body: body,
+      type: type,
+      executionId: executionId,
+      timestamp: new Date().toISOString(),
+      source: 'server'
+    };
+    
+    history.unshift(newNotification); // 최신이 위로
+    
+    // 최대 100개까지만 보관
+    if (history.length > 100) {
+      history.splice(100);
+    }
+    
+    // 파일에 저장
+    const jsonData = JSON.stringify(history, null, 2);
+    await fs.writeFile(NOTIFICATION_HISTORY_FILE, jsonData);
+    
+    console.log(`📝 알림 히스토리 저장: "${title.substring(0, 30)}..." (총 ${history.length}개)`);
+    
+    return newNotification;
+  } catch (error) {
+    console.error('❌ 알림 히스토리 저장 실패:', error);
+  }
+};
+
+const loadNotificationHistory = async () => {
+  try {
+    const data = await fs.readFile(NOTIFICATION_HISTORY_FILE, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.log('📝 알림 히스토리 파일 없음 - 빈 배열 반환');
+    return [];
   }
 };
 
@@ -482,6 +537,56 @@ const getHighPriorityTasks = async () => {
   }
 };
 
+const getDailyTasks = async () => {
+  try {
+    if (!NOTION_API_KEY || !NOTION_TASKS_DB_ID) {
+      console.log('📅 Notion API 키 또는 Tasks DB ID 없음 - Daily 작업 조회 건너뜀');
+      return [];
+    }
+    
+    console.log('📅 Daily 작업 조회 시작:', { dbId: NOTION_TASKS_DB_ID.substring(0, 8) + '...' });
+    
+    const response = await axios.post(
+      `https://api.notion.com/v1/databases/${NOTION_TASKS_DB_ID}/query`,
+      {
+        filter: {
+          property: 'Status',
+          status: {
+            equals: 'Daily'
+          }
+        }
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${NOTION_API_KEY}`,
+          'Notion-Version': '2022-06-28',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    
+    console.log('✅ Daily 작업 조회 완료:', { count: response.data.results.length });
+    
+    return response.data.results.map(page => {
+      const titleProperty = page.properties.Name || page.properties.Title || page.properties.title;
+      let title = '제목 없음';
+      
+      if (titleProperty) {
+        if (titleProperty.title && titleProperty.title.length > 0) {
+          title = titleProperty.title.map(t => t.plain_text).join('');
+        } else if (titleProperty.rich_text && titleProperty.rich_text.length > 0) {
+          title = titleProperty.rich_text.map(t => t.plain_text).join('');
+        }
+      }
+      
+      return title;
+    });
+  } catch (error) {
+    console.error('Daily 작업 조회 실패:', error.message);
+    return [];
+  }
+};
+
 const sendPushNotification = async (title, body, data = {}) => {
   const results = [];
   
@@ -539,6 +644,11 @@ const sendPushNotification = async (title, body, data = {}) => {
       const response = await admin.messaging().send(message);
       console.log(`✅ ${device} 알림 전송 성공:`, response);
       results.push({ device, success: true, response });
+      
+      // 첫 번째 성공한 전송에서만 히스토리 저장 (중복 방지)
+      if (results.filter(r => r.success).length === 1) {
+        await saveNotificationHistory(title, body, data.type, data.executionId);
+      }
     } catch (error) {
       console.error(`❌ ${device} 알림 전송 실패:`, error.message);
       console.error(`❌ 오류 코드:`, error.code);
@@ -622,11 +732,12 @@ const sendMorningBriefing = async (executionId) => {
     const korea = new Date(now.getTime() + (9 * 60 * 60 * 1000));
     const todayStr = korea.toISOString().split('T')[0];
     
-    const [weather, news, todayEvents, highTasks] = await Promise.all([
+    const [weather, news, todayEvents, highTasks, dailyTasks] = await Promise.all([
       getCurrentWeather(),
       getTopNews(),
       getTodayEvents(todayStr),
-      getHighPriorityTasks()
+      getHighPriorityTasks(),
+      getDailyTasks()
     ]);
     
     let briefing = `🌅 좋은 아침입니다!\n\n`;
@@ -640,6 +751,10 @@ const sendMorningBriefing = async (executionId) => {
     
     if (highTasks.length > 0) {
       briefing += `⭐ HIGH 우선순위 작업:\n${highTasks.map(task => `• ${task}`).join('\n')}\n\n`;
+    }
+    
+    if (dailyTasks.length > 0) {
+      briefing += `📅 Daily 작업:\n${dailyTasks.map(task => `• ${task}`).join('\n')}\n\n`;
     }
     
     briefing += `📰 주요 뉴스:\n${news.headline}\n${news.abstract}`;
@@ -667,9 +782,10 @@ const sendEveningBriefing = async (executionId) => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowDateStr = tomorrow.toISOString().split('T')[0];
     
-    const [tomorrowEvents, highTasks] = await Promise.all([
+    const [tomorrowEvents, highTasks, dailyTasks] = await Promise.all([
       getTomorrowEvents(tomorrowDateStr),
-      getHighPriorityTasks()
+      getHighPriorityTasks(),
+      getDailyTasks()
     ]);
     
     let briefing = `🌆 저녁 브리핑입니다.\n\n`;
@@ -681,9 +797,15 @@ const sendEveningBriefing = async (executionId) => {
     }
     
     if (highTasks.length > 0) {
-      briefing += `⭐ HIGH 우선순위 작업:\n${highTasks.map(task => `• ${task}`).join('\n')}`;
+      briefing += `⭐ HIGH 우선순위 작업:\n${highTasks.map(task => `• ${task}`).join('\n')}\n\n`;
     } else {
-      briefing += `⭐ HIGH 우선순위 작업이 없습니다.`;
+      briefing += `⭐ HIGH 우선순위 작업이 없습니다.\n\n`;
+    }
+    
+    if (dailyTasks.length > 0) {
+      briefing += `📅 Daily 작업:\n${dailyTasks.map(task => `• ${task}`).join('\n')}`;
+    } else {
+      briefing += `📅 Daily 작업이 없습니다.`;
     }
     
     await sendPushNotification('🌆 저녁 브리핑', briefing, {
@@ -699,6 +821,72 @@ const sendEveningBriefing = async (executionId) => {
   }
 };
 
+// Express 서버 설정 (개발/테스트용)
+const app = express();
+app.use(express.json());
+app.use(express.static(path.join(__dirname, '../client')));
+
+// CORS 설정
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
+// 알림 히스토리 조회 API
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const history = await loadNotificationHistory();
+    res.json({
+      success: true,
+      notifications: history,
+      count: history.length
+    });
+  } catch (error) {
+    console.error('히스토리 조회 실패:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// 테스트 알림 전송 API
+app.post('/api/test-notification', async (req, res) => {
+  try {
+    const { title, body } = req.body;
+    const testTitle = title || '🧪 테스트 알림';
+    const testBody = body || '서버에서 전송한 테스트 알림입니다.';
+    
+    const results = await sendPushNotification(testTitle, testBody, {
+      type: 'test',
+      executionId: 'manual-test-' + Date.now()
+    });
+    
+    res.json({
+      success: true,
+      results: results,
+      message: '테스트 알림이 전송되었습니다.'
+    });
+  } catch (error) {
+    console.error('테스트 알림 전송 실패:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// 서버 시작 (포트가 설정된 경우에만)
+const PORT = process.env.PORT;
+if (PORT) {
+  app.listen(PORT, () => {
+    console.log(`🚀 서버가 포트 ${PORT}에서 실행 중입니다.`);
+    console.log(`📱 알림 히스토리: http://localhost:${PORT}/history.html`);
+    console.log(`📊 API 엔드포인트: http://localhost:${PORT}/api/notifications`);
+  });
+}
+
 module.exports = {
   sendPushNotification,
   checkWeatherChanges,
@@ -708,5 +896,9 @@ module.exports = {
   getTopNews,
   getTodayEvents,
   getTomorrowEvents,
-  getHighPriorityTasks
+  getHighPriorityTasks,
+  getDailyTasks,
+  loadNotificationHistory,
+  saveNotificationHistory,
+  app
 };

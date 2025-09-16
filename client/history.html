@@ -109,6 +109,48 @@
             return stored ? JSON.parse(stored) : [];
         }
 
+        async function getServerNotifications() {
+            try {
+                const response = await fetch('/api/notifications');
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('[SERVER] 서버에서 알림 히스토리 로드:', data.length, '개');
+                    return data;
+                }
+            } catch (error) {
+                console.log('[SERVER] 서버 알림 히스토리 로드 실패:', error);
+            }
+            return [];
+        }
+
+        function mergeNotifications(localNotifications, serverNotifications) {
+            const merged = [...localNotifications];
+            
+            // 서버 알림을 로컬에 없는 것만 추가
+            serverNotifications.forEach(serverNotif => {
+                const exists = merged.some(localNotif => 
+                    Math.abs(new Date(localNotif.time) - new Date(serverNotif.timestamp)) < 5000 && 
+                    localNotif.title === serverNotif.title
+                );
+                
+                if (!exists) {
+                    merged.push({
+                        id: serverNotif.id,
+                        title: serverNotif.title,
+                        body: serverNotif.body,
+                        time: serverNotif.timestamp,
+                        timestamp: new Date(serverNotif.timestamp).getTime(),
+                        source: serverNotif.source || 'server'
+                    });
+                }
+            });
+            
+            // 시간순으로 정렬 (최신순)
+            merged.sort((a, b) => new Date(b.time) - new Date(a.time));
+            
+            return merged;
+        }
+
         function clearHistory() {
             if (confirm('모든 알림 히스토리를 삭제하시겠습니까?')) {
                 localStorage.removeItem('fcm_notifications');
@@ -128,22 +170,36 @@
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
         }
 
-        function loadNotifications() {
-            const notifications = getNotifications();
+        async function loadNotifications() {
             const container = document.getElementById('notifications-container');
+            container.innerHTML = '<div class="no-notifications">알림 로딩 중...</div>';
             
-            if (notifications.length === 0) {
-                container.innerHTML = '<div class="no-notifications">저장된 알림이 없습니다</div>';
-                return;
+            try {
+                const localNotifications = getNotifications();
+                const serverNotifications = await getServerNotifications();
+                const allNotifications = mergeNotifications(localNotifications, serverNotifications);
+                
+                console.log('[MERGE] 로컬:', localNotifications.length, '개, 서버:', serverNotifications.length, '개, 통합:', allNotifications.length, '개');
+                
+                if (allNotifications.length === 0) {
+                    container.innerHTML = '<div class="no-notifications">저장된 알림이 없습니다</div>';
+                    return;
+                }
+                
+                container.innerHTML = allNotifications.map(notif => {
+                    const sourceLabel = notif.source === 'server' ? '🖥️' : '📱';
+                    return `
+                        <div class="notification-item">
+                            <div class="notification-title">${sourceLabel} ${notif.title}</div>
+                            <div class="notification-body">${notif.body}</div>
+                            <div class="notification-time">${formatTime(notif.time)}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('[LOAD] 알림 로딩 실패:', error);
+                container.innerHTML = '<div class="no-notifications">알림 로딩 중 오류가 발생했습니다</div>';
             }
-            
-            container.innerHTML = notifications.map(notif => `
-                <div class="notification-item">
-                    <div class="notification-title">${notif.title}</div>
-                    <div class="notification-body">${notif.body}</div>
-                    <div class="notification-time">${formatTime(notif.time)}</div>
-                </div>
-            `).join('');
         }
 
         // 페이지 로드 시 알림 불러오기
@@ -176,9 +232,35 @@
             loadNotifications();
         }
 
+        // 서버 테스트 알림 추가
+        async function addServerTestNotification() {
+            try {
+                const response = await fetch('/api/test-notification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: '🖥️ 서버 테스트 알림',
+                        body: '서버 측 알림 히스토리 저장 기능이 정상 작동합니다!'
+                    })
+                });
+                
+                if (response.ok) {
+                    console.log('[SERVER] 서버 테스트 알림 전송 성공');
+                    setTimeout(loadNotifications, 1000); // 1초 후 새로고침
+                } else {
+                    console.error('[SERVER] 서버 테스트 알림 전송 실패');
+                }
+            } catch (error) {
+                console.error('[SERVER] 서버 테스트 알림 요청 실패:', error);
+            }
+        }
+
         // 개발 모드에서 테스트 버튼 추가
         if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-            document.querySelector('.header').innerHTML += '<button class="refresh-btn" onclick="addTestNotification()">🧪 테스트 알림 추가</button>';
+            document.querySelector('.header').innerHTML += '<button class="refresh-btn" onclick="addTestNotification()">🧪 로컬 테스트</button>';
+            document.querySelector('.header').innerHTML += '<button class="refresh-btn" onclick="addServerTestNotification()">🖥️ 서버 테스트</button>';
         }
     </script>
 </body>
