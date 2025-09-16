@@ -235,6 +235,9 @@ const getCurrentWeather = async () => {
       itemCount: Array.isArray(response.data.response?.body?.items?.item) ? response.data.response.body.items.item.length : 'not array'
     });
     
+    // 전체 응답 구조 디버깅
+    console.log('🔍 전체 응답 데이터:', JSON.stringify(response.data, null, 2).substring(0, 500) + '...');
+    
     if (response.data.response?.header?.resultCode !== '00') {
       console.error('❌ 날씨 API 오류:', response.data.response?.header);
       throw new Error(`날씨 API 오류: ${response.data.response?.header?.resultMsg || '알 수 없는 오류'}`);
@@ -309,7 +312,7 @@ const getTodayEvents = async (dateStr) => {
       `https://api.notion.com/v1/databases/${NOTION_CALENDAR_DB_ID}/query`,
       {
         filter: {
-          property: 'Date',
+          property: 'date', // 소문자로 시도
           date: {
             equals: dateStr
           }
@@ -366,7 +369,7 @@ const getTomorrowEvents = async (dateStr) => {
       `https://api.notion.com/v1/databases/${NOTION_CALENDAR_DB_ID}/query`,
       {
         filter: {
-          property: 'Date',
+          property: 'date', // 소문자로 시도
           date: {
             equals: dateStr
           }
