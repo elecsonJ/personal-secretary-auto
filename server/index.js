@@ -517,15 +517,16 @@ const sendPushNotification = async (title, body, data = {}) => {
     console.log(`🔑 토큰 (앞 20자): ${token.substring(0, 20)}...`);
     
     try {
+      // data-only 메시지로 변경 (Service Worker에서 처리)
       const message = {
         token: token,
-        notification: {
-          title: title,
-          body: body
-        },
         data: {
+          title: title,
+          body: body,
           timestamp: new Date().toISOString(),
-          ...data
+          type: data.type || 'personal_secretary',
+          executionId: data.executionId || '',
+          click_action: '/'
         },
         webpush: {
           fcm_options: {

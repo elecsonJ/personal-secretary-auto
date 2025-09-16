@@ -85,24 +85,26 @@ messaging.onBackgroundMessage((payload) => {
     console.log('[FINAL] body:', notificationBody);
     console.log('=== 메시지 처리 완료 ===');
     
-    // 알림 히스토리에 저장
+    // 클라이언트에게 알림 데이터 전송 (히스토리 저장용)
     try {
-        const notifications = JSON.parse(localStorage.getItem('fcm_notifications') || '[]');
-        const newNotification = {
-            id: Date.now(),
+        const notificationData = {
+            type: 'FCM_NOTIFICATION',
             title: notificationTitle,
             body: notificationBody,
             time: new Date().toISOString(),
             timestamp: Date.now()
         };
         
-        notifications.unshift(newNotification);
-        if (notifications.length > 50) notifications.splice(50);
+        // 모든 클라이언트에게 메시지 전송
+        self.clients.matchAll().then(clients => {
+            clients.forEach(client => {
+                client.postMessage(notificationData);
+            });
+        });
         
-        localStorage.setItem('fcm_notifications', JSON.stringify(notifications));
-        console.log('[HISTORY] 알림 히스토리에 저장됨');
+        console.log('[HISTORY] 클라이언트에 알림 데이터 전송됨');
     } catch (error) {
-        console.log('[HISTORY] 히스토리 저장 실패:', error);
+        console.log('[HISTORY] 클라이언트 메시지 전송 실패:', error);
     }
     
     // 메인 스레드로 알림 데이터 전송 (localStorage 저장용)

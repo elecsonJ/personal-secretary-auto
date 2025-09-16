@@ -155,10 +155,18 @@
         // Service Worker에서 알림을 받았을 때 자동으로 저장하도록 이벤트 리스너 추가
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.addEventListener('message', event => {
+                console.log('[HISTORY] Service Worker 메시지 수신:', event.data);
                 if (event.data && event.data.type === 'FCM_NOTIFICATION') {
-                    saveNotification(event.data.title, event.data.body);
+                    const time = event.data.time ? new Date(event.data.time) : new Date();
+                    saveNotification(event.data.title, event.data.body, time);
                     loadNotifications();
+                    console.log('[HISTORY] 알림 히스토리에 저장됨:', event.data.title);
                 }
+            });
+            
+            // Service Worker 등록 확인
+            navigator.serviceWorker.ready.then(registration => {
+                console.log('[HISTORY] Service Worker 등록 완료:', registration);
             });
         }
 
