@@ -202,7 +202,7 @@ const loadNotificationHistory = async () => {
 
 function parseWeatherData(items) {
   const now = new Date();
-  const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+  const koreaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
   const currentHour = koreaTime.getHours();
   
   if (!items || items.length === 0) {
@@ -728,9 +728,12 @@ const sendMorningBriefing = async (executionId) => {
   try {
     console.log(`[${executionId}] 아침 브리핑 시작...`);
     
+    // 한국 시간으로 오늘 날짜 계산
     const now = new Date();
-    const korea = new Date(now.getTime() + (9 * 60 * 60 * 1000));
-    const todayStr = korea.toISOString().split('T')[0];
+    const koreaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+    const todayStr = koreaTime.toISOString().split('T')[0];
+    
+    console.log(`[${executionId}] 한국 시간 기준 오늘 날짜: ${todayStr}`);
     
     const [weather, news, todayEvents, highTasks, dailyTasks] = await Promise.all([
       getCurrentWeather(),
@@ -754,7 +757,7 @@ const sendMorningBriefing = async (executionId) => {
     }
     
     if (dailyTasks.length > 0) {
-      briefing += `📅 Daily 작업:\n${dailyTasks.map(task => `• ${task}`).join('\n')}\n\n`;
+      briefing += `🔄 Daily 작업:\n${dailyTasks.map(task => `• ${task}`).join('\n')}\n\n`;
     }
     
     briefing += `📰 주요 뉴스:\n${news.headline}\n${news.abstract}`;
@@ -776,11 +779,14 @@ const sendEveningBriefing = async (executionId) => {
   try {
     console.log(`[${executionId}] 저녁 브리핑 시작...`);
     
+    // 한국 시간으로 내일 날짜 계산
     const now = new Date();
-    const korea = new Date(now.getTime() + (9 * 60 * 60 * 1000));
-    const tomorrow = new Date(korea);
+    const koreaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+    const tomorrow = new Date(koreaTime);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowDateStr = tomorrow.toISOString().split('T')[0];
+    
+    console.log(`[${executionId}] 한국 시간 기준 내일 날짜: ${tomorrowDateStr}`);
     
     const [tomorrowEvents, highTasks, dailyTasks] = await Promise.all([
       getTomorrowEvents(tomorrowDateStr),
@@ -803,9 +809,9 @@ const sendEveningBriefing = async (executionId) => {
     }
     
     if (dailyTasks.length > 0) {
-      briefing += `📅 Daily 작업:\n${dailyTasks.map(task => `• ${task}`).join('\n')}`;
+      briefing += `🔄 Daily 작업:\n${dailyTasks.map(task => `• ${task}`).join('\n')}`;
     } else {
-      briefing += `📅 Daily 작업이 없습니다.`;
+      briefing += `🔄 Daily 작업이 없습니다.`;
     }
     
     await sendPushNotification('🌆 저녁 브리핑', briefing, {
