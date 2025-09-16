@@ -27,10 +27,17 @@ if (!admin.apps.length) {
         try {
           const decoded = Buffer.from(serviceAccountJson.trim(), 'base64').toString('utf-8');
           console.log('디코딩된 내용 (처음 100자):', decoded.substring(0, 100) + '...');
+          console.log('디코딩된 내용 (167번째 주변):', decoded.substring(160, 180));
+          
+          // 불필요한 문자 제거 및 정리
+          const cleanedJson = decoded
+            .replace(/\r\n/g, '\n')  // Windows 줄바꿈 정리
+            .replace(/\r/g, '\n')    // Mac 줄바꿈 정리
+            .trim();                 // 앞뒤 공백 제거
           
           // 디코딩된 내용이 JSON인지 확인
-          if (decoded.trim().startsWith('{')) {
-            serviceAccount = JSON.parse(decoded);
+          if (cleanedJson.startsWith('{')) {
+            serviceAccount = JSON.parse(cleanedJson);
             console.log('✅ Base64 디코딩 및 JSON 파싱 성공');
           } else {
             throw new Error('디코딩된 내용이 JSON 형태가 아닙니다');
@@ -38,8 +45,13 @@ if (!admin.apps.length) {
         } catch (decodeError) {
           console.error('Base64 디코딩 실패:', decodeError.message);
           console.log('원본 JSON으로 직접 파싱 시도...');
-          // 원본 그대로 파싱 시도
-          serviceAccount = JSON.parse(serviceAccountJson);
+          try {
+            // 원본 그대로 파싱 시도
+            serviceAccount = JSON.parse(serviceAccountJson);
+          } catch (originalError) {
+            console.error('원본 JSON 파싱도 실패:', originalError.message);
+            throw originalError;
+          }
         }
       }
       
