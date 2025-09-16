@@ -29,20 +29,31 @@ if (!admin.apps.length) {
           console.log('디코딩된 내용 (처음 100자):', decoded.substring(0, 100) + '...');
           console.log('디코딩된 내용 (167번째 주변):', decoded.substring(160, 180));
           
-          // private_key 내부 줄바꿈을 \\n으로 이스케이프 처리
+          // 강력한 JSON 정리: private_key 따옴표 내부의 모든 줄바꿈을 \\n으로 치환
           let cleanedJson = decoded.trim();
           
-          // private_key 영역에서 실제 줄바꿈을 \\n으로 변환
-          const privateKeyRegex = /"private_key":\s*"(-----BEGIN PRIVATE KEY-----[\s\S]*?-----END PRIVATE KEY-----)"/;
-          const match = cleanedJson.match(privateKeyRegex);
-          
-          if (match) {
-            const originalKey = match[1];
-            const escapedKey = originalKey
-              .replace(/\n/g, '\\n')
-              .replace(/\r/g, '\\n');
-            cleanedJson = cleanedJson.replace(originalKey, escapedKey);
-            console.log('🔑 private_key 줄바꿈 문자 이스케이프 처리 완료');
+          // private_key 값 부분만 찾아서 줄바꿈 처리
+          const privateKeyStart = cleanedJson.indexOf('"private_key":"');
+          if (privateKeyStart !== -1) {
+            const valueStart = privateKeyStart + '"private_key":"'.length;
+            const valueEnd = cleanedJson.indexOf('","', valueStart);
+            
+            if (valueEnd !== -1) {
+              const beforeKey = cleanedJson.substring(0, valueStart);
+              const keyValue = cleanedJson.substring(valueStart, valueEnd);
+              const afterKey = cleanedJson.substring(valueEnd);
+              
+              // private_key 값 내부의 실제 줄바꿈을 \\n으로 치환
+              const escapedKeyValue = keyValue
+                .replace(/\n/g, '\\n')
+                .replace(/\r\n/g, '\\n')
+                .replace(/\r/g, '\\n');
+              
+              cleanedJson = beforeKey + escapedKeyValue + afterKey;
+              console.log('🔑 private_key 값 정리 완료');
+              console.log('🔍 처리 전 키 길이:', keyValue.length);
+              console.log('🔍 처리 후 키 길이:', escapedKeyValue.length);
+            }
           }
           
           // 디코딩된 내용이 JSON인지 확인
