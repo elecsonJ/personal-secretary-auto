@@ -222,10 +222,28 @@ const getCurrentWeather = async () => {
     
     const url = `${WEATHER_API_URL}?serviceKey=${SERVICE_KEY}&numOfRows=1000&pageNo=1&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=55&ny=127`;
     
+    console.log('🌤️ 날씨 API 요청:', { baseDate, baseTime, hour });
+    console.log('🔗 API URL:', url.substring(0, 100) + '...');
+    
     const response = await axios.get(url);
+    console.log('📡 날씨 API 응답 상태:', response.status);
+    console.log('📊 응답 데이터 구조:', {
+      hasResponse: !!response.data.response,
+      hasBody: !!response.data.response?.body,
+      hasItems: !!response.data.response?.body?.items,
+      itemType: Array.isArray(response.data.response?.body?.items?.item) ? 'array' : typeof response.data.response?.body?.items?.item,
+      itemCount: Array.isArray(response.data.response?.body?.items?.item) ? response.data.response.body.items.item.length : 'not array'
+    });
+    
+    if (response.data.response?.header?.resultCode !== '00') {
+      console.error('❌ 날씨 API 오류:', response.data.response?.header);
+      throw new Error(`날씨 API 오류: ${response.data.response?.header?.resultMsg || '알 수 없는 오류'}`);
+    }
+    
     const items = response.data.response?.body?.items?.item;
     
     if (!items) {
+      console.error('❌ 날씨 데이터 없음:', response.data);
       throw new Error('날씨 API에서 데이터를 가져올 수 없습니다.');
     }
     
@@ -244,23 +262,36 @@ const getCurrentWeather = async () => {
 const getTopNews = async () => {
   try {
     if (!NYT_API_KEY) {
+      console.log('📰 NYT API 키 없음 - 기본 메시지 반환');
       return { headline: 'NYT API 키가 설정되지 않았습니다.', abstract: '뉴스를 가져올 수 없습니다.' };
     }
     
+    console.log('📰 NYT 뉴스 조회 시작...');
     const response = await axios.get(`https://api.nytimes.com/svc/topstories/v2/world.json?api-key=${NYT_API_KEY}`);
     const articles = response.data.results;
     
     if (articles && articles.length > 0) {
       const topArticle = articles[0];
+      console.log('✅ NYT 뉴스 조회 성공:', { 
+        count: articles.length, 
+        title: topArticle.title?.substring(0, 50) + '...' 
+      });
       return {
         headline: topArticle.title || '제목 없음',
         abstract: topArticle.abstract || '내용 없음'
       };
     }
     
+    console.log('⚠️ NYT 뉴스 없음');
     return { headline: '뉴스를 찾을 수 없습니다.', abstract: '최신 뉴스가 없습니다.' };
   } catch (error) {
-    console.error('뉴스 조회 실패:', error.message);
+    console.error('❌ 뉴스 조회 실패:', error.message);
+    if (error.response) {
+      console.error('📡 NYT API 응답 오류:', {
+        status: error.response.status,
+        statusText: error.response.statusText
+      });
+    }
     return { headline: '뉴스 조회 실패', abstract: '뉴스를 가져올 수 없습니다.' };
   }
 };
@@ -268,8 +299,11 @@ const getTopNews = async () => {
 const getTodayEvents = async (dateStr) => {
   try {
     if (!NOTION_API_KEY || !NOTION_CALENDAR_DB_ID) {
+      console.log('📅 Notion API 키 또는 DB ID 없음 - 일정 조회 건너뜀');
       return [];
     }
+    
+    console.log('📅 오늘 일정 조회 시작:', { dateStr, dbId: NOTION_CALENDAR_DB_ID.substring(0, 8) + '...' });
     
     const response = await axios.post(
       `https://api.notion.com/v1/databases/${NOTION_CALENDAR_DB_ID}/query`,
@@ -290,6 +324,11 @@ const getTodayEvents = async (dateStr) => {
       }
     );
     
+    console.log('✅ Notion 일정 API 응답 성공:', { 
+      status: response.status, 
+      resultCount: response.data?.results?.length || 0 
+    });
+    
     return response.data.results.map(page => {
       const titleProperty = page.properties.Name || page.properties.Title || page.properties.title;
       let title = '제목 없음';
@@ -305,7 +344,14 @@ const getTodayEvents = async (dateStr) => {
       return title;
     });
   } catch (error) {
-    console.error('오늘 일정 조회 실패:', error.message);
+    console.error('❌ 오늘 일정 조회 실패:', error.message);
+    if (error.response) {
+      console.error('📡 Notion API 응답 오류:', {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data
+      });
+    }
     return [];
   }
 };
@@ -358,8 +404,11 @@ const getTomorrowEvents = async (dateStr) => {
 const getHighPriorityTasks = async () => {
   try {
     if (!NOTION_API_KEY || !NOTION_TASKS_DB_ID) {
+      console.log('⭐ Notion API 키 또는 Tasks DB ID 없음 - 작업 조회 건너뜀');
       return [];
     }
+    
+    console.log('⭐ HIGH 우선순위 작업 조회 시작:', { dbId: NOTION_TASKS_DB_ID.substring(0, 8) + '...' });
     
     const response = await axios.post(
       `https://api.notion.com/v1/databases/${NOTION_TASKS_DB_ID}/query`,
