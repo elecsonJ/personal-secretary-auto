@@ -403,23 +403,18 @@ const getHighPriorityTasks = async () => {
 const sendPushNotification = async (title, body, data = {}) => {
   const results = [];
   
-  // Firebase Admin SDK 사용 가능 여부 확인
+  // Firebase Admin SDK 사용 가능 여부 확인 (간단한 방법)
   let isFirebaseReady = false;
   try {
-    await admin.messaging().send({
-      token: 'test-dry-run-token',
-      notification: { title: 'test', body: 'test' },
-      dryRun: true
-    });
-    isFirebaseReady = true;
-  } catch (error) {
-    if (error.code === 'messaging/registration-token-not-registered' || 
-        error.code === 'messaging/invalid-registration-token') {
-      isFirebaseReady = true; // Firebase는 정상, 토큰만 잘못됨
-    } else {
-      console.error('🔥 Firebase Messaging 초기화 확인 실패:', error.message);
-      isFirebaseReady = false;
+    // Firebase messaging 객체가 존재하는지만 확인
+    const messaging = admin.messaging();
+    if (messaging) {
+      isFirebaseReady = true;
+      console.log('🔥 Firebase Messaging 객체 확인 완료');
     }
+  } catch (error) {
+    console.error('🔥 Firebase Messaging 초기화 확인 실패:', error.message);
+    isFirebaseReady = false;
   }
   
   if (!isFirebaseReady) {
