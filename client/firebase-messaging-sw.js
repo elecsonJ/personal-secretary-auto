@@ -1,5 +1,54 @@
 // Firebase Messaging Service Worker
 
+// IndexedDB 저장 함수
+async function saveToIndexedDB(notificationData) {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('FCMNotifications', 1);
+        
+        request.onerror = () => reject(request.error);
+        
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('notifications')) {
+                const store = db.createObjectStore('notifications', { keyPath: 'id' });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+            }
+        };
+        
+        request.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(['notifications'], 'readwrite');
+            const store = transaction.objectStore('notifications');
+            
+            const addRequest = store.add(notificationData);
+            
+            addRequest.onsuccess = () => {
+                // 최대 50개까지만 보관
+                const cursorRequest = store.index('timestamp').openCursor(null, 'prev');
+                let count = 0;
+                const toDelete = [];
+                
+                cursorRequest.onsuccess = (event) => {
+                    const cursor = event.target.result;
+                    if (cursor) {
+                        count++;
+                        if (count > 50) {
+                            toDelete.push(cursor.value.id);
+                        }
+                        cursor.continue();
+                    } else {
+                        // 오래된 항목 삭제
+                        toDelete.forEach(id => store.delete(id));
+                        resolve();
+                    }
+                };
+            };
+            
+            addRequest.onerror = () => reject(addRequest.error);
+        };
+    });
+}
+
 // Firebase SDK imports
 importScripts('https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js');
@@ -85,59 +134,38 @@ messaging.onBackgroundMessage((payload) => {
     console.log('[FINAL] body:', notificationBody);
     console.log('=== 메시지 처리 완료 ===');
     
-    // 클라이언트에게 알림 데이터 전송 (히스토리 저장용)
+    // Service Worker에서 직접 IndexedDB에 저장
     try {
         const notificationData = {
-            type: 'FCM_NOTIFICATION',
+            id: Date.now(),
             title: notificationTitle,
             body: notificationBody,
             time: new Date().toISOString(),
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            data: payload.data || {},
+            source: isFromGitHub ? 'github-actions' : 'manual',
+            executionId: payload.data?.executionId || null
         };
         
-        // 모든 클라이언트에게 메시지 전송
+        // IndexedDB에 직접 저장
+        await saveToIndexedDB(notificationData);
+        console.log('[INDEXEDDB] 알림 히스토리 저장 완료:', notificationData.title);
+        
+        // 클라이언트에게도 알림 (UI 업데이트용)
         self.clients.matchAll().then(clients => {
-            clients.forEach(client => {
-                client.postMessage(notificationData);
+            console.log('[CLIENTS] 활성 클라이언트 수:', clients.length);
+            clients.forEach((client, index) => {
+                console.log(`[CLIENT ${index + 1}] 알림 데이터 전송`);
+                client.postMessage({
+                    type: 'NOTIFICATION_RECEIVED',
+                    notification: notificationData
+                });
             });
         });
         
-        console.log('[HISTORY] 클라이언트에 알림 데이터 전송됨');
     } catch (error) {
-        console.log('[HISTORY] 클라이언트 메시지 전송 실패:', error);
+        console.error('[STORAGE] 알림 저장 실패:', error);
     }
-    
-    // 메인 스레드로 알림 데이터 전송 (localStorage 저장용)
-    const notificationData = {
-        id: Date.now(),
-        title: notificationTitle,
-        body: notificationBody,
-        data: payload.data || {},
-        timestamp: timestamp, // 일관된 timestamp 사용
-        sent: true,
-        source: isFromGitHub ? 'github-actions' : 'manual', // 메시지 출처 표시
-        executionId: payload.data?.executionId || null
-    };
-    
-    console.log('[STORAGE] 메인 스레드로 알림 데이터 전송:', notificationData);
-    
-    if (isFromGitHub) {
-        console.log('🚀 [GitHub Actions 알림을 localStorage에 저장 시도]');
-    }
-    
-    // 모든 활성 클라이언트에게 메시지 전송
-    self.clients.matchAll().then(clients => {
-        console.log('[STORAGE] 활성 클라이언트 수:', clients.length);
-        clients.forEach((client, index) => {
-            console.log(`[STORAGE] 클라이언트 ${index + 1}에게 메시지 전송`);
-            client.postMessage({
-                type: 'NOTIFICATION_RECEIVED',
-                notification: notificationData
-            });
-        });
-    }).catch(error => {
-        console.error('[STORAGE] 클라이언트 메시지 전송 실패:', error);
-    });
     
     const notificationOptions = {
         body: notificationBody,

@@ -3,17 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>개인 비서 자동화 시스템</title>
-    
-    <!-- PWA 설정 -->
-    <meta name="theme-color" content="#2196F3">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="개인비서">
-    
+    <title>개인 비서</title>
+    <meta name="description" content="스마트한 일정 관리와 알림 서비스">
     <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2196F3">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
-    
     <style>
         * {
             margin: 0;
@@ -25,610 +19,471 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: white;
+            color: #333;
             padding: 20px;
         }
         
         .container {
-            max-width: 400px;
+            max-width: 600px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
         
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .service-status {
+            text-align: center;
             margin-bottom: 30px;
         }
         
-        h1 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 300;
-            flex-grow: 1;
-            text-align: center;
-        }
-        
-        .refresh-icon {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            background: #4CAF50;
             color: white;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        
+        .status-indicator::before {
+            content: "●";
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .features {
+            list-style: none;
+        }
+        
+        .features li {
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 18px;
+            font-size: 1.05em;
         }
         
-        .refresh-icon:hover {
-            background: rgba(255, 255, 255, 0.35);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            transform: scale(1.1);
+        .features li:last-child {
+            border-bottom: none;
         }
         
-        .refresh-icon:active {
-            transform: scale(0.95) rotate(180deg);
-            background: rgba(255, 255, 255, 0.4);
+        .features li::before {
+            content: "✓";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.2em;
         }
         
-        @keyframes refreshSpin {
-            0% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.05) rotate(180deg); }
-            100% { transform: scale(1) rotate(360deg); }
+        .recent-notifications {
+            margin-top: 20px;
         }
         
-        .refresh-icon.spinning {
-            animation: refreshSpin 0.6s ease-in-out;
+        .recent-notifications h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 500;
         }
         
-        .status-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 15px 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .status-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .status-value {
-            opacity: 0.8;
-            font-size: 14px;
-        }
-        
-        button {
-            width: 100%;
+        .notification-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 10px 0;
+            margin-bottom: 10px;
+            border-radius: 8px;
         }
         
-        button:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .notification-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .notification-body {
+            color: #666;
+            line-height: 1.4;
+            font-size: 0.95em;
+        }
+        
+        .notification-time {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 8px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+        
+        .action-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 10px 5px 0 0;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        .action-button:hover {
+            background: #5a67d8;
             transform: translateY(-2px);
         }
         
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+        .install-prompt {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
         }
         
-        .log-area {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            margin-top: 20px;
+        .install-button {
+            background: white;
+            color: #4CAF50;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 0 5px;
+            cursor: pointer;
         }
         
-        .setup-section {
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        .test-section {
+            border-top: 1px solid #eee;
             padding-top: 20px;
             margin-top: 20px;
+            text-align: center;
         }
         
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 14px;
+        .test-section h4 {
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 1.1em;
         }
         
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .success {
-            color: #4CAF50;
-        }
-        
-        .error {
-            color: #f44336;
-        }
-        
-        .warning {
-            color: #FF9800;
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .card {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div></div> <!-- 빈 공간으로 중앙 정렬 유지 -->
             <h1>🤖 개인 비서</h1>
-            <button class="refresh-icon" onclick="refreshData()" title="새로고침">🔄</button>
+            <p>스마트한 일정 관리와 알림 서비스</p>
         </div>
         
-        <!-- 최신 알림 표시 -->
-        <div class="status-card" id="latestNotification">
-            <div class="status-title">
-                <span>📱</span>
-                <span>최신 알림</span>
-            </div>
-            <div class="status-value" id="latestNotificationContent">알림 내역이 없습니다</div>
-        </div>
-        
-        <!-- 빠른 액세스 버튼 -->
-        <button onclick="window.location.href='dashboard.html'" style="margin-bottom: 20px; background: rgba(255, 255, 255, 0.3);">📱 전체 알림 내역 보기</button>
-        
-        <!-- 간단한 상태 표시 -->
-        <div class="status-card">
-            <div class="status-title">
-                <span>🔄</span>
-                <span>시스템 상태</span>
-            </div>
-            <div class="status-value" id="systemStatus">초기화 중...</div>
-        </div>
-        
-        <!-- GitHub Actions 모니터링 -->
-        <div class="status-card">
-            <div class="status-title">
-                <span>🚀</span>
-                <span>GitHub Actions 모니터링</span>
-            </div>
-            <div class="status-value">
-                <div>메시지 수신: <span id="githubMessageCount">0</span>개</div>
-                <div>마지막 수신: <span id="lastGithubMessage">-</span></div>
-                <button onclick="clearGithubMonitoring()" style="margin-top: 5px; padding: 5px 10px; font-size: 12px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 5px; cursor: pointer;">카운터 초기화</button>
+        <div class="install-prompt" id="installPrompt">
+            📱 이 앱을 홈 화면에 추가하시겠습니까?
+            <div style="margin-top: 15px;">
+                <button class="install-button" onclick="installApp()">추가</button>
+                <button class="install-button" onclick="hideInstallPrompt()">나중에</button>
             </div>
         </div>
         
-        <!-- 테스트 버튼들 (자주 사용하는 기능만) -->
-        <button onclick="testMorningBriefing()" id="morningBtn" disabled>🌅 아침 브리핑 테스트</button>
-        <button onclick="testEveningPrep()" id="eveningBtn" disabled>🌆 저녁 준비 테스트</button>
-        <button onclick="testWeatherCheck()" id="weatherBtn" disabled>🌤️ 날씨 체크 테스트</button>
-        
-        <!-- 설정 섹션 (하단으로 이동) -->
-        <div class="setup-section">
-            <h3>🔧 초기 설정 (한 번만 필요)</h3>
-            <button onclick="requestNotificationPermission()">🔔 알림 권한 요청</button>
-            <button onclick="generateFCMToken()" id="tokenBtn" disabled>📱 FCM 토큰 생성</button>
-            <input type="text" id="fcmTokenInput" placeholder="FCM 토큰을 여기에 입력하세요">
-            <button onclick="saveFCMToken()">💾 토큰 저장</button>
+        <div class="card">
+            <div class="service-status">
+                <div class="status-indicator">
+                    서비스 활성화됨
+                </div>
+                <p>개인 비서가 자동으로 중요한 정보를 알려드립니다</p>
+            </div>
+            
+            <ul class="features">
+                <li>매일 오전 7시 아침 브리핑 (날씨, 오늘 일정)</li>
+                <li>매일 오후 7시 저녁 준비 (내일 일정, 중요 작업)</li>
+                <li>날씨 변화 실시간 알림</li>
+                <li>Notion 캘린더 및 작업 연동</li>
+            </ul>
         </div>
         
-        <!-- 로그 영역 -->
-        <div class="log-area" id="logArea">시스템 로그가 여기에 표시됩니다...\n</div>
+        <div class="card">
+            <div class="recent-notifications">
+                <h3>📥 최근 알림</h3>
+                <div id="notificationsList">
+                    <div class="empty-state">
+                        최근 알림이 없습니다
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="/history.html" class="action-button">전체 히스토리 보기</a>
+                    <button class="action-button" onclick="refreshNotifications()">새로고침</button>
+                </div>
+            </div>
+            
+            <div class="test-section">
+                <h4>테스트 기능</h4>
+                <button class="action-button" onclick="testMorningBriefing()">🌅 아침 브리핑</button>
+                <button class="action-button" onclick="testEveningBriefing()">🌆 저녁 준비</button>
+                <button class="action-button" onclick="testWeatherCheck()">🌤️ 날씨 확인</button>
+            </div>
+        </div>
     </div>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js"></script>
-    
+
     <script>
-        // Firebase 설정
-        const firebaseConfig = {
-            apiKey: "AIzaSyDOJg47e_S3-sgZJMeYZwSsy-MqS463rc0",
-            authDomain: "personal-secretary-auto.firebaseapp.com",
-            projectId: "personal-secretary-auto",
-            storageBucket: "personal-secretary-auto.firebasestorage.app",
-            messagingSenderId: "10792151581",
-            appId: "1:10792151581:web:69fc187087a3566f9db4f4",
-            measurementId: "G-R4097RRZ9B"
-        };
+        // PWA 설치 기능
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPrompt').style.display = 'block';
+        });
+        
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    deferredPrompt = null;
+                    hideInstallPrompt();
+                });
+            }
+        }
+        
+        function hideInstallPrompt() {
+            document.getElementById('installPrompt').style.display = 'none';
+        }
         
         // Firebase 초기화
         let messaging = null;
-        let fcmToken = localStorage.getItem('fcmToken');
+        let isFirebaseReady = false;
         
-        function log(message, type = 'info') {
-            const logArea = document.getElementById('logArea');
-            const timestamp = new Date().toLocaleString('ko-KR');
-            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
-            logArea.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
-            logArea.scrollTop = logArea.scrollHeight;
-        }
-        
-        function updateStatus() {
-            const systemStatus = document.getElementById('systemStatus');
-            
-            if (fcmToken) {
-                systemStatus.innerHTML = `<span class="success">준비 완료</span>`;
-                
-                // 버튼들 활성화
-                document.getElementById('morningBtn').disabled = false;
-                document.getElementById('eveningBtn').disabled = false;
-                document.getElementById('weatherBtn').disabled = false;
-            } else {
-                systemStatus.innerHTML = `<span class="warning">FCM 토큰 필요</span>`;
-            }
-            
-            // 최신 알림 업데이트
-            updateLatestNotification();
-        }
-        
-        function updateLatestNotification() {
-            const latestContent = document.getElementById('latestNotificationContent');
-            
+        async function initializeFirebase() {
             try {
-                const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                // Firebase SDK 동적 로드
+                const { initializeApp } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js');
+                const { getMessaging, getToken, onMessage } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging.js');
                 
-                if (history.length === 0) {
-                    latestContent.innerHTML = '알림 내역이 없습니다';
-                    return;
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDOJg47e_S3-sgZJMeYZwSsy-MqS463rc0",
+                    authDomain: "personal-secretary-auto.firebaseapp.com",
+                    projectId: "personal-secretary-auto",
+                    storageBucket: "personal-secretary-auto.firebasestorage.app",
+                    messagingSenderId: "10792151581",
+                    appId: "1:10792151581:web:69fc187087a3566f9db4f4",
+                    measurementId: "G-R4097RRZ9B"
+                };
+                
+                const app = initializeApp(firebaseConfig);
+                messaging = getMessaging(app);
+                
+                // Service Worker 등록
+                if ('serviceWorker' in navigator) {
+                    await navigator.serviceWorker.register('/firebase-messaging-sw.js');
                 }
                 
-                const latest = history[0];
-                const timeAgo = getTimeAgo(latest.timestamp);
-                const emoji = getNotificationEmoji(latest.data?.type);
+                // 알림 권한 자동 요청
+                if ('Notification' in window && Notification.permission === 'default') {
+                    await Notification.requestPermission();
+                }
                 
-                latestContent.innerHTML = `
-                    <div style="margin-bottom: 5px;">
-                        <strong>${emoji} ${latest.title}</strong>
-                        <span style="font-size: 12px; opacity: 0.7; margin-left: 10px;">${timeAgo}</span>
-                    </div>
-                    <div style="font-size: 14px; opacity: 0.8; max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
-                        ${latest.body.length > 100 ? latest.body.substring(0, 100) + '...' : latest.body}
-                    </div>
-                `;
-                
-            } catch (error) {
-                latestContent.innerHTML = '알림 로드 실패';
-            }
-        }
-        
-        function getTimeAgo(timestamp) {
-            const now = new Date();
-            const time = new Date(timestamp);
-            const diff = now - time;
-            const minutes = Math.floor(diff / (1000 * 60));
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            
-            if (minutes < 1) return '방금 전';
-            if (minutes < 60) return `${minutes}분 전`;
-            if (hours < 24) return `${hours}시간 전`;
-            return time.toLocaleDateString('ko-KR');
-        }
-        
-        function getNotificationEmoji(type) {
-            const typeMap = {
-                'weather_daily': '🌤️',
-                'weather_urgent': '⚠️',
-                'task_daily': '📅',
-                'task_urgent': '🎯',
-                'news_main': '📰',
-                'news_tech': '🤖',
-                'news_science': '🔬',
-                'news_business': '💰',
-                'general': '📢'
-            };
-            return typeMap[type] || '📢';
-        }
-        
-        async function requestNotificationPermission() {
-            try {
-                if ('Notification' in window) {
-                    const permission = await Notification.requestPermission();
-                    if (permission === 'granted') {
-                        log('알림 권한이 허용되었습니다.', 'success');
-                        document.getElementById('tokenBtn').disabled = false;
-                        return true;
-                    } else {
-                        log('알림 권한이 거부되었습니다.', 'error');
-                        return false;
+                // FCM 토큰 자동 생성 및 저장
+                if (Notification.permission === 'granted') {
+                    try {
+                        const token = await getToken(messaging, {
+                            vapidKey: 'BL7f2URrHMEdvGhD-wFLRN8mGNFCkNpR7ZbhqNtlNt4GJUb7lTdZ4z-_cDyVBQFO8vZhJMwKN9X2RQ6GgD7-EwE'
+                        });
+                        
+                        if (token) {
+                            console.log('FCM 토큰 생성됨:', token);
+                            localStorage.setItem('fcmToken', token);
+                        }
+                    } catch (error) {
+                        console.error('FCM 토큰 생성 실패:', error);
                     }
-                } else {
-                    log('이 브라우저는 알림을 지원하지 않습니다.', 'error');
-                    return false;
                 }
+                
+                // 포그라운드 메시지 수신
+                onMessage(messaging, (payload) => {
+                    console.log('포그라운드 메시지 수신:', payload);
+                    addNotificationToUI(payload);
+                });
+                
+                isFirebaseReady = true;
+                console.log('Firebase 초기화 완료');
+                return true;
+                
             } catch (error) {
-                log('알림 권한 요청 중 오류: ' + error.message, 'error');
+                console.error('Firebase 초기화 실패:', error);
                 return false;
             }
         }
         
-        async function generateFCMToken() {
-            try {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                messaging = firebase.messaging();
-                
-                const token = await messaging.getToken();
-                if (token) {
-                    fcmToken = token;
-                    localStorage.setItem('fcmToken', token);
-                    document.getElementById('fcmTokenInput').value = token;
-                    log('FCM 토큰이 생성되었습니다.', 'success');
-                    log('토큰: ' + token, 'info');
-                    updateStatus();
-                } else {
-                    log('FCM 토큰 생성에 실패했습니다.', 'error');
-                }
-            } catch (error) {
-                log('FCM 토큰 생성 오류: ' + error.message, 'error');
+        // 알림을 UI에 표시
+        function addNotificationToUI(payload) {
+            const notification = {
+                id: Date.now(),
+                title: payload.data?.title || payload.notification?.title || '알림',
+                body: payload.data?.body || payload.notification?.body || '새 알림이 도착했습니다.',
+                time: new Date().toISOString(),
+                source: payload.data?.source || 'fcm'
+            };
+            
+            // localStorage에 저장
+            const notifications = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+            notifications.unshift(notification);
+            
+            // 최대 100개까지만 유지
+            if (notifications.length > 100) {
+                notifications.splice(100);
             }
+            
+            localStorage.setItem('notificationHistory', JSON.stringify(notifications));
+            displayRecentNotifications();
         }
         
-        function saveFCMToken() {
-            const inputToken = document.getElementById('fcmTokenInput').value.trim();
-            if (inputToken) {
-                fcmToken = inputToken;
-                localStorage.setItem('fcmToken', inputToken);
-                log('FCM 토큰이 저장되었습니다.', 'success');
-                updateStatus();
-            } else {
-                log('유효한 FCM 토큰을 입력해주세요.', 'error');
+        // 최근 알림 표시 (최대 3개)
+        function displayRecentNotifications() {
+            const notifications = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+            const container = document.getElementById('notificationsList');
+            
+            if (notifications.length === 0) {
+                container.innerHTML = '<div class="empty-state">최근 알림이 없습니다</div>';
+                return;
             }
-        }
-        
-        async function makeTestRequest(type) {
-            try {
-                log(`${type} 테스트 요청 중...`, 'info');
+            
+            container.innerHTML = notifications.slice(0, 3).map(notif => {
+                const time = new Date(notif.time);
+                const timeStr = formatTimeAgo(time);
                 
-                // GitHub Actions 워크플로우 트리거 (실제 구현에서는 서버 API 호출)
-                log(`${type} 알림이 서버에서 처리됩니다.`, 'success');
-                log('GitHub Actions에서 실제 알림을 전송합니다.', 'info');
-                
-            } catch (error) {
-                log(`${type} 테스트 오류: ` + error.message, 'error');
-            }
+                return `
+                    <div class="notification-item">
+                        <div class="notification-title">${notif.title}</div>
+                        <div class="notification-body">${notif.body.length > 80 ? notif.body.substring(0, 80) + '...' : notif.body}</div>
+                        <div class="notification-time">${timeStr}</div>
+                    </div>
+                `;
+            }).join('');
         }
         
-        function testMorningBriefing() {
-            makeTestRequest('아침 브리핑');
-        }
-        
-        function testEveningPrep() {
-            makeTestRequest('저녁 준비');
-        }
-        
-        function testWeatherCheck() {
-            makeTestRequest('날씨 체크');
-        }
-        
-        function refreshData() {
-            const refreshBtn = document.querySelector('.refresh-icon');
-            
-            // 스피닝 애니메이션 시작
-            refreshBtn.classList.add('spinning');
-            
-            log('데이터 새로고침 중...', 'info');
-            updateStatus();
-            updateLatestNotification();
-            
-            // 애니메이션 완료 후 클래스 제거
-            setTimeout(() => {
-                refreshBtn.classList.remove('spinning');
-                log('새로고침 완료', 'success');
-            }, 600);
-        }
-        
-        // GitHub Actions 모니터링 함수들
-        function updateGithubMonitoring(notification) {
-            const count = parseInt(localStorage.getItem('githubMessageCount') || '0') + 1;
-            localStorage.setItem('githubMessageCount', count.toString());
-            localStorage.setItem('lastGithubMessage', notification.timestamp);
-            
-            document.getElementById('githubMessageCount').textContent = count;
-            document.getElementById('lastGithubMessage').textContent = formatTimeAgo(notification.timestamp);
-            
-            log(`🚀 GitHub Actions 알림 #${count}: ${notification.title}`, 'success');
-        }
-        
-        function clearGithubMonitoring() {
-            localStorage.setItem('githubMessageCount', '0');
-            localStorage.removeItem('lastGithubMessage');
-            
-            document.getElementById('githubMessageCount').textContent = '0';
-            document.getElementById('lastGithubMessage').textContent = '-';
-            
-            log('GitHub Actions 카운터가 초기화되었습니다', 'info');
-        }
-        
-        function formatTimeAgo(timestamp) {
+        function formatTimeAgo(date) {
             const now = new Date();
-            const time = new Date(timestamp);
-            const diffMs = now - time;
-            const diffMins = Math.floor(diffMs / 60000);
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
             
-            if (diffMins < 1) return '방금 전';
-            if (diffMins < 60) return `${diffMins}분 전`;
-            
-            const diffHours = Math.floor(diffMins / 60);
-            if (diffHours < 24) return `${diffHours}시간 전`;
-            
-            return time.toLocaleString('ko-KR');
+            if (minutes < 1) return '방금 전';
+            if (minutes < 60) return `${minutes}분 전`;
+            if (hours < 24) return `${hours}시간 전`;
+            if (days < 7) return `${days}일 전`;
+            return date.toLocaleDateString('ko-KR');
         }
         
-        function loadGithubMonitoring() {
-            const count = localStorage.getItem('githubMessageCount') || '0';
-            const lastMessage = localStorage.getItem('lastGithubMessage');
-            
-            document.getElementById('githubMessageCount').textContent = count;
-            document.getElementById('lastGithubMessage').textContent = 
-                lastMessage ? formatTimeAgo(lastMessage) : '-';
+        function refreshNotifications() {
+            displayRecentNotifications();
         }
         
-        // Service Worker 메시지 리스너 (FCM 알림 저장용)
-        function setupServiceWorkerMessageListener() {
-            console.log('[MAIN] Service Worker 메시지 리스너 설정');
-            
-            navigator.serviceWorker.addEventListener('message', (event) => {
-                console.log('[MAIN] Service Worker로부터 메시지 수신:', event.data);
-                
-                if (event.data && event.data.type === 'NOTIFICATION_RECEIVED') {
-                    const notification = event.data.notification;
-                    console.log('[MAIN] FCM 알림 데이터 처리:', notification);
-                    
-                    // GitHub Actions 메시지인지 확인
-                    if (notification.source === 'github-actions') {
-                        console.log('🚀 [MAIN] GitHub Actions 알림 수신됨!');
-                        console.log('🚀 [MAIN] ExecutionId:', notification.executionId);
-                        log(`GitHub Actions 알림 수신: ${notification.title}`, 'success');
-                        
-                        // GitHub Actions 카운터 업데이트
-                        updateGithubMonitoring(notification);
-                    }
-                    
-                    // 기존 히스토리 가져오기
-                    const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
-                    console.log('[MAIN] 기존 히스토리 항목 수:', history.length);
-                    
-                    // 중복 방지: 같은 timestamp의 알림이 이미 있는지 확인
-                    const isDuplicate = history.some(item => 
-                        Math.abs(new Date(item.timestamp) - new Date(notification.timestamp)) < 1000
-                    );
-                    
-                    if (!isDuplicate) {
-                        // 새 알림을 맨 앞에 추가
-                        history.unshift(notification);
-                        console.log('[MAIN] 새 알림 추가됨. 총 항목 수:', history.length);
-                        
-                        // 최대 100개까지만 보관
-                        if (history.length > 100) {
-                            history.splice(100);
-                            console.log('[MAIN] 히스토리 100개로 제한');
-                        }
-                        
-                        // localStorage에 저장
-                        localStorage.setItem('notificationHistory', JSON.stringify(history));
-                        console.log('[MAIN] 알림 히스토리 저장 완료');
-                        
-                        // UI 업데이트
-                        updateLatestNotification();
-                        log(`FCM 알림 저장: ${notification.title}`, 'success');
-                    } else {
-                        console.log('[MAIN] 중복 알림 무시됨');
-                    }
-                }
-            });
-        }
-        
-        // 테스트용 알림 데이터 추가 함수
-        function addTestNotificationData() {
-            const existingHistory = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
-            
-            // 이미 테스트 데이터가 있으면 추가하지 않음
-            if (existingHistory.length > 0) return;
-            
-            const testNotifications = [
-                {
-                    id: Date.now(),
-                    title: '🌤️ 오늘 날씨',
-                    body: '22°C ☀️ 맑음\n강수확률: 10%\n미세먼지: 좋음',
-                    data: { type: 'weather_daily' },
-                    timestamp: new Date(Date.now() - 3600000).toISOString(), // 1시간 전
-                    sent: true
-                },
-                {
-                    id: Date.now() + 1,
-                    title: '📰 메인 뉴스',
-                    body: '1. 주요 경제 동향\n2. 국제 정치 소식\n3. 사회 이슈\n4. 문화 예술\n5. 스포츠 소식',
-                    data: { type: 'news_main' },
-                    timestamp: new Date(Date.now() - 7200000).toISOString(), // 2시간 전
-                    sent: true
-                }
-            ];
-            
-            localStorage.setItem('notificationHistory', JSON.stringify(testNotifications));
-            log('테스트 알림 데이터 추가 완료', 'success');
-        }
-        
-        // 페이지 로드 시 초기화
-        window.addEventListener('load', () => {
-            log('개인 비서 자동화 시스템 시작', 'success');
-            
-            // Service Worker 메시지 리스너 설정
-            setupServiceWorkerMessageListener();
-            
-            // GitHub Actions 모니터링 로드
-            loadGithubMonitoring();
-            
-            // 테스트 데이터 추가 (최초 1회만)
-            addTestNotificationData();
-            
-            if (fcmToken) {
-                document.getElementById('fcmTokenInput').value = fcmToken;
+        // 테스트 함수들 - GitHub Actions 워크플로우 트리거
+        async function testMorningBriefing() {
+            try {
+                // GitHub Actions API 호출 (실제 구현에서는 워크플로우 트리거)
+                console.log('아침 브리핑 테스트 실행');
+                alert('아침 브리핑 테스트가 실행되었습니다. 잠시 후 알림을 받으실 수 있습니다.');
+            } catch (error) {
+                console.error('아침 브리핑 테스트 실패:', error);
+                alert('테스트 실행에 실패했습니다.');
             }
-            
-            updateStatus();
-            
-            // 5초마다 상태 업데이트
-            setInterval(updateStatus, 5000);
-            
-            // 1분마다 GitHub Actions 모니터링 시간 업데이트
-            setInterval(loadGithubMonitoring, 60000);
-        });
+        }
         
-        // FCM 메시지 수신 처리 및 내역 저장
+        async function testEveningBriefing() {
+            try {
+                console.log('저녁 준비 테스트 실행');
+                alert('저녁 준비 테스트가 실행되었습니다. 잠시 후 알림을 받으실 수 있습니다.');
+            } catch (error) {
+                console.error('저녁 준비 테스트 실패:', error);
+                alert('테스트 실행에 실패했습니다.');
+            }
+        }
+        
+        async function testWeatherCheck() {
+            try {
+                console.log('날씨 확인 테스트 실행');
+                alert('날씨 확인 테스트가 실행되었습니다. 잠시 후 알림을 받으실 수 있습니다.');
+            } catch (error) {
+                console.error('날씨 확인 테스트 실패:', error);
+                alert('테스트 실행에 실패했습니다.');
+            }
+        }
+        
+        // Service Worker에서 메시지 수신
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('message', (event) => {
-                if (event.data && event.data.type === 'FCM_MESSAGE') {
-                    log('FCM 메시지 수신: ' + event.data.title, 'success');
-                    
-                    // 알림 내역 저장
-                    const notification = {
-                        id: Date.now(),
-                        title: event.data.title,
-                        body: event.data.body,
-                        data: event.data.data || {},
-                        timestamp: new Date().toISOString(),
-                        sent: true
-                    };
-                    
-                    const history = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
-                    history.unshift(notification);
-                    
-                    // 최대 100개까지만 보관
-                    if (history.length > 100) {
-                        history.splice(100);
-                    }
-                    
-                    localStorage.setItem('notificationHistory', JSON.stringify(history));
+            navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data && event.data.type === 'NOTIFICATION_RECEIVED') {
+                    console.log('Service Worker에서 알림 수신:', event.data.notification);
+                    addNotificationToUI({
+                        data: {
+                            title: event.data.notification.title,
+                            body: event.data.notification.body,
+                            source: event.data.notification.source
+                        }
+                    });
                 }
             });
         }
+        
+        // 페이지 로드시 초기화
+        document.addEventListener('DOMContentLoaded', async () => {
+            displayRecentNotifications();
+            await initializeFirebase();
+            
+            // 주기적으로 알림 새로고침 (30초마다)
+            setInterval(displayRecentNotifications, 30000);
+        });
     </script>
 </body>
 </html>

@@ -210,20 +210,35 @@ function parseWeatherData(items) {
     return {
       rainProbability: '정보 없음',
       temperature: '정보 없음',
+      minTemp: '정보 없음',
+      maxTemp: '정보 없음',
       skyCondition: '정보 없음',
-      description: '날씨 정보를 가져올 수 없습니다.'
+      rainType: '정보 없음',
+      rainAmount: '0',
+      description: '날씨 정보를 가져올 수 없습니다.',
+      urgencyLevel: 'low'
     };
   }
   
   const currentData = {};
+  const todayData = {};
   
+  // 현재 시간 데이터와 하루 전체 데이터 수집
   for (const item of items) {
     const fcstTime = parseInt(item.fcstTime);
     const fcstHour = Math.floor(fcstTime / 100);
     
+    // 현재 시간 ±1시간 데이터
     if (Math.abs(fcstHour - currentHour) <= 1) {
       currentData[item.category] = item.fcstValue;
     }
+    
+    // 오늘 하루 전체 데이터 (최고/최저 기온용)
+    todayData[item.category] = todayData[item.category] || [];
+    todayData[item.category].push({
+      time: fcstHour,
+      value: item.fcstValue
+    });
   }
   
   if (Object.keys(currentData).length === 0) {
@@ -231,15 +246,35 @@ function parseWeatherData(items) {
     return {
       rainProbability: '정보 없음',
       temperature: '정보 없음',
+      minTemp: '정보 없음',
+      maxTemp: '정보 없음',
       skyCondition: '정보 없음',
-      description: '현재 시간대 날씨 정보가 없습니다.'
+      rainType: '정보 없음',
+      rainAmount: '0',
+      description: '현재 시간대 날씨 정보가 없습니다.',
+      urgencyLevel: 'low'
     };
   }
   
+  // 기본 데이터 추출
   const rainProb = currentData.POP || '0';
   const temp = currentData.TMP || '정보없음';
   const sky = currentData.SKY || '1';
+  const rainType = currentData.PTY || '0';
+  const rainAmount = currentData.RN1 || '0';
   
+  // 최고/최저 기온 계산
+  let minTemp = '정보없음';
+  let maxTemp = '정보없음';
+  
+  if (todayData.TMN && todayData.TMN.length > 0) {
+    minTemp = Math.min(...todayData.TMN.map(d => parseInt(d.value) || 0));
+  }
+  if (todayData.TMX && todayData.TMX.length > 0) {
+    maxTemp = Math.max(...todayData.TMX.map(d => parseInt(d.value) || 0));
+  }
+  
+  // 하늘 상태 해석
   let skyDescription;
   switch(sky) {
     case '1': skyDescription = '맑음'; break;
@@ -248,11 +283,71 @@ function parseWeatherData(items) {
     default: skyDescription = '정보없음';
   }
   
+  // 강수 형태 해석
+  let rainTypeDescription;
+  switch(rainType) {
+    case '0': rainTypeDescription = '없음'; break;
+    case '1': rainTypeDescription = '비'; break;
+    case '2': rainTypeDescription = '비/눈'; break;
+    case '3': rainTypeDescription = '눈'; break;
+    case '4': rainTypeDescription = '소나기'; break;
+    default: rainTypeDescription = '정보없음';
+  }
+  
+  // 긴급도 판단
+  let urgencyLevel = 'low';
+  const rainAmountNum = parseFloat(rainAmount.replace('mm', '')) || 0;
+  const rainProbNum = parseInt(rainProb) || 0;
+  
+  if (rainAmountNum >= 10 || rainType === '4') {
+    urgencyLevel = 'urgent'; // 소나기 또는 10mm 이상
+  } else if (rainAmountNum >= 5 || rainProbNum >= 70) {
+    urgencyLevel = 'important'; // 5mm 이상 또는 강수확률 70% 이상
+  } else if (rainAmountNum > 0 || rainProbNum >= 30) {
+    urgencyLevel = 'normal'; // 강수 있음 또는 30% 이상
+  }
+  
+  // 설명 문자열 생성 - 강수 정보 우선
+  let description = `${temp}°C`;
+  
+  if (minTemp !== '정보없음' && maxTemp !== '정보없음') {
+    description += ` (${minTemp}-${maxTemp}°C)`;
+  }
+  
+  // 강수 정보를 더 상세하게
+  if (rainAmountNum > 0) {
+    const currentTime = koreaTime.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    description += `, ${rainTypeDescription} ${rainAmount}mm/h`;
+    if (rainProbNum > 0) {
+      description += ` (확률 ${rainProb}%)`;
+    }
+    description += ` - ${currentTime} 기준`;
+  } else if (rainProbNum > 0) {
+    description += `, 강수확률 ${rainProb}%`;
+    // 다음 예상 강수 시간대 추가하면 좋을 것
+  }
+  
+  description += `, ${skyDescription}`;
+  
+  console.log('🌤️ 파싱된 날씨 데이터:', {
+    현재기온: temp,
+    최저최고: `${minTemp}-${maxTemp}`,
+    강수형태: rainTypeDescription,
+    강수량: rainAmount,
+    강수확률: rainProb,
+    긴급도: urgencyLevel
+  });
+  
   return {
     rainProbability: rainProb,
     temperature: temp,
+    minTemp: minTemp,
+    maxTemp: maxTemp,
     skyCondition: skyDescription,
-    description: `${temp}°C, ${rainProb}% ${skyDescription}`
+    rainType: rainTypeDescription,
+    rainAmount: rainAmount,
+    description: description,
+    urgencyLevel: urgencyLevel
   };
 }
 
@@ -679,40 +774,109 @@ const checkWeatherChanges = async (executionId) => {
     
     let shouldNotify = false;
     let notificationReason = '';
+    let alertLevel = 'normal';
     
     if (!previousState) {
       shouldNotify = true;
-      notificationReason = '첫 번째 실행';
+      notificationReason = '날씨 모니터링 시작';
+      alertLevel = 'info';
     } else {
       const currentRainProb = parseInt(currentWeather.rainProbability) || 0;
       const prevRainProb = parseInt(previousState.rainProbability) || 0;
       const currentTemp = parseInt(currentWeather.temperature) || 0;
       const prevTemp = parseInt(previousState.temperature) || 0;
+      const currentRainAmount = parseFloat(currentWeather.rainAmount?.replace('mm', '')) || 0;
+      const prevRainAmount = parseFloat(previousState.rainAmount?.replace('mm', '')) || 0;
       
-      if (Math.abs(currentRainProb - prevRainProb) >= 20) {
+      // 1. 긴급 알림: 강수량 급증, 소나기 발생
+      if (currentRainAmount >= 10 || currentWeather.rainType === '소나기') {
         shouldNotify = true;
+        alertLevel = 'urgent';
+        if (currentWeather.rainType === '소나기') {
+          notificationReason = `소나기 발생! (${currentRainAmount}mm/h)`;
+        } else {
+          notificationReason = `집중호우 (${currentRainAmount}mm/h)`;
+        }
+      }
+      // 2. 중요 알림: 강수량 변화, 강수확률 급증
+      else if (currentRainAmount >= 3 || Math.abs(currentRainAmount - prevRainAmount) >= 2) {
+        shouldNotify = true;
+        alertLevel = 'important';
+        if (currentRainAmount > prevRainAmount) {
+          notificationReason = `강수량 증가: ${prevRainAmount}mm → ${currentRainAmount}mm/h`;
+        } else {
+          notificationReason = `강수량 감소: ${prevRainAmount}mm → ${currentRainAmount}mm/h`;
+        }
+      }
+      else if (Math.abs(currentRainProb - prevRainProb) >= 40) {
+        shouldNotify = true;
+        alertLevel = 'important';
+        if (currentRainProb > prevRainProb) {
+          notificationReason = `강수확률 급증: ${prevRainProb}% → ${currentRainProb}%`;
+        } else {
+          notificationReason = `강수확률 급감: ${prevRainProb}% → ${currentRainProb}%`;
+        }
+      }
+      // 기온 변화 알림 (매우 극단적인 경우만)
+      else if (Math.abs(currentTemp - prevTemp) >= 10) {
+        shouldNotify = true;
+        alertLevel = 'urgent';
+        notificationReason = `극단적 기온 변화: ${prevTemp}°C → ${currentTemp}°C`;
+      }
+      // 3. 일반 알림: 강수확률 변화
+      else if (Math.abs(currentRainProb - prevRainProb) >= 25) {
+        shouldNotify = true;
+        alertLevel = 'normal';
         notificationReason = `강수확률 변화: ${prevRainProb}% → ${currentRainProb}%`;
-      } else if (Math.abs(currentTemp - prevTemp) >= 5) {
+      }
+      else if (currentWeather.rainType !== previousState.rainType && currentWeather.rainType !== '없음') {
         shouldNotify = true;
-        notificationReason = `기온 변화: ${prevTemp}°C → ${currentTemp}°C`;
-      } else if (currentWeather.skyCondition !== previousState.skyCondition) {
-        shouldNotify = true;
-        notificationReason = `날씨 변화: ${previousState.skyCondition} → ${currentWeather.skyCondition}`;
+        alertLevel = 'important';
+        notificationReason = `강수 형태 변화: ${previousState.rainType || '없음'} → ${currentWeather.rainType}`;
+      }
+      else if (currentWeather.skyCondition !== previousState.skyCondition) {
+        // 하늘 상태 변화는 강수와 연관될 때만 알림
+        const isSignificantSkyChange = 
+          (previousState.skyCondition === '맑음' && currentWeather.skyCondition === '흐림' && currentRainProb >= 30) ||
+          (previousState.skyCondition === '흐림' && currentWeather.skyCondition === '맑음' && prevRainProb >= 30);
+        
+        if (isSignificantSkyChange) {
+          shouldNotify = true;
+          alertLevel = 'normal';
+          notificationReason = `날씨 변화: ${previousState.skyCondition} → ${currentWeather.skyCondition}`;
+        }
       }
     }
     
     if (shouldNotify) {
-      const title = '🌤️ 날씨 변화 알림';
-      const body = `${currentWeather.description}\n변화 사유: ${notificationReason}`;
+      // 알림 제목과 아이콘을 긴급도에 따라 설정
+      let title;
+      switch (alertLevel) {
+        case 'urgent':
+          title = '🚨 긴급 날씨 알림';
+          break;
+        case 'important':
+          title = '⚠️ 중요 날씨 알림';
+          break;
+        case 'info':
+          title = '📍 날씨 모니터링';
+          break;
+        default:
+          title = '🌤️ 날씨 변화 알림';
+      }
+      
+      const body = `${currentWeather.description}\n\n${notificationReason}`;
       
       await sendPushNotification(title, body, {
         type: 'weather_change',
-        executionId: executionId
+        executionId: executionId,
+        alertLevel: alertLevel,
+        urgency: currentWeather.urgencyLevel
       });
       
-      console.log(`[${executionId}] 날씨 변화 알림 전송: ${notificationReason}`);
+      console.log(`[${executionId}] 날씨 ${alertLevel} 알림 전송: ${notificationReason}`);
     } else {
-      console.log(`[${executionId}] 날씨 변화 없음 - 알림 전송 안 함`);
+      console.log(`[${executionId}] 유의미한 날씨 변화 없음 - 알림 전송 안 함`);
     }
     
     await saveWeatherState(currentWeather);
@@ -883,14 +1047,16 @@ app.post('/api/test-notification', async (req, res) => {
   }
 });
 
-// 서버 시작 (포트가 설정된 경우에만)
-const PORT = process.env.PORT;
+// 서버 시작 (포트가 설정된 경우 또는 개발 환경)
+const PORT = process.env.PORT || (process.env.NODE_ENV !== 'production' ? 3000 : null);
 if (PORT) {
   app.listen(PORT, () => {
     console.log(`🚀 서버가 포트 ${PORT}에서 실행 중입니다.`);
     console.log(`📱 알림 히스토리: http://localhost:${PORT}/history.html`);
     console.log(`📊 API 엔드포인트: http://localhost:${PORT}/api/notifications`);
   });
+} else {
+  console.log('💡 Express 서버가 시작되지 않았습니다. 히스토리 기능을 사용하려면 PORT 환경변수를 설정하세요.');
 }
 
 module.exports = {

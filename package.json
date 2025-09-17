@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "nodemon server/index.js",
+    "server": "PORT=3000 node server/index.js",
     "build": "npm install",
     "test": "node server/test.js"
   },
