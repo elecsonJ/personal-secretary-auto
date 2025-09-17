@@ -788,7 +788,7 @@ const checkWeatherChanges = async (executionId) => {
       const currentRainAmount = parseFloat(currentWeather.rainAmount?.replace('mm', '')) || 0;
       const prevRainAmount = parseFloat(previousState.rainAmount?.replace('mm', '')) || 0;
       
-      // 1. 긴급 알림: 강수량 급증, 소나기 발생
+      // 1. 긴급 알림: 강수량 급증, 소나기 발생 (즉시 알림 필요)
       if (currentRainAmount >= 10 || currentWeather.rainType === '소나기') {
         shouldNotify = true;
         alertLevel = 'urgent';
@@ -798,17 +798,18 @@ const checkWeatherChanges = async (executionId) => {
           notificationReason = `집중호우 (${currentRainAmount}mm/h)`;
         }
       }
-      // 2. 중요 알림: 강수량 변화, 강수확률 급증
-      else if (currentRainAmount >= 3 || Math.abs(currentRainAmount - prevRainAmount) >= 2) {
+      // 2. 중요 알림: 상당한 강수량 변화만 (기준 상향)
+      else if (currentRainAmount >= 5 || Math.abs(currentRainAmount - prevRainAmount) >= 3) {
         shouldNotify = true;
         alertLevel = 'important';
         if (currentRainAmount > prevRainAmount) {
-          notificationReason = `강수량 증가: ${prevRainAmount}mm → ${currentRainAmount}mm/h`;
+          notificationReason = `강수량 급증: ${prevRainAmount}mm → ${currentRainAmount}mm/h`;
         } else {
-          notificationReason = `강수량 감소: ${prevRainAmount}mm → ${currentRainAmount}mm/h`;
+          notificationReason = `강수량 급감: ${prevRainAmount}mm → ${currentRainAmount}mm/h`;
         }
       }
-      else if (Math.abs(currentRainProb - prevRainProb) >= 40) {
+      // 강수확률 변화는 더 큰 변화만 알림 (50% 이상)
+      else if (Math.abs(currentRainProb - prevRainProb) >= 50) {
         shouldNotify = true;
         alertLevel = 'important';
         if (currentRainProb > prevRainProb) {
@@ -823,8 +824,8 @@ const checkWeatherChanges = async (executionId) => {
         alertLevel = 'urgent';
         notificationReason = `극단적 기온 변화: ${prevTemp}°C → ${currentTemp}°C`;
       }
-      // 3. 일반 알림: 강수확률 변화
-      else if (Math.abs(currentRainProb - prevRainProb) >= 25) {
+      // 3. 일반 알림: 큰 강수확률 변화만 (30% 이상)
+      else if (Math.abs(currentRainProb - prevRainProb) >= 30) {
         shouldNotify = true;
         alertLevel = 'normal';
         notificationReason = `강수확률 변화: ${prevRainProb}% → ${currentRainProb}%`;
