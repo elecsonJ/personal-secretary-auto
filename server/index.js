@@ -797,9 +797,10 @@ const checkWeatherChanges = async (executionId) => {
     let alertLevel = 'normal';
     
     if (!previousState) {
-      shouldNotify = true;
-      notificationReason = '날씨 모니터링 시작';
+      shouldNotify = false; // 첫 실행 시에는 알림 보내지 않음
+      notificationReason = '날씨 모니터링 시작 - 기준값 설정';
       alertLevel = 'info';
+      console.log(`[${executionId}] 첫 실행 감지 - 기준값 설정 후 다음 실행부터 변화 감지`);
     } else {
       const currentRainProb = parseInt(currentWeather.rainProbability) || 0;
       const prevRainProb = parseInt(previousState.rainProbability) || 0;

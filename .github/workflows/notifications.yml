@@ -71,6 +71,19 @@ jobs:
         path: ./data
       continue-on-error: true
     
+    - name: Check downloaded artifacts
+      run: |
+        echo "데이터 디렉토리 내용 확인:"
+        ls -la ./data/ || echo "data 디렉토리 없음"
+        if [ -f "./data/weather-state.json" ]; then
+          echo "✅ weather-state.json 파일 존재"
+          echo "파일 크기: $(wc -c < ./data/weather-state.json) bytes"
+          echo "파일 내용 미리보기:"
+          head -n 5 ./data/weather-state.json
+        else
+          echo "❌ weather-state.json 파일 없음"
+        fi
+    
     - name: Check current time and determine action
       id: determine_action
       run: |
