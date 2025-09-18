@@ -512,16 +512,36 @@ const getTodayEvents = async (dateStr) => {
       usedProperty: usedProperty
     });
     
-    return response.data.results.map(page => {
-      const titleProperty = page.properties.Name || page.properties.Title || page.properties.title;
+    return response.data.results.map((page, index) => {
+      console.log(`📅 일정 ${index + 1} 속성들:`, Object.keys(page.properties));
+      
+      // 다양한 제목 속성명 시도
+      const possibleTitleProps = ['Name', 'Title', 'title', '제목', '이름', '일정', 'Event', 'Task', 'Summary'];
+      let titleProperty = null;
+      let usedTitleProp = null;
+      
+      for (const prop of possibleTitleProps) {
+        if (page.properties[prop]) {
+          titleProperty = page.properties[prop];
+          usedTitleProp = prop;
+          break;
+        }
+      }
+      
       let title = '제목 없음';
       
       if (titleProperty) {
+        console.log(`📅 일정 ${index + 1} 제목 속성 (${usedTitleProp}):`, titleProperty);
+        
         if (titleProperty.title && titleProperty.title.length > 0) {
           title = titleProperty.title.map(t => t.plain_text).join('');
         } else if (titleProperty.rich_text && titleProperty.rich_text.length > 0) {
           title = titleProperty.rich_text.map(t => t.plain_text).join('');
         }
+        
+        console.log(`📅 일정 ${index + 1} 최종 제목:`, title);
+      } else {
+        console.log(`❌ 일정 ${index + 1} 제목 속성 찾을 수 없음. 사용 가능한 속성:`, Object.keys(page.properties));
       }
       
       return title;
