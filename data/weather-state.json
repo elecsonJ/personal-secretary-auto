@@ -1,0 +1,10 @@
+{
+  "temperature": "20",
+  "rainProbability": "10",
+  "rainAmount": "0mm",
+  "rainType": "없음",
+  "skyCondition": "맑음",
+  "description": "초기 날씨 상태",
+  "lastUpdated": "2024-09-18T05:00:00.000Z",
+  "urgencyLevel": "normal"
+}

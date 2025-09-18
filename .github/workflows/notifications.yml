@@ -35,6 +35,10 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
     
+    # Repository에 쓰기 권한 부여 (날씨 상태 파일 저장용)
+    permissions:
+      contents: write
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -63,25 +67,18 @@ jobs:
     - name: Create data directory
       run: mkdir -p ./data
     
-    # 이전 날씨 데이터 복원
-    - name: Download previous weather data
-      uses: actions/download-artifact@v4
-      with:
-        name: weather-data
-        path: ./data
-      continue-on-error: true
-    
-    - name: Check downloaded artifacts
+    # Git에서 이전 날씨 상태 확인 (이미 체크아웃된 상태)
+    - name: Check existing weather state
       run: |
-        echo "데이터 디렉토리 내용 확인:"
-        ls -la ./data/ || echo "data 디렉토리 없음"
+        echo "Repository 날씨 상태 파일 확인:"
         if [ -f "./data/weather-state.json" ]; then
-          echo "✅ weather-state.json 파일 존재"
+          echo "✅ weather-state.json 파일 존재 (Git에서 로드됨)"
           echo "파일 크기: $(wc -c < ./data/weather-state.json) bytes"
           echo "파일 내용 미리보기:"
           head -n 5 ./data/weather-state.json
+          echo "파일 최종 수정: $(stat -c %y ./data/weather-state.json)"
         else
-          echo "❌ weather-state.json 파일 없음"
+          echo "❌ weather-state.json 파일 없음 - 첫 실행"
         fi
     
     - name: Check current time and determine action
@@ -198,26 +195,7 @@ jobs:
         });
         "
     
-    # 날씨 데이터 저장 (다음 실행을 위해)
-    - name: Check if weather data exists
-      id: check_weather_data
-      run: |
-        if [ -f "./data/weather-state.json" ]; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-          echo "✅ weather-state.json 파일 발견"
-        else
-          echo "exists=false" >> $GITHUB_OUTPUT
-          echo "ℹ️ weather-state.json 파일 없음 - 첫 실행이거나 생성되지 않음"
-        fi
-    
-    - name: Save weather data
-      if: steps.check_weather_data.outputs.exists == 'true'
-      uses: actions/upload-artifact@v4
-      with:
-        name: weather-data
-        path: ./data/weather-state.json
-        retention-days: 7
-      continue-on-error: true
+    # 날씨 데이터는 이제 Git 커밋으로 자동 저장됨 (server/index.js에서 처리)
     
     - name: Log completion
       run: |

@@ -141,9 +141,38 @@ const saveWeatherState = async (weatherData) => {
     await fs.writeFile(WEATHER_STATE_FILE, jsonData);
     console.log(`✅ 날씨 상태 저장 성공: ${WEATHER_STATE_FILE}`);
     console.log(`📁 파일 크기: ${jsonData.length} bytes`);
+    
+    // GitHub Actions 환경에서는 Git에 커밋하여 영구 저장
+    if (process.env.GITHUB_ACTIONS) {
+      await commitWeatherStateToGit(weatherData);
+    }
   } catch (error) {
     console.error('❌ 날씨 상태 저장 실패:', error);
     console.error('파일 경로:', WEATHER_STATE_FILE);
+  }
+};
+
+const commitWeatherStateToGit = async (weatherData) => {
+  try {
+    const { execSync } = require('child_process');
+    const timestamp = new Date().toISOString();
+    
+    console.log('🔄 GitHub Repository에 날씨 상태 커밋 중...');
+    
+    // Git 설정
+    execSync('git config --global user.name "Weather Bot"');
+    execSync('git config --global user.email "weather-bot@github-actions"');
+    
+    // 파일 추가 및 커밋
+    execSync('git add data/weather-state.json');
+    execSync(`git commit -m "Update weather state - ${timestamp}" || echo "No changes to commit"`);
+    execSync('git push');
+    
+    console.log(`✅ 날씨 상태 Git 커밋 완료: ${timestamp}`);
+    
+  } catch (error) {
+    console.error('❌ Git 커밋 실패:', error.message);
+    // Git 커밋 실패해도 알림은 계속 진행
   }
 };
 
