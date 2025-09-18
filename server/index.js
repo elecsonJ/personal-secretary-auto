@@ -478,42 +478,6 @@ const getCurrentWeather = async () => {
   }
 };
 
-const getTopNews = async () => {
-  try {
-    if (!NYT_API_KEY) {
-      console.log('📰 NYT API 키 없음 - 기본 메시지 반환');
-      return { headline: 'NYT API 키가 설정되지 않았습니다.', abstract: '뉴스를 가져올 수 없습니다.' };
-    }
-    
-    console.log('📰 NYT 뉴스 조회 시작...');
-    const response = await axios.get(`https://api.nytimes.com/svc/topstories/v2/world.json?api-key=${NYT_API_KEY}`);
-    const articles = response.data.results;
-    
-    if (articles && articles.length > 0) {
-      const topArticle = articles[0];
-      console.log('✅ NYT 뉴스 조회 성공:', { 
-        count: articles.length, 
-        title: topArticle.title?.substring(0, 50) + '...' 
-      });
-      return {
-        headline: topArticle.title || '제목 없음',
-        abstract: topArticle.abstract || '내용 없음'
-      };
-    }
-    
-    console.log('⚠️ NYT 뉴스 없음');
-    return { headline: '뉴스를 찾을 수 없습니다.', abstract: '최신 뉴스가 없습니다.' };
-  } catch (error) {
-    console.error('❌ 뉴스 조회 실패:', error.message);
-    if (error.response) {
-      console.error('📡 NYT API 응답 오류:', {
-        status: error.response.status,
-        statusText: error.response.statusText
-      });
-    }
-    return { headline: '뉴스 조회 실패', abstract: '뉴스를 가져올 수 없습니다.' };
-  }
-};
 
 const getTodayEvents = async (dateStr) => {
   try {
@@ -1055,9 +1019,8 @@ const sendMorningBriefing = async (executionId) => {
     
     console.log(`[${executionId}] 한국 시간 기준 오늘 날짜: ${todayStr}`);
     
-    const [weather, news, todayEvents, highTasks, dailyTasks] = await Promise.all([
+    const [weather, todayEvents, highTasks, dailyTasks] = await Promise.all([
       getCurrentWeather(),
-      getTopNews(),
       getTodayEvents(todayStr),
       getHighPriorityTasks(),
       getDailyTasks()
@@ -1080,7 +1043,6 @@ const sendMorningBriefing = async (executionId) => {
       briefing += `🔄 Daily 작업:\n${dailyTasks.map(task => `• ${task}`).join('\n')}\n\n`;
     }
     
-    briefing += `📰 주요 뉴스:\n${news.headline}\n${news.abstract}`;
     
     await sendPushNotification('🌅 아침 브리핑', briefing, {
       type: 'morning_briefing',
@@ -1253,7 +1215,6 @@ module.exports = {
   sendMorningBriefing,
   sendEveningBriefing,
   getCurrentWeather,
-  getTopNews,
   getTodayEvents,
   getTomorrowEvents,
   getHighPriorityTasks,
