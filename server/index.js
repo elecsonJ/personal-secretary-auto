@@ -808,6 +808,11 @@ const checkWeatherChanges = async (executionId) => {
       const currentRainAmount = parseFloat(currentWeather.rainAmount?.replace('mm', '')) || 0;
       const prevRainAmount = parseFloat(previousState.rainAmount?.replace('mm', '')) || 0;
       
+      console.log(`[${executionId}] 날씨 변화 분석:`);
+      console.log(`  이전: 강수확률 ${prevRainProb}%, 강수량 ${prevRainAmount}mm, 온도 ${prevTemp}°C, 강수형태 ${previousState.rainType || '없음'}`);
+      console.log(`  현재: 강수확률 ${currentRainProb}%, 강수량 ${currentRainAmount}mm, 온도 ${currentTemp}°C, 강수형태 ${currentWeather.rainType || '없음'}`);
+      console.log(`  변화: 강수확률 ${currentRainProb - prevRainProb >= 0 ? '+' : ''}${currentRainProb - prevRainProb}%, 강수량 ${currentRainAmount - prevRainAmount >= 0 ? '+' : ''}${currentRainAmount - prevRainAmount}mm, 온도 ${currentTemp - prevTemp >= 0 ? '+' : ''}${currentTemp - prevTemp}°C`);
+      
       // 1. 긴급 알림: 강수량 급증, 소나기 발생 (즉시 알림 필요)
       if (currentRainAmount >= 10 || currentWeather.rainType === '소나기') {
         shouldNotify = true;
@@ -886,18 +891,26 @@ const checkWeatherChanges = async (executionId) => {
           title = '🌤️ 날씨 변화 알림';
       }
       
-      const body = `${currentWeather.description}\n\n${notificationReason}`;
+      const body = `${currentWeather.description}\n\n📋 발송 이유: ${notificationReason}\n🕐 확인 시간: ${new Date().toLocaleString('ko-KR', {timeZone: 'Asia/Seoul'})}`;
       
       await sendPushNotification(title, body, {
         type: 'weather_change',
         executionId: executionId,
         alertLevel: alertLevel,
-        urgency: currentWeather.urgencyLevel
+        urgency: currentWeather.urgencyLevel,
+        reason: notificationReason
       });
       
       console.log(`[${executionId}] 날씨 ${alertLevel} 알림 전송: ${notificationReason}`);
     } else {
       console.log(`[${executionId}] 유의미한 날씨 변화 없음 - 알림 전송 안 함`);
+      if (previousState) {
+        const currentRainProb = parseInt(currentWeather.rainProbability) || 0;
+        const prevRainProb = parseInt(previousState.rainProbability) || 0;
+        const currentRainAmount = parseFloat(currentWeather.rainAmount?.replace('mm', '')) || 0;
+        const prevRainAmount = parseFloat(previousState.rainAmount?.replace('mm', '')) || 0;
+        console.log(`[${executionId}] 알림 기준 미달: 강수확률 변화 ${Math.abs(currentRainProb - prevRainProb)}% (기준: 30% 이상), 강수량 변화 ${Math.abs(currentRainAmount - prevRainAmount)}mm (기준: 3mm 이상)`);
+      }
     }
     
     await saveWeatherState(currentWeather);
