@@ -621,44 +621,106 @@ const getTodayEvents = async (dateStr) => {
 const getTomorrowEvents = async (dateStr) => {
   try {
     if (!NOTION_API_KEY || !NOTION_CALENDAR_DB_ID) {
+      console.log('📅 Notion API 키 또는 Calendar DB ID 없음 - 내일 일정 조회 건너뜀');
       return [];
     }
     
-    const response = await axios.post(
-      `https://api.notion.com/v1/databases/${NOTION_CALENDAR_DB_ID}/query`,
-      {
-        filter: {
-          property: 'date', // 소문자로 시도
-          date: {
-            equals: dateStr
+    console.log('📅 내일 일정 조회 시작:', { 
+      dateStr, 
+      dbId: NOTION_CALENDAR_DB_ID.substring(0, 8) + '...' 
+    });
+    
+    // 다양한 날짜 속성명 시도
+    const possibleDateProps = ['Date', 'date', '날짜', '일자', 'When', 'Time'];
+    let response = null;
+    let usedProperty = null;
+    
+    for (const prop of possibleDateProps) {
+      try {
+        console.log(`📅 내일 일정: ${prop} 속성으로 조회 시도...`);
+        
+        response = await axios.post(
+          `https://api.notion.com/v1/databases/${NOTION_CALENDAR_DB_ID}/query`,
+          {
+            filter: {
+              property: prop,
+              date: {
+                equals: dateStr
+              }
+            }
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${NOTION_API_KEY}`,
+              'Notion-Version': '2022-06-28',
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${NOTION_API_KEY}`,
-          'Notion-Version': '2022-06-28',
-          'Content-Type': 'application/json'
+        );
+        
+        usedProperty = prop;
+        console.log(`✅ 내일 일정: ${prop} 속성으로 성공!`);
+        break;
+      } catch (error) {
+        console.log(`❌ 내일 일정: ${prop} 속성 실패:`, error.response?.data?.message || error.message);
+        continue;
+      }
+    }
+    
+    if (!response) {
+      console.error('❌ 내일 일정: 모든 날짜 속성 시도 실패 - 일정 조회 포기');
+      return [];
+    }
+    
+    console.log('✅ Notion 내일 일정 API 응답 성공:', { 
+      status: response.status, 
+      resultCount: response.data?.results?.length || 0,
+      usedProperty: usedProperty
+    });
+    
+    return response.data.results.map((page, index) => {
+      console.log(`📅 내일 일정 ${index + 1} 속성들:`, Object.keys(page.properties));
+      
+      // 다양한 제목 속성명 시도
+      const possibleTitleProps = ['Name', 'Title', 'title', '제목', '이름', '일정', 'Event', 'Task', 'Summary'];
+      let titleProperty = null;
+      let usedTitleProp = null;
+      
+      for (const prop of possibleTitleProps) {
+        if (page.properties[prop]) {
+          titleProperty = page.properties[prop];
+          usedTitleProp = prop;
+          break;
         }
       }
-    );
-    
-    return response.data.results.map(page => {
-      const titleProperty = page.properties.Name || page.properties.Title || page.properties.title;
+      
       let title = '제목 없음';
       
       if (titleProperty) {
+        console.log(`📅 내일 일정 ${index + 1} 제목 속성 (${usedTitleProp}):`, titleProperty);
+        
         if (titleProperty.title && titleProperty.title.length > 0) {
           title = titleProperty.title.map(t => t.plain_text).join('');
         } else if (titleProperty.rich_text && titleProperty.rich_text.length > 0) {
           title = titleProperty.rich_text.map(t => t.plain_text).join('');
         }
+        
+        console.log(`📅 내일 일정 ${index + 1} 최종 제목:`, title);
+      } else {
+        console.log(`❌ 내일 일정 ${index + 1} 제목 속성 찾을 수 없음. 사용 가능한 속성:`, Object.keys(page.properties));
       }
       
       return title;
     });
   } catch (error) {
-    console.error('내일 일정 조회 실패:', error.message);
+    console.error('❌ 내일 일정 조회 실패:', error.message);
+    if (error.response) {
+      console.error('📡 Notion API 응답 오류:', {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data
+      });
+    }
     return [];
   }
 };
@@ -1044,13 +1106,24 @@ const sendEveningBriefing = async (executionId) => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowDateStr = tomorrow.toISOString().split('T')[0];
     
-    console.log(`[${executionId}] 한국 시간 기준 내일 날짜: ${tomorrowDateStr}`);
+    console.log(`[${executionId}] 📅 날짜 계산 상세:`, {
+      UTC_현재시간: now.toISOString(),
+      KST_현재시간: koreaTime.toISOString(),
+      KST_내일날짜: tomorrow.toISOString(),
+      Notion_검색용_날짜문자열: tomorrowDateStr
+    });
     
     const [tomorrowEvents, highTasks, dailyTasks] = await Promise.all([
       getTomorrowEvents(tomorrowDateStr),
       getHighPriorityTasks(),
       getDailyTasks()
     ]);
+    
+    console.log(`[${executionId}] 📅 내일 일정 조회 결과:`, {
+      조회된_일정수: tomorrowEvents.length,
+      일정_내용: tomorrowEvents,
+      검색한_날짜: tomorrowDateStr
+    });
     
     let briefing = `🌆 저녁 브리핑입니다.\n\n`;
     
@@ -1134,6 +1207,27 @@ app.post('/api/test-notification', async (req, res) => {
     });
   } catch (error) {
     console.error('테스트 알림 전송 실패:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// 저녁 브리핑 테스트 API
+app.post('/api/test-evening-briefing', async (req, res) => {
+  try {
+    console.log('🌆 저녁 브리핑 테스트 API 호출됨');
+    
+    const testExecutionId = 'manual-evening-test-' + Date.now();
+    await sendEveningBriefing(testExecutionId);
+    
+    res.json({
+      success: true,
+      message: '저녁 브리핑 테스트가 완료되었습니다. 서버 로그를 확인하세요.'
+    });
+  } catch (error) {
+    console.error('저녁 브리핑 테스트 실패:', error);
     res.status(500).json({
       success: false,
       error: error.message
