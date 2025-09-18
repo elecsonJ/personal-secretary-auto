@@ -387,27 +387,73 @@
         }
         
         // 최근 알림 표시 (최대 3개)
-        function displayRecentNotifications() {
-            const notifications = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+        async function displayRecentNotifications() {
             const container = document.getElementById('notificationsList');
+            container.innerHTML = '<div class="empty-state">알림 로딩 중...</div>';
             
-            if (notifications.length === 0) {
-                container.innerHTML = '<div class="empty-state">최근 알림이 없습니다</div>';
-                return;
-            }
-            
-            container.innerHTML = notifications.slice(0, 3).map(notif => {
-                const time = new Date(notif.time);
-                const timeStr = formatTimeAgo(time);
+            try {
+                // 서버에서 최신 알림 가져오기
+                const response = await fetch('/api/notifications');
+                let notifications = [];
                 
-                return `
-                    <div class="notification-item">
-                        <div class="notification-title">${notif.title}</div>
-                        <div class="notification-body">${notif.body.length > 80 ? notif.body.substring(0, 80) + '...' : notif.body}</div>
-                        <div class="notification-time">${timeStr}</div>
-                    </div>
-                `;
-            }).join('');
+                if (response.ok) {
+                    const result = await response.json();
+                    notifications = result.notifications || [];
+                    console.log(`[MAIN] 서버에서 ${notifications.length}개 알림 로드`);
+                } else {
+                    console.log('[MAIN] 서버 API 실패, 로컬 스토리지 사용');
+                    notifications = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                }
+                
+                if (notifications.length === 0) {
+                    container.innerHTML = '<div class="empty-state">최근 알림이 없습니다</div>';
+                    return;
+                }
+                
+                // 최신 3개만 표시
+                container.innerHTML = notifications.slice(0, 3).map(notif => {
+                    const timeField = notif.time || notif.timestamp;
+                    const time = new Date(timeField);
+                    const timeStr = formatTimeAgo(time);
+                    const sourceIcon = notif.source === 'github-actions' ? '🤖 ' : 
+                                     notif.source === 'fcm-direct' ? '📱 ' : 
+                                     notif.source === 'server' ? '🖥️ ' : '';
+                    
+                    return `
+                        <div class="notification-item">
+                            <div class="notification-title">${sourceIcon}${notif.title}</div>
+                            <div class="notification-body">${notif.body.length > 80 ? notif.body.substring(0, 80) + '...' : notif.body}</div>
+                            <div class="notification-time">${timeStr}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('[MAIN] 알림 로딩 실패:', error);
+                
+                // 폴백: 로컬 스토리지 사용
+                try {
+                    const localNotifications = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                    if (localNotifications.length > 0) {
+                        container.innerHTML = localNotifications.slice(0, 3).map(notif => {
+                            const time = new Date(notif.time || notif.timestamp);
+                            const timeStr = formatTimeAgo(time);
+                            
+                            return `
+                                <div class="notification-item">
+                                    <div class="notification-title">📱 ${notif.title}</div>
+                                    <div class="notification-body">${notif.body.length > 80 ? notif.body.substring(0, 80) + '...' : notif.body}</div>
+                                    <div class="notification-time">${timeStr}</div>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        container.innerHTML = '<div class="empty-state">최근 알림이 없습니다</div>';
+                    }
+                } catch (fallbackError) {
+                    container.innerHTML = '<div class="empty-state">알림 로딩 중 오류 발생</div>';
+                }
+            }
         }
         
         function formatTimeAgo(date) {

@@ -176,6 +176,31 @@ const commitWeatherStateToGit = async (weatherData) => {
   }
 };
 
+const commitNotificationHistoryToGit = async (notification) => {
+  try {
+    const { execSync } = require('child_process');
+    const timestamp = new Date().toISOString();
+    const shortTitle = notification.title.substring(0, 30);
+    
+    console.log('📝 GitHub Repository에 알림 히스토리 커밋 중...');
+    
+    // Git 설정
+    execSync('git config --global user.name "Notification Bot"');
+    execSync('git config --global user.email "notification-bot@github-actions"');
+    
+    // 파일 추가 및 커밋
+    execSync('git add data/notification-history.json');
+    execSync(`git commit -m "Add notification: ${shortTitle}... - ${timestamp}" || echo "No changes to commit"`);
+    execSync('git push');
+    
+    console.log(`✅ 알림 히스토리 Git 커밋 완료: ${shortTitle}...`);
+    
+  } catch (error) {
+    console.error('❌ 알림 히스토리 Git 커밋 실패:', error.message);
+    // Git 커밋 실패해도 알림은 계속 진행
+  }
+};
+
 const saveNotificationHistory = async (title, body, type = 'personal_secretary', executionId = '') => {
   try {
     await ensureDataDir();
@@ -212,6 +237,11 @@ const saveNotificationHistory = async (title, body, type = 'personal_secretary',
     await fs.writeFile(NOTIFICATION_HISTORY_FILE, jsonData);
     
     console.log(`📝 알림 히스토리 저장: "${title.substring(0, 30)}..." (총 ${history.length}개)`);
+    
+    // GitHub Actions 환경에서는 Git에 커밋하여 영구 저장
+    if (process.env.GITHUB_ACTIONS) {
+      await commitNotificationHistoryToGit(newNotification);
+    }
     
     return newNotification;
   } catch (error) {

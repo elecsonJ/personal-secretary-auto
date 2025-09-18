@@ -269,27 +269,92 @@
             container.innerHTML = '<div class="no-notifications">알림 로딩 중...</div>';
             
             try {
-                // 로컬 스토리지에서 알림 히스토리 불러오기
-                const notifications = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                console.log('[HISTORY] 알림 히스토리 로딩 시작...');
                 
-                if (notifications.length === 0) {
+                // 1. 서버 API에서 영구 저장된 히스토리 불러오기 (우선순위)
+                let notifications = await getServerNotifications();
+                console.log(`[SERVER] 서버에서 ${notifications.length}개 알림 로드`);
+                
+                // 2. 로컬 스토리지 알림과 병합 (FCM 직접 수신 등)
+                const localNotifications = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                console.log(`[LOCAL] 로컬에서 ${localNotifications.length}개 알림 로드`);
+                
+                // 3. 중복 제거하며 병합 (타임스탬프 기준)
+                const merged = mergeNotifications(notifications, localNotifications);
+                console.log(`[MERGED] 총 ${merged.length}개 알림 (중복 제거 후)`);
+                
+                if (merged.length === 0) {
                     container.innerHTML = '<div class="no-notifications">저장된 알림이 없습니다</div>';
                     return;
                 }
                 
-                container.innerHTML = notifications.map(notif => {
+                container.innerHTML = merged.map(notif => {
+                    const timeField = notif.time || notif.timestamp;
+                    const sourceIcon = notif.source === 'github-actions' ? '🤖' : 
+                                     notif.source === 'fcm-direct' ? '📱' : '🖥️';
+                    
                     return `
                         <div class="notification-item">
-                            <div class="notification-title">${notif.title}</div>
+                            <div class="notification-title">${sourceIcon} ${notif.title}</div>
                             <div class="notification-body">${notif.body}</div>
-                            <div class="notification-time">${formatTime(notif.time)}</div>
+                            <div class="notification-time">${formatTime(timeField)}</div>
                         </div>
                     `;
                 }).join('');
+                
+                console.log('[HISTORY] 알림 히스토리 로딩 완료');
+                
             } catch (error) {
-                console.error('알림 로딩 실패:', error);
-                container.innerHTML = '<div class="no-notifications">알림 로딩 중 오류가 발생했습니다</div>';
+                console.error('[HISTORY] 알림 로딩 실패:', error);
+                
+                // 폴백: 로컬 스토리지만 사용
+                try {
+                    const localNotifications = JSON.parse(localStorage.getItem('notificationHistory') || '[]');
+                    if (localNotifications.length > 0) {
+                        container.innerHTML = localNotifications.map(notif => {
+                            return `
+                                <div class="notification-item">
+                                    <div class="notification-title">📱 ${notif.title}</div>
+                                    <div class="notification-body">${notif.body}</div>
+                                    <div class="notification-time">${formatTime(notif.time || notif.timestamp)}</div>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        container.innerHTML = '<div class="no-notifications">서버 연결 실패 - 저장된 알림이 없습니다</div>';
+                    }
+                } catch (fallbackError) {
+                    container.innerHTML = '<div class="no-notifications">알림 로딩 중 오류가 발생했습니다</div>';
+                }
             }
+        }
+        
+        function mergeNotifications(serverNotifications, localNotifications) {
+            const merged = [];
+            const seen = new Set();
+            
+            // 서버 알림 추가 (우선순위)
+            serverNotifications.forEach(notif => {
+                const key = `${notif.title}-${notif.timestamp}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    merged.push(notif);
+                }
+            });
+            
+            // 로컬 알림 추가 (중복 제거)
+            localNotifications.forEach(notif => {
+                const timestamp = notif.time || notif.timestamp;
+                const key = `${notif.title}-${timestamp}`;
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    merged.push({...notif, timestamp, source: 'local'});
+                }
+            });
+            
+            // 최신순 정렬
+            merged.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            return merged;
         }
 
         // 페이지 로드 시 알림 불러오기
