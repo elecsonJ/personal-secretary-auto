@@ -137,7 +137,13 @@ const loadPreviousWeatherState = async () => {
 const saveWeatherState = async (weatherData) => {
   try {
     await ensureDataDir();
-    const jsonData = JSON.stringify(weatherData, null, 2);
+    // 마지막 알림 정보를 weatherData에 포함
+    const stateWithNotification = {
+      ...weatherData,
+      lastNotificationSent: weatherData.lastNotificationSent || null,
+      lastNotificationReason: weatherData.lastNotificationReason || null
+    };
+    const jsonData = JSON.stringify(stateWithNotification, null, 2);
     await fs.writeFile(WEATHER_STATE_FILE, jsonData);
     console.log(`✅ 날씨 상태 저장 성공: ${WEATHER_STATE_FILE}`);
     console.log(`📁 파일 크기: ${jsonData.length} bytes`);
@@ -946,12 +952,23 @@ const checkWeatherChanges = async (executionId) => {
         alertLevel = 'important';
         notificationReason = `강수 형태 변화: ${previousState.rainType || '없음'} → ${currentWeather.rainType}`;
       }
+      // 상황이 호전될 때의 알림 (비가 멈추거나 강수확률이 크게 감소)
+      else if (prevRainAmount >= 3 && currentRainAmount === 0) {
+        shouldNotify = true;
+        alertLevel = 'normal';
+        notificationReason = `비가 그쳤습니다! (${prevRainAmount}mm → 0mm)`;
+      }
+      else if (prevRainProb >= 70 && currentRainProb <= 30) {
+        shouldNotify = true;
+        alertLevel = 'normal';
+        notificationReason = `강수확률 대폭 감소: ${prevRainProb}% → ${currentRainProb}%`;
+      }
       else if (currentWeather.skyCondition !== previousState.skyCondition) {
         // 하늘 상태 변화는 강수와 연관될 때만 알림
-        const isSignificantSkyChange = 
+        const isSignificantSkyChange =
           (previousState.skyCondition === '맑음' && currentWeather.skyCondition === '흐림' && currentRainProb >= 30) ||
           (previousState.skyCondition === '흐림' && currentWeather.skyCondition === '맑음' && prevRainProb >= 30);
-        
+
         if (isSignificantSkyChange) {
           shouldNotify = true;
           alertLevel = 'normal';
@@ -961,33 +978,49 @@ const checkWeatherChanges = async (executionId) => {
     }
     
     if (shouldNotify) {
-      // 알림 제목과 아이콘을 긴급도에 따라 설정
-      let title;
-      switch (alertLevel) {
-        case 'urgent':
-          title = '🚨 긴급 날씨 알림';
-          break;
-        case 'important':
-          title = '⚠️ 중요 날씨 알림';
-          break;
-        case 'info':
-          title = '📍 날씨 모니터링';
-          break;
-        default:
-          title = '🌤️ 날씨 변화 알림';
+      // 중복 알림 방지: 같은 이유로 최근에 알림을 보냈는지 확인
+      const now = new Date().getTime();
+      const hoursSinceLastNotification = previousState?.lastNotificationSent
+        ? (now - new Date(previousState.lastNotificationSent).getTime()) / (1000 * 60 * 60)
+        : 24; // 이전 알림이 없으면 24시간으로 설정
+
+      // 같은 이유로 3시간 내에 알림을 보낸 경우 중복 알림 방지
+      if (previousState?.lastNotificationReason === notificationReason && hoursSinceLastNotification < 3) {
+        console.log(`[${executionId}] 중복 알림 방지: "${notificationReason}" - ${hoursSinceLastNotification.toFixed(1)}시간 전에 동일한 알림 전송됨`);
+        shouldNotify = false;
+      } else {
+        // 알림 제목과 아이콘을 긴급도에 따라 설정
+        let title;
+        switch (alertLevel) {
+          case 'urgent':
+            title = '🚨 긴급 날씨 알림';
+            break;
+          case 'important':
+            title = '⚠️ 중요 날씨 알림';
+            break;
+          case 'info':
+            title = '📍 날씨 모니터링';
+            break;
+          default:
+            title = '🌤️ 날씨 변화 알림';
+        }
+
+        const body = `${currentWeather.description}\n\n📋 발송 이유: ${notificationReason}\n🕐 확인 시간: ${new Date().toLocaleString('ko-KR', {timeZone: 'Asia/Seoul'})}`;
+
+        await sendPushNotification(title, body, {
+          type: 'weather_change',
+          executionId: executionId,
+          alertLevel: alertLevel,
+          urgency: currentWeather.urgencyLevel,
+          reason: notificationReason
+        });
+
+        // 현재 날씨 상태에 마지막 알림 정보 추가
+        currentWeather.lastNotificationSent = new Date().toISOString();
+        currentWeather.lastNotificationReason = notificationReason;
+
+        console.log(`[${executionId}] 날씨 ${alertLevel} 알림 전송: ${notificationReason}`);
       }
-      
-      const body = `${currentWeather.description}\n\n📋 발송 이유: ${notificationReason}\n🕐 확인 시간: ${new Date().toLocaleString('ko-KR', {timeZone: 'Asia/Seoul'})}`;
-      
-      await sendPushNotification(title, body, {
-        type: 'weather_change',
-        executionId: executionId,
-        alertLevel: alertLevel,
-        urgency: currentWeather.urgencyLevel,
-        reason: notificationReason
-      });
-      
-      console.log(`[${executionId}] 날씨 ${alertLevel} 알림 전송: ${notificationReason}`);
     } else {
       console.log(`[${executionId}] 유의미한 날씨 변화 없음 - 알림 전송 안 함`);
       if (previousState) {
