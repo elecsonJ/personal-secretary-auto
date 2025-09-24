@@ -170,7 +170,7 @@ const commitWeatherStateToGit = async (weatherData) => {
     execSync('git config --global user.email "weather-bot@github-actions"');
     
     // 파일 추가 및 커밋
-    execSync('git add data/weather-state.json');
+    execSync('git add ./data/weather-state.json');
     execSync(`git commit -m "Update weather state - ${timestamp}" || echo "No changes to commit"`);
     execSync('git push');
     
@@ -195,7 +195,7 @@ const commitNotificationHistoryToGit = async (notification) => {
     execSync('git config --global user.email "notification-bot@github-actions"');
     
     // 파일 추가 및 커밋
-    execSync('git add data/notification-history.json');
+    execSync('git add ./data/notification-history.json');
     execSync(`git commit -m "Add notification: ${shortTitle}... - ${timestamp}" || echo "No changes to commit"`);
     execSync('git push');
     
@@ -935,8 +935,8 @@ const checkWeatherChanges = async (executionId) => {
           notificationReason = `강수확률 급감: ${prevRainProb}% → ${currentRainProb}%`;
         }
       }
-      // 기온 변화 알림 (매우 극단적인 경우만)
-      else if (Math.abs(currentTemp - prevTemp) >= 10) {
+      // 기온 변화 알림 (매우 극단적인 경우만, 단 이전 온도가 0인 경우는 제외)
+      else if (Math.abs(currentTemp - prevTemp) >= 10 && prevTemp !== 0) {
         shouldNotify = true;
         alertLevel = 'urgent';
         notificationReason = `극단적 기온 변화: ${prevTemp}°C → ${currentTemp}°C`;
