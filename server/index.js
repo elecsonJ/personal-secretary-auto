@@ -426,19 +426,23 @@ const getCurrentWeather = async () => {
     
     const hour = now.getHours();
     let baseTime;
-    if (hour < 2) baseTime = '2300';
-    else if (hour < 5) baseTime = '0200';
-    else if (hour < 8) baseTime = '0500';
-    else if (hour < 11) baseTime = '0800';
-    else if (hour < 14) baseTime = '1100';
-    else if (hour < 17) baseTime = '1400';
-    else if (hour < 20) baseTime = '1700';
-    else if (hour < 23) baseTime = '2000';
+    // 기상청 API는 각 시간의 10분 후에 업데이트됨 (예: 14시 데이터는 14시 10분 이후 제공)
+    const minute = now.getMinutes();
+    const currentHourMinute = hour * 100 + minute; // 1430 = 14시 30분
+
+    if (currentHourMinute < 210) baseTime = '2300'; // 전날 23시
+    else if (currentHourMinute < 510) baseTime = '0200';
+    else if (currentHourMinute < 810) baseTime = '0500';
+    else if (currentHourMinute < 1110) baseTime = '0800';
+    else if (currentHourMinute < 1410) baseTime = '1100';
+    else if (currentHourMinute < 1710) baseTime = '1400';
+    else if (currentHourMinute < 2010) baseTime = '1700';
+    else if (currentHourMinute < 2310) baseTime = '2000';
     else baseTime = '2300';
     
     const url = `${WEATHER_API_URL}?serviceKey=${SERVICE_KEY}&numOfRows=1000&pageNo=1&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=55&ny=127`;
     
-    console.log('🌤️ 날씨 API 요청:', { baseDate, baseTime, hour });
+    console.log('🌤️ 날씨 API 요청:', { baseDate, baseTime, hour, minute, currentHourMinute });
     console.log('🔗 API URL:', url.substring(0, 100) + '...');
     
     const response = await axios.get(url);
