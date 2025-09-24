@@ -418,17 +418,19 @@ function parseWeatherData(items) {
 
 const getCurrentWeather = async () => {
   try {
+    // 한국 시간 기준으로 계산 (GitHub Actions는 UTC에서 실행)
     const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
+    const koreaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+    const year = koreaTime.getFullYear();
+    const month = String(koreaTime.getMonth() + 1).padStart(2, '0');
+    const day = String(koreaTime.getDate()).padStart(2, '0');
     const baseDate = `${year}${month}${day}`;
-    
-    const hour = now.getHours();
+
+    const hour = koreaTime.getHours();
     let baseTime;
     // 기상청 API는 각 시간의 10분 후에 업데이트됨 (예: 14시 데이터는 14시 10분 이후 제공)
-    const minute = now.getMinutes();
-    const currentHourMinute = hour * 100 + minute; // 1430 = 14시 30분
+    const minute = koreaTime.getMinutes();
+    const currentHourMinute = hour * 100 + minute; // 1430 = 14시 30분 (한국시간)
 
     if (currentHourMinute < 210) baseTime = '2300'; // 전날 23시
     else if (currentHourMinute < 510) baseTime = '0200';
@@ -442,7 +444,7 @@ const getCurrentWeather = async () => {
     
     const url = `${WEATHER_API_URL}?serviceKey=${SERVICE_KEY}&numOfRows=1000&pageNo=1&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=55&ny=127`;
     
-    console.log('🌤️ 날씨 API 요청:', { baseDate, baseTime, hour, minute, currentHourMinute });
+    console.log('🌤️ 날씨 API 요청 (한국시간):', { baseDate, baseTime, hour, minute, currentHourMinute });
     console.log('🔗 API URL:', url.substring(0, 100) + '...');
     
     const response = await axios.get(url);
