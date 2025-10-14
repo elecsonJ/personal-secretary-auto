@@ -7,6 +7,6 @@
   "description": "현재 날씨: 24°C (최저 16°C, 최고 27°C), 강수확률 30%",
   "lastUpdated": "2024-09-24T05:30:00.000Z",
   "urgencyLevel": "normal",
-  "lastNotificationSent": "2024-09-24T05:32:00.000Z",
-  "lastNotificationReason": "극단적 기온 변화: 0°C → 24°C"
+  "lastNotificationSent": null,
+  "lastNotificationReason": null
 }

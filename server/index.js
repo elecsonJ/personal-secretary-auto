@@ -97,7 +97,11 @@ if (!admin.apps.length) {
   }
 }
 
-const WEATHER_API_URL = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst';
+// 기상청 API 엔드포인트
+const WEATHER_API_URL = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst'; // 단기예보 (3일)
+const ULTRA_SRT_NCST_URL = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst'; // 초단기실황 (현재)
+const ULTRA_SRT_FCST_URL = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst'; // 초단기예보 (6시간)
+
 // 기존 서비스 키가 만료되었으므로 fallback 처리
 const SERVICE_KEY = process.env.WEATHER_API_KEY || 'DecGaYFaJhEcm%2BWE4VqPKFPH2R9Ja6eI7w3OL2fgZCUMGDgJRjl%2BgRqkv%2Fx34vn0OJXTz26K3ywHvfFl4EfB4w%3D%3D';
 
@@ -169,8 +173,8 @@ const commitWeatherStateToGit = async (weatherData) => {
     execSync('git config --global user.name "Weather Bot"');
     execSync('git config --global user.email "weather-bot@github-actions"');
     
-    // 파일 추가 및 커밋
-    execSync('git add ./data/weather-state.json');
+    // 파일 추가 및 커밋 (server 디렉토리에서 실행되므로 ../data 사용)
+    execSync('git add ../data/weather-state.json');
     execSync(`git commit -m "Update weather state - ${timestamp}" || echo "No changes to commit"`);
     execSync('git push');
     
@@ -194,8 +198,8 @@ const commitNotificationHistoryToGit = async (notification) => {
     execSync('git config --global user.name "Notification Bot"');
     execSync('git config --global user.email "notification-bot@github-actions"');
     
-    // 파일 추가 및 커밋
-    execSync('git add ./data/notification-history.json');
+    // 파일 추가 및 커밋 (server 디렉토리에서 실행되므로 ../data 사용)
+    execSync('git add ../data/notification-history.json');
     execSync(`git commit -m "Add notification: ${shortTitle}... - ${timestamp}" || echo "No changes to commit"`);
     execSync('git push');
     
@@ -323,20 +327,31 @@ function parseWeatherData(items) {
   
   // 기본 데이터 추출
   const rainProb = currentData.POP || '0';
-  const temp = currentData.TMP || '정보없음';
+  const temp = currentData.TMP !== undefined ? currentData.TMP : '정보없음';
   const sky = currentData.SKY || '1';
   const rainType = currentData.PTY || '0';
   const rainAmount = currentData.RN1 || '0';
+
+  // TMP 데이터가 명시적으로 없으면 유효하지 않은 것으로 판단
+  if (currentData.TMP === undefined) {
+    console.log('⚠️  현재 시간대에 TMP(온도) 데이터가 없습니다.');
+  }
   
   // 최고/최저 기온 계산
   let minTemp = '정보없음';
   let maxTemp = '정보없음';
-  
+
   if (todayData.TMN && todayData.TMN.length > 0) {
-    minTemp = Math.min(...todayData.TMN.map(d => parseInt(d.value) || 0));
+    const validTemps = todayData.TMN.map(d => parseInt(d.value)).filter(t => !isNaN(t));
+    if (validTemps.length > 0) {
+      minTemp = Math.min(...validTemps);
+    }
   }
   if (todayData.TMX && todayData.TMX.length > 0) {
-    maxTemp = Math.max(...todayData.TMX.map(d => parseInt(d.value) || 0));
+    const validTemps = todayData.TMX.map(d => parseInt(d.value)).filter(t => !isNaN(t));
+    if (validTemps.length > 0) {
+      maxTemp = Math.max(...validTemps);
+    }
   }
   
   // 하늘 상태 해석
@@ -416,24 +431,153 @@ function parseWeatherData(items) {
   };
 }
 
-const getCurrentWeather = async () => {
+// 온도 데이터 유효성 검증 함수
+const isValidTemperature = (temp) => {
+  if (!temp || temp === '정보 없음' || temp === '정보없음') {
+    return false;
+  }
+  const tempNum = parseInt(temp);
+  // 한국 기온 범위: -30°C ~ 45°C (극한 기온 고려)
+  return !isNaN(tempNum) && tempNum >= -30 && tempNum <= 45;
+};
+
+// 초단기실황 API - 현재 관측 데이터 (가장 정확)
+const getUltraSrtNcst = async () => {
   try {
-    // 한국 시간 기준으로 계산 (GitHub Actions는 UTC에서 실행)
     const now = new Date();
     const koreaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+
+    const hour = koreaTime.getHours();
+    const minute = koreaTime.getMinutes();
+
+    // 초단기실황은 매시각 10분 이후 데이터 제공
+    // 현재 시각이 10분 이전이면 이전 시각 데이터 사용
+    let baseTime;
+    if (minute < 10) {
+      const prevHour = hour === 0 ? 23 : hour - 1;
+      baseTime = String(prevHour).padStart(2, '0') + '00';
+      if (hour === 0) {
+        koreaTime.setDate(koreaTime.getDate() - 1);
+      }
+    } else {
+      baseTime = String(hour).padStart(2, '0') + '00';
+    }
+
     const year = koreaTime.getFullYear();
     const month = String(koreaTime.getMonth() + 1).padStart(2, '0');
     const day = String(koreaTime.getDate()).padStart(2, '0');
     const baseDate = `${year}${month}${day}`;
 
+    const url = `${ULTRA_SRT_NCST_URL}?serviceKey=${SERVICE_KEY}&numOfRows=100&pageNo=1&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=55&ny=127`;
+
+    console.log('⚡ 초단기실황 API 요청:', { baseDate, baseTime, hour, minute });
+
+    const response = await axios.get(url);
+
+    if (response.data.response?.header?.resultCode !== '00') {
+      console.error('❌ 초단기실황 API 오류:', response.data.response?.header);
+      return null;
+    }
+
+    const items = response.data.response?.body?.items?.item;
+    if (!items || items.length === 0) {
+      console.error('❌ 초단기실황 데이터 없음');
+      return null;
+    }
+
+    // 초단기실황 데이터 파싱
+    const ncstData = {};
+    items.forEach(item => {
+      ncstData[item.category] = item.obsrValue;
+    });
+
+    console.log('⚡ 초단기실황 데이터:', ncstData);
+
+    return {
+      temperature: ncstData.T1H || null,        // 기온
+      rainType: ncstData.PTY || '0',            // 강수형태
+      rain1h: ncstData.RN1 || '0',              // 1시간 강수량
+      humidity: ncstData.REH || '0',            // 습도
+      windSpeed: ncstData.WSD || '0',           // 풍속
+    };
+  } catch (error) {
+    console.error('❌ 초단기실황 조회 실패:', error.message);
+    return null;
+  }
+};
+
+// 개선된 날씨 조회: 초단기실황(현재) + 단기예보(미래) 병합
+const getCurrentWeather = async () => {
+  try {
+    console.log('🌤️ 날씨 조회 시작: 초단기실황 + 단기예보 병합');
+
+    // 1. 초단기실황으로 현재 정확한 온도와 강수량 가져오기
+    const ultraSrtData = await getUltraSrtNcst();
+
+    // 2. 단기예보로 향후 예보 가져오기
+    const forecastData = await getVilageFcst();
+
+    // 3. 데이터 병합
+    if (!forecastData) {
+      console.error('❌ 단기예보 데이터 없음 - 날씨 조회 실패');
+      return null;
+    }
+
+    // 초단기실황 데이터가 있으면 현재 온도와 강수량을 우선 사용
+    if (ultraSrtData && ultraSrtData.temperature) {
+      console.log('⚡ 초단기실황 데이터로 현재 온도 업데이트:', {
+        예보온도: forecastData.temperature,
+        실황온도: ultraSrtData.temperature
+      });
+
+      forecastData.temperature = ultraSrtData.temperature;
+
+      // 강수량도 실황 데이터 우선
+      if (ultraSrtData.rain1h && ultraSrtData.rain1h !== '강수없음') {
+        forecastData.rainAmount = ultraSrtData.rain1h;
+      }
+
+      // 강수형태도 실황 데이터 우선
+      if (ultraSrtData.rainType !== '0') {
+        const rainTypeMap = {
+          '0': '없음',
+          '1': '비',
+          '2': '비/눈',
+          '3': '눈',
+          '4': '소나기'
+        };
+        forecastData.rainType = rainTypeMap[ultraSrtData.rainType] || '없음';
+      }
+    } else {
+      console.log('⚠️ 초단기실황 데이터 없음 - 단기예보 데이터만 사용');
+    }
+
+    return forecastData;
+  } catch (error) {
+    console.error('❌ 날씨 조회 실패:', error.message);
+    return null;
+  }
+};
+
+// 단기예보 API (기존 getCurrentWeather 로직)
+const getVilageFcst = async () => {
+  try {
+    // 한국 시간 기준으로 계산 (GitHub Actions는 UTC에서 실행)
+    const now = new Date();
+    const koreaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
+
     const hour = koreaTime.getHours();
-    let baseTime;
-    // 기상청 API는 각 시간의 10분 후에 업데이트됨 (예: 14시 데이터는 14시 10분 이후 제공)
     const minute = koreaTime.getMinutes();
     const currentHourMinute = hour * 100 + minute; // 1430 = 14시 30분 (한국시간)
 
-    if (currentHourMinute < 210) baseTime = '2300'; // 전날 23시
-    else if (currentHourMinute < 510) baseTime = '0200';
+    // 기상청 API는 각 시간의 10분 후에 업데이트됨 (예: 14시 데이터는 14시 10분 이후 제공)
+    let baseTime;
+    let targetDate = new Date(koreaTime); // 복사본 생성
+
+    if (currentHourMinute < 210) {
+      baseTime = '2300';
+      targetDate.setDate(targetDate.getDate() - 1); // 전날로 설정
+    } else if (currentHourMinute < 510) baseTime = '0200';
     else if (currentHourMinute < 810) baseTime = '0500';
     else if (currentHourMinute < 1110) baseTime = '0800';
     else if (currentHourMinute < 1410) baseTime = '1100';
@@ -441,12 +585,16 @@ const getCurrentWeather = async () => {
     else if (currentHourMinute < 2010) baseTime = '1700';
     else if (currentHourMinute < 2310) baseTime = '2000';
     else baseTime = '2300';
-    
+
+    const year = targetDate.getFullYear();
+    const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const day = String(targetDate.getDate()).padStart(2, '0');
+    const baseDate = `${year}${month}${day}`;
+
     const url = `${WEATHER_API_URL}?serviceKey=${SERVICE_KEY}&numOfRows=1000&pageNo=1&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=55&ny=127`;
-    
-    console.log('🌤️ 날씨 API 요청 (한국시간):', { baseDate, baseTime, hour, minute, currentHourMinute });
-    console.log('🔗 API URL:', url.substring(0, 100) + '...');
-    
+
+    console.log('📅 단기예보 API 요청 (한국시간):', { baseDate, baseTime, hour, minute, currentHourMinute, targetDate: targetDate.toISOString() });
+
     const response = await axios.get(url);
     console.log('📡 날씨 API 응답 상태:', response.status);
     console.log('📊 응답 데이터 구조:', {
@@ -456,37 +604,78 @@ const getCurrentWeather = async () => {
       itemType: Array.isArray(response.data.response?.body?.items?.item) ? 'array' : typeof response.data.response?.body?.items?.item,
       itemCount: Array.isArray(response.data.response?.body?.items?.item) ? response.data.response.body.items.item.length : 'not array'
     });
-    
+
     // 전체 응답 구조 디버깅
     console.log('🔍 전체 응답 데이터:', JSON.stringify(response.data, null, 2).substring(0, 500) + '...');
-    
+
     // XML 응답인 경우 (서비스 키 오류)
     if (typeof response.data === 'string' && response.data.includes('SERVICE_KEY_IS_NOT_REGISTERED_ERROR')) {
       console.error('❌ 날씨 API 서비스 키 오류: 키가 등록되지 않았거나 만료됨');
       throw new Error('날씨 API 서비스 키가 만료되었습니다. 관리자에게 문의하세요.');
     }
-    
+
     if (response.data.response?.header?.resultCode !== '00') {
       console.error('❌ 날씨 API 오류:', response.data.response?.header);
       throw new Error(`날씨 API 오류: ${response.data.response?.header?.resultMsg || '알 수 없는 오류'}`);
     }
-    
+
     const items = response.data.response?.body?.items?.item;
-    
+
     if (!items) {
       console.error('❌ 날씨 데이터 없음:', response.data);
       throw new Error('날씨 API에서 데이터를 가져올 수 없습니다.');
     }
-    
-    return parseWeatherData(items);
+
+    const weatherData = parseWeatherData(items);
+
+    console.log('🌡️ 파싱된 날씨 데이터 검증:', {
+      temperature: weatherData.temperature,
+      isValid: isValidTemperature(weatherData.temperature),
+      rainProbability: weatherData.rainProbability,
+      rainAmount: weatherData.rainAmount
+    });
+
+    // 날씨 데이터 유효성 검증
+    if (!isValidTemperature(weatherData.temperature)) {
+      console.error('❌ 유효하지 않은 온도 데이터:', weatherData.temperature);
+      console.error('❌ 전체 날씨 데이터:', JSON.stringify(weatherData, null, 2));
+      throw new Error('날씨 API에서 유효하지 않은 온도 데이터를 받았습니다.');
+    }
+
+    // 추가 안전장치: 의심스러운 온도 경고 (API 오류 가능성)
+    const tempNum = parseInt(weatherData.temperature);
+    if (tempNum === 0) {
+      console.warn('⚠️  온도가 정확히 0°C입니다. API 오류가 아닌지 확인 필요.');
+      console.warn('⚠️  현재 월:', new Date().toLocaleString("en-US", {timeZone: "Asia/Seoul", month: 'long'}));
+    }
+
+    return weatherData;
   } catch (error) {
-    console.error('날씨 조회 실패:', error.message);
-    return {
-      rainProbability: '정보 없음',
-      temperature: '정보 없음',
-      skyCondition: '정보 없음',
-      description: '날씨 정보를 가져올 수 없습니다.'
-    };
+    console.error('❌ 날씨 조회 실패:', error.message);
+
+    // 상세한 에러 정보 로깅
+    if (error.response) {
+      console.error('📡 HTTP 응답 에러:');
+      console.error('  - 상태 코드:', error.response.status);
+      console.error('  - 상태 텍스트:', error.response.statusText);
+      console.error('  - 응답 데이터:', JSON.stringify(error.response.data).substring(0, 500));
+
+      // 404 에러인 경우 특별 처리
+      if (error.response.status === 404) {
+        console.error('⚠️  404 에러 - 가능한 원인:');
+        console.error('  1. API 엔드포인트가 변경되었을 수 있습니다');
+        console.error('  2. 요청한 날짜/시간의 데이터가 없을 수 있습니다');
+        console.error('  3. 서비스 키가 유효하지 않을 수 있습니다');
+        console.error('💡 해결 방법: WEATHER_API_KEY를 재발급 받으세요');
+      }
+    } else if (error.request) {
+      console.error('📡 네트워크 에러: 응답을 받지 못했습니다');
+      console.error('  - 요청 정보:', error.request);
+    } else {
+      console.error('⚠️  요청 설정 에러:', error.message);
+    }
+
+    return null; // 날씨 정보를 불러오지 못한 경우 null 반환
   }
 };
 
@@ -880,37 +1069,59 @@ const sendPushNotification = async (title, body, data = {}) => {
 const checkWeatherChanges = async (executionId) => {
   try {
     console.log(`[${executionId}] 날씨 변화 확인 시작...`);
-    
+
     const currentWeather = await getCurrentWeather();
     if (!currentWeather) {
       console.error(`[${executionId}] 날씨 데이터를 가져올 수 없습니다 - 함수 종료`);
+      console.log(`[${executionId}] 날씨 API 실패 - 이전 상태 유지 및 알림 없음 (상태 저장하지 않음)`);
       return;
     }
-    
+
     const previousState = await loadPreviousWeatherState();
-    
+
+    // 이전 상태의 온도가 유효하지 않으면 무시하고 새로 시작
+    if (previousState && !isValidTemperature(previousState.temperature)) {
+      console.log(`[${executionId}] 이전 상태의 온도가 유효하지 않음 (${previousState.temperature}) - 초기화하고 새로 시작`);
+      previousState.temperature = null;
+    }
+
     let shouldNotify = false;
     let notificationReason = '';
     let alertLevel = 'normal';
-    
-    if (!previousState) {
+
+    if (!previousState || !previousState.temperature) {
       shouldNotify = false; // 첫 실행 시에는 알림 보내지 않음
       notificationReason = '날씨 모니터링 시작 - 기준값 설정';
       alertLevel = 'info';
       console.log(`[${executionId}] 첫 실행 감지 - 기준값 설정 후 다음 실행부터 변화 감지`);
     } else {
+      // 현재 온도는 이미 유효성 검증을 통과했으므로 안전
+      const currentTempRaw = currentWeather.temperature;
+      const prevTempRaw = previousState.temperature;
+      const currentTempNum = parseInt(currentTempRaw);
+      const prevTempNum = parseInt(prevTempRaw);
+
+      // 온도 유효성 체크 - isValidTemperature 함수 사용
+      const isCurrentTempValid = isValidTemperature(currentTempRaw);
+      const isPrevTempValid = isValidTemperature(prevTempRaw);
+
       const currentRainProb = parseInt(currentWeather.rainProbability) || 0;
       const prevRainProb = parseInt(previousState.rainProbability) || 0;
-      const currentTemp = parseInt(currentWeather.temperature) || 0;
-      const prevTemp = parseInt(previousState.temperature) || 0;
+      const currentTemp = isCurrentTempValid ? currentTempNum : null;
+      const prevTemp = isPrevTempValid ? prevTempNum : null;
       const currentRainAmount = parseFloat(currentWeather.rainAmount?.replace('mm', '')) || 0;
       const prevRainAmount = parseFloat(previousState.rainAmount?.replace('mm', '')) || 0;
       
       console.log(`[${executionId}] 날씨 변화 분석:`);
-      console.log(`  이전: 강수확률 ${prevRainProb}%, 강수량 ${prevRainAmount}mm, 온도 ${prevTemp}°C, 강수형태 ${previousState.rainType || '없음'}`);
-      console.log(`  현재: 강수확률 ${currentRainProb}%, 강수량 ${currentRainAmount}mm, 온도 ${currentTemp}°C, 강수형태 ${currentWeather.rainType || '없음'}`);
-      console.log(`  변화: 강수확률 ${currentRainProb - prevRainProb >= 0 ? '+' : ''}${currentRainProb - prevRainProb}%, 강수량 ${currentRainAmount - prevRainAmount >= 0 ? '+' : ''}${currentRainAmount - prevRainAmount}mm, 온도 ${currentTemp - prevTemp >= 0 ? '+' : ''}${currentTemp - prevTemp}°C`);
-      
+      console.log(`  이전: 강수확률 ${prevRainProb}%, 강수량 ${prevRainAmount}mm, 온도 ${prevTemp !== null ? prevTemp + '°C' : '정보없음'}, 강수형태 ${previousState.rainType || '없음'}`);
+      console.log(`  현재: 강수확률 ${currentRainProb}%, 강수량 ${currentRainAmount}mm, 온도 ${currentTemp !== null ? currentTemp + '°C' : '정보없음'}, 강수형태 ${currentWeather.rainType || '없음'}`);
+
+      if (currentTemp !== null && prevTemp !== null) {
+        console.log(`  변화: 강수확률 ${currentRainProb - prevRainProb >= 0 ? '+' : ''}${currentRainProb - prevRainProb}%, 강수량 ${currentRainAmount - prevRainAmount >= 0 ? '+' : ''}${currentRainAmount - prevRainAmount}mm, 온도 ${currentTemp - prevTemp >= 0 ? '+' : ''}${currentTemp - prevTemp}°C`);
+      } else {
+        console.log(`  변화: 강수확률 ${currentRainProb - prevRainProb >= 0 ? '+' : ''}${currentRainProb - prevRainProb}%, 강수량 ${currentRainAmount - prevRainAmount >= 0 ? '+' : ''}${currentRainAmount - prevRainAmount}mm, 온도: 비교 불가 (유효한 온도 정보 없음)`);
+      }
+
       // 1. 긴급 알림: 강수량 급증, 소나기 발생 (즉시 알림 필요)
       if (currentRainAmount >= 10 || currentWeather.rainType === '소나기') {
         shouldNotify = true;
@@ -941,8 +1152,8 @@ const checkWeatherChanges = async (executionId) => {
           notificationReason = `강수확률 급감: ${prevRainProb}% → ${currentRainProb}%`;
         }
       }
-      // 기온 변화 알림 (매우 극단적인 경우만, 단 이전 온도가 0인 경우는 제외)
-      else if (Math.abs(currentTemp - prevTemp) >= 10 && prevTemp !== 0) {
+      // 기온 변화 알림 (매우 극단적인 경우만, 단 온도 정보가 유효한 경우에만)
+      else if (currentTemp !== null && prevTemp !== null && Math.abs(currentTemp - prevTemp) >= 10) {
         shouldNotify = true;
         alertLevel = 'urgent';
         notificationReason = `극단적 기온 변화: ${prevTemp}°C → ${currentTemp}°C`;
@@ -1050,23 +1261,30 @@ const checkWeatherChanges = async (executionId) => {
 const sendMorningBriefing = async (executionId) => {
   try {
     console.log(`[${executionId}] 아침 브리핑 시작...`);
-    
+
     // 한국 시간으로 오늘 날짜 계산
     const now = new Date();
     const koreaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Seoul"}));
     const todayStr = koreaTime.toISOString().split('T')[0];
-    
+
     console.log(`[${executionId}] 한국 시간 기준 오늘 날짜: ${todayStr}`);
-    
+
     const [weather, todayEvents, highTasks, dailyTasks] = await Promise.all([
       getCurrentWeather(),
       getTodayEvents(todayStr),
       getHighPriorityTasks(),
       getDailyTasks()
     ]);
-    
+
     let briefing = `🌅 좋은 아침입니다!\n\n`;
-    briefing += `🌤️ 오늘 날씨: ${weather.description}\n\n`;
+
+    // 날씨 데이터가 유효한 경우에만 표시
+    if (weather && isValidTemperature(weather.temperature)) {
+      briefing += `🌤️ 오늘 날씨: ${weather.description}\n\n`;
+    } else {
+      briefing += `🌤️ 오늘 날씨: 날씨 정보를 가져올 수 없습니다.\n\n`;
+      console.log(`[${executionId}] 날씨 정보 없음 또는 유효하지 않음 - 기본 메시지 사용`);
+    }
     
     if (todayEvents.length > 0) {
       briefing += `📅 오늘의 일정:\n${todayEvents.map(event => `• ${event}`).join('\n')}\n\n`;
