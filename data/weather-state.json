@@ -1,12 +1,13 @@
 {
-  "temperature": "24",
-  "rainProbability": "30",
-  "rainAmount": "0mm",
+  "rainProbability": "0",
+  "temperature": "22.5",
+  "minTemp": 7,
+  "maxTemp": 24,
+  "skyCondition": "맑음",
   "rainType": "없음",
-  "skyCondition": "흐림",
-  "description": "현재 날씨: 24°C (최저 16°C, 최고 27°C), 강수확률 30%",
-  "lastUpdated": "2024-09-24T05:30:00.000Z",
-  "urgencyLevel": "normal",
-  "lastNotificationSent": null,
-  "lastNotificationReason": null
+  "rainAmount": "0",
+  "description": "15°C (7-24°C), 맑음",
+  "urgencyLevel": "low",
+  "lastNotificationSent": "2025-10-15T08:43:36.443Z",
+  "lastNotificationReason": "강수확률 변화: 30% → 0%"
 }
