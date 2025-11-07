@@ -1,13 +1,13 @@
 {
   "rainProbability": "0",
-  "temperature": "8.5",
+  "temperature": "18",
   "minTemp": 4,
   "maxTemp": 19,
   "skyCondition": "맑음",
   "rainType": "없음",
   "rainAmount": "0",
-  "description": "7°C (4-19°C), 맑음",
+  "description": "10°C (4-19°C), 맑음",
   "urgencyLevel": "low",
-  "lastNotificationSent": null,
-  "lastNotificationReason": null
+  "lastNotificationSent": "2025-11-07T03:18:57.430Z",
+  "lastNotificationReason": "극단적 기온 변화: 8°C → 18°C"
 }
