@@ -1,5 +1,14 @@
 [
   {
+    "id": 1763638133073,
+    "title": "🌤️ 날씨 변화 알림",
+    "body": "9°C (-2-15°C), 강수확률 10%, 맑음\n\n📋 발송 이유: 날씨 변화: 흐림 → 맑음\n🕐 확인 시간: 2025. 11. 20. 오후 8:28:52",
+    "type": "weather_change",
+    "executionId": "github-actions-19535331211-828",
+    "timestamp": "2025-11-20T11:28:53.073Z",
+    "source": "server"
+  },
+  {
     "id": 1763633994196,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 근로 대체\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-18511563760-570",
     "timestamp": "2025-10-14T22:15:25.169Z",
-    "source": "server"
-  },
-  {
-    "id": 1726631400000,
-    "title": "🤖 개인 비서 시스템 활성화",
-    "body": "알림 히스토리 영구 저장 시스템이 준비되었습니다.\n\n📋 발송 이유: 시스템 초기화\n🕐 확인 시간: 2024. 9. 18 오후 2:10:00",
-    "type": "system",
-    "executionId": "system-init",
-    "timestamp": "2024-09-18T05:10:00.000Z",
     "source": "server"
   }
 ]
