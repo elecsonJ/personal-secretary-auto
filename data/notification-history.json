@@ -1,5 +1,14 @@
 [
   {
+    "id": 1763940585428,
+    "title": "⚠️ 중요 날씨 알림",
+    "body": "6°C (1-16°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 강수확률 급증: 0% → 60%\n🕐 확인 시간: 2025. 11. 24. 오전 8:29:45",
+    "type": "weather_change",
+    "executionId": "github-actions-19618956149-851",
+    "timestamp": "2025-11-23T23:29:45.428Z",
+    "source": "server"
+  },
+  {
     "id": 1763936256140,
     "title": "🌅 아침 브리핑",
     "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 4°C (1-16°C), 강수확률 30%, 흐림\n\n📅 오늘의 일정:\n• 서울대 수강료 납부\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-18666382032-612",
     "timestamp": "2025-10-20T22:15:29.928Z",
-    "source": "server"
-  },
-  {
-    "id": 1760955914072,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• C언어 중간??\n• 이해원 특강 시대인재북스 11시 오픈\n• 데통 수업 있음\n• 데이터통신 과제4\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-18649016618-610",
-    "timestamp": "2025-10-20T10:25:14.072Z",
     "source": "server"
   }
 ]
