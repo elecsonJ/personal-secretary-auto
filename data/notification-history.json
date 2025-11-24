@@ -1,5 +1,14 @@
 [
   {
+    "id": 1763979653558,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 브아솔 콘 티켓 배송일\n• 창공설 미팅?\n• 데통 동영상 강의 대체\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-19630865176-855",
+    "timestamp": "2025-11-24T10:20:53.558Z",
+    "source": "server"
+  },
+  {
     "id": 1763962623684,
     "title": "⚠️ 중요 날씨 알림",
     "body": "9°C (1-12°C), 맑음\n\n📋 발송 이유: 강수확률 급감: 60% → 0%\n🕐 확인 시간: 2025. 11. 24. 오후 2:37:03",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-18680633196-617",
     "timestamp": "2025-10-21T10:18:50.184Z",
-    "source": "server"
-  },
-  {
-    "id": 1761016491860,
-    "title": "🚨 긴급 날씨 알림",
-    "body": "17°C (4-19°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 극단적 기온 변화: 22°C → 11°C\n🕐 확인 시간: 2025. 10. 21. 오후 12:14:51",
-    "type": "weather_change",
-    "executionId": "github-actions-18671670631-614",
-    "timestamp": "2025-10-21T03:14:51.860Z",
     "source": "server"
   }
 ]
