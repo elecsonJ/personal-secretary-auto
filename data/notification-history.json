@@ -1,5 +1,14 @@
 [
   {
+    "id": 1764070225712,
+    "title": "🌤️ 날씨 변화 알림",
+    "body": "10°C (-3-12°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 강수확률 변화: 0% → 30%\n🕐 확인 시간: 2025. 11. 25. 오후 8:30:25",
+    "type": "weather_change",
+    "executionId": "github-actions-19668023351-863",
+    "timestamp": "2025-11-25T11:30:25.712Z",
+    "source": "server"
+  },
+  {
     "id": 1764066118699,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 2025 교내 모의 해킹 대회 RunaCTF 신청\n• ai sw 전문가 특강 16시반\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-18745188459-631",
     "timestamp": "2025-10-23T10:19:14.287Z",
-    "source": "server"
-  },
-  {
-    "id": 1761171215598,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 날씨 정보를 가져올 수 없습니다.\n\n📅 오늘의 일정:\n• 자구 중간\n• 데이터통신 중간 10시\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-18731310825-626",
-    "timestamp": "2025-10-22T22:13:35.598Z",
     "source": "server"
   }
 ]
