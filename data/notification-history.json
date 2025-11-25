@@ -1,5 +1,14 @@
 [
   {
+    "id": 1764066118699,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 2025 교내 모의 해킹 대회 RunaCTF 신청\n• ai sw 전문가 특강 16시반\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-19666160033-862",
+    "timestamp": "2025-11-25T10:21:58.699Z",
+    "source": "server"
+  },
+  {
     "id": 1764027045178,
     "title": "⚠️ 중요 날씨 알림",
     "body": "0°C (-2-10°C), 맑음\n\n📋 발송 이유: 강수 형태 변화: 없음 → 비\n🕐 확인 시간: 2025. 11. 25. 오전 8:30:44",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-18731310825-626",
     "timestamp": "2025-10-22T22:13:35.598Z",
-    "source": "server"
-  },
-  {
-    "id": 1761128378516,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 자구 중간\n• 데이터통신 중간 10시\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-18713021192-624",
-    "timestamp": "2025-10-22T10:19:38.516Z",
     "source": "server"
   }
 ]
