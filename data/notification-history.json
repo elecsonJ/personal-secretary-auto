@@ -1,5 +1,14 @@
 [
   {
+    "id": 1764156587909,
+    "title": "🌤️ 날씨 변화 알림",
+    "body": "9°C (-3-13°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 강수확률 변화: 30% → 60%\n🕐 확인 시간: 2025. 11. 26. 오후 8:29:47",
+    "type": "weather_change",
+    "executionId": "github-actions-19702200381-870",
+    "timestamp": "2025-11-26T11:29:47.909Z",
+    "source": "server"
+  },
+  {
     "id": 1764152437332,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-18793427300-640",
     "timestamp": "2025-10-24T22:16:07.506Z",
-    "source": "server"
-  },
-  {
-    "id": 1761301187857,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-18776824356-638",
-    "timestamp": "2025-10-24T10:19:47.857Z",
     "source": "server"
   }
 ]
