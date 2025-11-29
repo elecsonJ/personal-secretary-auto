@@ -1,5 +1,14 @@
 [
   {
+    "id": 1764411491127,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 알고리즘 과제3\n• 윤원형 20-22시\n• 정우현 10-12시\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-19782539622-890",
+    "timestamp": "2025-11-29T10:18:11.127Z",
+    "source": "server"
+  },
+  {
     "id": 1764386913210,
     "title": "🚨 긴급 날씨 알림",
     "body": "2°C (-3-13°C), 강수확률 20%, 구름많음\n\n📋 발송 이유: 극단적 기온 변화: -1°C → 9°C\n🕐 확인 시간: 2025. 11. 29. 오후 12:28:32",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-18871499765-666",
     "timestamp": "2025-10-28T10:19:48.341Z",
-    "source": "server"
-  },
-  {
-    "id": 1761607724829,
-    "title": "🌤️ 날씨 변화 알림",
-    "body": "12°C (4-19°C), 맑음\n\n📋 발송 이유: 강수확률 변화: 30% → 0%\n🕐 확인 시간: 2025. 10. 28. 오전 8:28:44",
-    "type": "weather_change",
-    "executionId": "github-actions-18858959004-662",
-    "timestamp": "2025-10-27T23:28:44.829Z",
     "source": "server"
   }
 ]
