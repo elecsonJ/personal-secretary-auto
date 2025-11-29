@@ -1,5 +1,14 @@
 [
   {
+    "id": 1764454556211,
+    "title": "🌅 아침 브리핑",
+    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -7°C (-7-14°C), 강수확률 20%, 구름많음\n\n📅 오늘의 일정:\n• 알고리즘 과제3\n• 윤원형 20-22시\n• 정우현 10-12시\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
+    "type": "morning_briefing",
+    "executionId": "github-actions-19790026548-892",
+    "timestamp": "2025-11-29T22:15:56.211Z",
+    "source": "server"
+  },
+  {
     "id": 1764411491127,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 알고리즘 과제3\n• 윤원형 20-22시\n• 정우현 10-12시\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-18873246198-667",
     "timestamp": "2025-10-28T11:28:02.298Z",
-    "source": "server"
-  },
-  {
-    "id": 1761646788341,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 은밀한 독서단 3,4주차 미션\n• TOPCIT 특강\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-18871499765-666",
-    "timestamp": "2025-10-28T10:19:48.341Z",
     "source": "server"
   }
 ]
