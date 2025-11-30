@@ -1,5 +1,14 @@
 [
   {
+    "id": 1764497860036,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 윤이정 시험\n• 자구 과제\n• 7시반 책 당근\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-19797440677-897",
+    "timestamp": "2025-11-30T10:17:40.036Z",
+    "source": "server"
+  },
+  {
     "id": 1764474167349,
     "title": "🚨 긴급 날씨 알림",
     "body": "-3°C (-8-15°C), 강수확률 10%, 맑음\n\n📋 발송 이유: 극단적 기온 변화: -6°C → 14°C\n🕐 확인 시간: 2025. 11. 30. 오후 12:42:47",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-18923595793-675",
     "timestamp": "2025-10-29T22:15:35.979Z",
-    "source": "server"
-  },
-  {
-    "id": 1761733172033,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 창공설 수업 6시(중간 보고서)\n• 데통 수업 없음\n• 서울대 수강신청\n• 아두이노 프로젝트 인터페이스 만들기\n• 윤원형 8시-10시?\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-18904521405-673",
-    "timestamp": "2025-10-29T10:19:32.033Z",
     "source": "server"
   }
 ]
