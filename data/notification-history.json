@@ -1,5 +1,14 @@
 [
   {
+    "id": 1764474167349,
+    "title": "🚨 긴급 날씨 알림",
+    "body": "-3°C (-8-15°C), 강수확률 10%, 맑음\n\n📋 발송 이유: 극단적 기온 변화: -6°C → 14°C\n🕐 확인 시간: 2025. 11. 30. 오후 12:42:47",
+    "type": "weather_change",
+    "executionId": "github-actions-19793341013-894",
+    "timestamp": "2025-11-30T03:42:47.349Z",
+    "source": "server"
+  },
+  {
     "id": 1764459003329,
     "title": "🚨 긴급 날씨 알림",
     "body": "-6°C (-7-14°C), 강수확률 20%, 구름많음\n\n📋 발송 이유: 극단적 기온 변화: 12°C → -6°C\n🕐 확인 시간: 2025. 11. 30. 오전 8:30:02",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-18904521405-673",
     "timestamp": "2025-10-29T10:19:32.033Z",
-    "source": "server"
-  },
-  {
-    "id": 1761689882948,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 날씨 정보를 가져올 수 없습니다.\n\n📅 오늘의 일정:\n• 은밀한 독서단 3,4주차 미션\n• TOPCIT 특강\n• 정우현 20-22시\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-18890760958-668",
-    "timestamp": "2025-10-28T22:18:02.948Z",
     "source": "server"
   }
 ]
