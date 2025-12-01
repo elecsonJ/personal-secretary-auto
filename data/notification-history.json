@@ -1,5 +1,14 @@
 [
   {
+    "id": 1764627325501,
+    "title": "🌅 아침 브리핑",
+    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -5°C (-9-5°C), 맑음\n\n📅 오늘의 일정:\n• 숙명여대 수강료 납부\n• UOS AI 창업 콜로키움\n• 음악학과 연주회\n• 창공설 미팅\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
+    "type": "morning_briefing",
+    "executionId": "github-actions-19839337549-906",
+    "timestamp": "2025-12-01T22:15:25.501Z",
+    "source": "server"
+  },
+  {
     "id": 1764588628615,
     "title": "⚠️ 중요 날씨 알림",
     "body": "-2°C (-9-5°C), 강수확률 10%, 맑음\n\n📋 발송 이유: 강수확률 급감: 60% → 10%\n🕐 확인 시간: 2025. 12. 1. 오후 8:30:28",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-19010834240-701",
     "timestamp": "2025-11-02T10:16:11.371Z",
-    "source": "server"
-  },
-  {
-    "id": 1762035362924,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 날씨 정보를 가져올 수 없습니다.\n\n📅 오늘의 일정:\n• 안성캠프장\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-19003387402-696",
-    "timestamp": "2025-11-01T22:16:02.924Z",
     "source": "server"
   }
 ]
