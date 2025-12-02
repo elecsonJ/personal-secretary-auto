@@ -1,5 +1,14 @@
 [
   {
+    "id": 1764670830634,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 쏜애플 티켓 배송\n• ai sw 전문가 특강 16시\n• 윤이정 20-22시?\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-19855164299-911",
+    "timestamp": "2025-12-02T10:20:30.634Z",
+    "source": "server"
+  },
+  {
     "id": 1764627325501,
     "title": "🌅 아침 브리핑",
     "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -5°C (-9-5°C), 맑음\n\n📅 오늘의 일정:\n• 숙명여대 수강료 납부\n• UOS AI 창업 콜로키움\n• 음악학과 연주회\n• 창공설 미팅\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-19018906682-703",
     "timestamp": "2025-11-02T22:16:23.574Z",
-    "source": "server"
-  },
-  {
-    "id": 1762078571371,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 자구 과제3\n• 음악학과 티켓 수령\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-19010834240-701",
-    "timestamp": "2025-11-02T10:16:11.371Z",
     "source": "server"
   }
 ]
