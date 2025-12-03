@@ -1,5 +1,14 @@
 [
   {
+    "id": 1764757320862,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 숙명여대 수강료 납부\n• 창공설 미팅\n• 근로 대체 10-11시\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-19890433993-918",
+    "timestamp": "2025-12-03T10:22:00.862Z",
+    "source": "server"
+  },
+  {
     "id": 1764713727015,
     "title": "🌅 아침 브리핑",
     "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 0°C (-10-7°C), 강수확률 30%, 흐림\n\n📅 오늘의 일정:\n• ai sw 전문가 특강 16시\n• 윤이정 20-22시?\n• C언어 과제\n• 점령전, MST 자성 포함해서 완성\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-19051019430-710",
     "timestamp": "2025-11-03T22:16:20.712Z",
-    "source": "server"
-  },
-  {
-    "id": 1762169295780,
-    "title": "🌤️ 날씨 변화 알림",
-    "body": "13°C (3-19°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 강수확률 변화: 0% → 30%\n🕐 확인 시간: 2025. 11. 3. 오후 8:28:15",
-    "type": "weather_change",
-    "executionId": "github-actions-19033066459-709",
-    "timestamp": "2025-11-03T11:28:15.780Z",
     "source": "server"
   }
 ]
