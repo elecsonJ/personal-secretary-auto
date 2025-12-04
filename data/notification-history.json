@@ -1,5 +1,14 @@
 [
   {
+    "id": 1764886521968,
+    "title": "🌅 아침 브리핑",
+    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 0°C (-2-12°C), 맑음\n\n📅 오늘의 일정:\n• 창공설 결과보고서\n• 창공설 미팅\n• 윤이정 20-22시?\n• 근로 대체 11-15시\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
+    "type": "morning_briefing",
+    "executionId": "github-actions-19945698565-927",
+    "timestamp": "2025-12-04T22:15:21.968Z",
+    "source": "server"
+  },
+  {
     "id": 1764843738750,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 창공설 결과보고서\n• 창공설 미팅\n• 윤이정 20-22시?\n• 근로 대체 11-15시\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-19098728296-722",
     "timestamp": "2025-11-05T10:20:12.514Z",
-    "source": "server"
-  },
-  {
-    "id": 1762312751346,
-    "title": "🚨 긴급 날씨 알림",
-    "body": "16°C (5-18°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 극단적 기온 변화: 6°C → 16°C\n🕐 확인 시간: 2025. 11. 5. 오후 12:19:11",
-    "type": "weather_change",
-    "executionId": "github-actions-19090151777-719",
-    "timestamp": "2025-11-05T03:19:11.346Z",
     "source": "server"
   }
 ]
