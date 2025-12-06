@@ -1,5 +1,14 @@
 [
   {
+    "id": 1765059338336,
+    "title": "🌅 아침 브리핑",
+    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 1°C (-5-12°C), 강수확률 20%, 구름많음\n\n📅 오늘의 일정:\n• 윤원형 20-21시\n• 정우현 10-12시\n• 윤이정 14-16?\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
+    "type": "morning_briefing",
+    "executionId": "github-actions-19995002154-941",
+    "timestamp": "2025-12-06T22:15:38.336Z",
+    "source": "server"
+  },
+  {
     "id": 1765020423637,
     "title": "🌤️ 날씨 변화 알림",
     "body": "6°C (-5-12°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 강수확률 변화: 0% → 30%\n🕐 확인 시간: 2025. 12. 6. 오후 8:27:03",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-19132381272-729",
     "timestamp": "2025-11-06T10:20:48.309Z",
-    "source": "server"
-  },
-  {
-    "id": 1762407263342,
-    "title": "🌤️ 날씨 변화 알림",
-    "body": "16°C (7-19°C), 강수확률 10%, 맑음\n\n📋 발송 이유: 날씨 변화: 흐림 → 맑음\n🕐 확인 시간: 2025. 11. 6. 오후 2:34:23",
-    "type": "weather_change",
-    "executionId": "github-actions-19125931343-727",
-    "timestamp": "2025-11-06T05:34:23.342Z",
     "source": "server"
   }
 ]
