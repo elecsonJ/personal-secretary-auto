@@ -1,5 +1,14 @@
 [
   {
+    "id": 1765150162232,
+    "title": "⚠️ 중요 날씨 알림",
+    "body": "5°C (-4-11°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 강수확률 급증: 0% → 60%\n🕐 확인 시간: 2025. 12. 8. 오전 8:29:21",
+    "type": "weather_change",
+    "executionId": "github-actions-20012040677-949",
+    "timestamp": "2025-12-07T23:29:22.232Z",
+    "source": "server"
+  },
+  {
     "id": 1765145735520,
     "title": "🌅 아침 브리핑",
     "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 4°C (-4-11°C), 강수확률 30%, 흐림\n\n📅 오늘 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-19182670430-738",
     "timestamp": "2025-11-07T22:15:20.498Z",
-    "source": "server"
-  },
-  {
-    "id": 1762514906388,
-    "title": "🚨 긴급 날씨 알림",
-    "body": "7°C (1-17°C), 강수확률 10%, 구름많음\n\n📋 발송 이유: 극단적 기온 변화: 19°C → 8°C\n🕐 확인 시간: 2025. 11. 7. 오후 8:28:26",
-    "type": "weather_change",
-    "executionId": "github-actions-19167011632-737",
-    "timestamp": "2025-11-07T11:28:26.388Z",
     "source": "server"
   }
 ]
