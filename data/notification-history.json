@@ -1,5 +1,14 @@
 [
   {
+    "id": 1765189281243,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 데통 휴강\n• 자구 휴강\n• 자구 동영상\n• 데통 동영상\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-20024666448-953",
+    "timestamp": "2025-12-08T10:21:21.243Z",
+    "source": "server"
+  },
+  {
     "id": 1765183638039,
     "title": "⚠️ 중요 날씨 알림",
     "body": "4°C (-4-11°C), 맑음\n\n📋 발송 이유: 강수확률 급감: 60% → 0%\n🕐 확인 시간: 2025. 12. 8. 오후 5:47:17",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-19199328108-745",
     "timestamp": "2025-11-08T22:14:09.089Z",
-    "source": "server"
-  },
-  {
-    "id": 1762596986314,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-19191672451-743",
-    "timestamp": "2025-11-08T10:16:26.314Z",
     "source": "server"
   }
 ]
