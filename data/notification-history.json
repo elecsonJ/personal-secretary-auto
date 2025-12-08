@@ -1,5 +1,14 @@
 [
   {
+    "id": 1765232230242,
+    "title": "🌅 아침 브리핑",
+    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -3°C (-5-11°C), 강수확률 20%, 구름많음\n\n📅 오늘의 일정:\n• 데통 휴강\n• 자구 휴강\n• 자구 동영상\n• 데통 동영상\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
+    "type": "morning_briefing",
+    "executionId": "github-actions-20044632495-955",
+    "timestamp": "2025-12-08T22:17:10.242Z",
+    "source": "server"
+  },
+  {
     "id": 1765189281243,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 데통 휴강\n• 자구 휴강\n• 자구 동영상\n• 데통 동영상\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-19207021849-750",
     "timestamp": "2025-11-09T10:16:09.027Z",
-    "source": "server"
-  },
-  {
-    "id": 1762640049089,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 4°C (0-16°C), 맑음\n\n📅 오늘 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-19199328108-745",
-    "timestamp": "2025-11-08T22:14:09.089Z",
     "source": "server"
   }
 ]
