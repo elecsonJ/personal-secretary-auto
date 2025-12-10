@@ -1,13 +1,13 @@
 {
   "rainProbability": "60",
-  "temperature": "10.2",
-  "minTemp": -6,
-  "maxTemp": 8,
+  "temperature": "8.7",
+  "minTemp": -5,
+  "maxTemp": 7,
   "skyCondition": "흐림",
-  "rainType": "비",
+  "rainType": "비/눈",
   "rainAmount": "0",
-  "description": "2°C (-6-8°C), 강수확률 60%, 흐림",
+  "description": "1°C (-5-7°C), 강수확률 60%, 흐림",
   "urgencyLevel": "normal",
-  "lastNotificationSent": null,
-  "lastNotificationReason": null
+  "lastNotificationSent": "2025-12-10T08:45:46.428Z",
+  "lastNotificationReason": "강수 형태 변화: 비 → 비/눈"
 }
