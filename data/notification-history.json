@@ -1,5 +1,14 @@
 [
   {
+    "id": 1765337995975,
+    "title": "🌤️ 날씨 변화 알림",
+    "body": "3°C (-6-11°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 강수확률 변화: 30% → 60%\n🕐 확인 시간: 2025. 12. 10. 오후 12:39:55",
+    "type": "weather_change",
+    "executionId": "github-actions-20086482656-964",
+    "timestamp": "2025-12-10T03:39:55.975Z",
+    "source": "server"
+  },
+  {
     "id": 1765318686059,
     "title": "🌅 아침 브리핑",
     "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 1°C (-6-11°C), 강수확률 30%, 흐림\n\n📅 오늘의 일정:\n• 학원 연락 답장\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-19256099324-762",
     "timestamp": "2025-11-11T05:34:17.622Z",
-    "source": "server"
-  },
-  {
-    "id": 1762813103930,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 2°C (1-15°C), 맑음\n\n📅 오늘 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-19247867464-759",
-    "timestamp": "2025-11-10T22:18:23.930Z",
     "source": "server"
   }
 ]
