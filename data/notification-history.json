@@ -1,5 +1,14 @@
 [
   {
+    "id": 1765577820727,
+    "title": "🌅 아침 브리핑",
+    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 2°C (-6-9°C), 강수확률 30%, 흐림\n\n📅 오늘의 일정:\n• 윤이정 13-14시?\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
+    "type": "morning_briefing",
+    "executionId": "github-actions-20181423237-983",
+    "timestamp": "2025-12-12T22:17:00.727Z",
+    "source": "server"
+  },
+  {
     "id": 1765534852704,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 윤이정 13-14시?\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-19330038120-779",
     "timestamp": "2025-11-13T11:29:41.401Z",
-    "source": "server"
-  },
-  {
-    "id": 1763029231462,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 최지연 논술\n• 4시 최강학원 면접\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-19328219296-778",
-    "timestamp": "2025-11-13T10:20:31.462Z",
     "source": "server"
   }
 ]
