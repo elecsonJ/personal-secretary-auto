@@ -1,5 +1,14 @@
 [
   {
+    "id": 1765750557451,
+    "title": "🌅 아침 브리핑",
+    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -1°C (-3-9°C), 맑음\n\n📅 오늘의 일정:\n• 알고리즘 기말\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
+    "type": "morning_briefing",
+    "executionId": "github-actions-20214950506-997",
+    "timestamp": "2025-12-14T22:15:57.451Z",
+    "source": "server"
+  },
+  {
     "id": 1765707500778,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 알고리즘 기말\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-19388351352-792",
     "timestamp": "2025-11-15T10:16:57.222Z",
-    "source": "server"
-  },
-  {
-    "id": 1763176562452,
-    "title": "🚨 긴급 날씨 알림",
-    "body": "4°C (-4-16°C), 맑음\n\n📋 발송 이유: 극단적 기온 변화: 2°C → 14°C\n🕐 확인 시간: 2025. 11. 15. 오후 12:16:02",
-    "type": "weather_change",
-    "executionId": "github-actions-19383584623-789",
-    "timestamp": "2025-11-15T03:16:02.452Z",
     "source": "server"
   }
 ]
