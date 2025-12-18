@@ -1,5 +1,14 @@
 [
   {
+    "id": 1766029139251,
+    "title": "🚨 긴급 날씨 알림",
+    "body": "-1°C (-4-12°C), 강수확률 1%, 맑음\n\n📋 발송 이유: 극단적 기온 변화: -5°C → 6°C\n🕐 확인 시간: 2025. 12. 18. 오후 12:38:58",
+    "type": "weather_change",
+    "executionId": "github-actions-20325220270-1020",
+    "timestamp": "2025-12-18T03:38:59.251Z",
+    "source": "server"
+  },
+  {
     "id": 1766009835227,
     "title": "🌅 아침 브리핑",
     "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -3°C (-4-12°C), 강수확률 10%, 구름많음\n\n📅 오늘의 일정:\n• 자구 기말\n• 고상기 교수 메일?\n• 정우현 연락\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-19462542193-813",
     "timestamp": "2025-11-18T10:20:58.233Z",
-    "source": "server"
-  },
-  {
-    "id": 1763417864990,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 0°C (-4-12°C), 맑음\n\n📅 오늘의 일정:\n• 데통 보강\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-19446417970-808",
-    "timestamp": "2025-11-17T22:17:44.990Z",
     "source": "server"
   }
 ]
