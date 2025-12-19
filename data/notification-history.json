@@ -1,5 +1,14 @@
 [
   {
+    "id": 1766143849220,
+    "title": "⚠️ 중요 날씨 알림",
+    "body": "4°C (-6-10°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 강수확률 급증: 0% → 60%\n🕐 확인 시간: 2025. 12. 19. 오후 8:30:48",
+    "type": "weather_change",
+    "executionId": "github-actions-20368713011-1031",
+    "timestamp": "2025-12-19T11:30:49.220Z",
+    "source": "server"
+  },
+  {
     "id": 1766139646421,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 쏜애플 콘\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-19533449618-827",
     "timestamp": "2025-11-20T10:19:54.196Z",
-    "source": "server"
-  },
-  {
-    "id": 1763590583706,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 7°C (-1-14°C), 강수확률 30%, 흐림\n\n📅 오늘의 일정:\n• 데통 보강 없음\n• 창공설 6시 50분\n• 근로 대체 10-12시\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-19518178080-822",
-    "timestamp": "2025-11-19T22:16:23.706Z",
     "source": "server"
   }
 ]
