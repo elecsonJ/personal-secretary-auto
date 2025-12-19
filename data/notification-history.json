@@ -1,5 +1,14 @@
 [
   {
+    "id": 1766182676604,
+    "title": "🌅 아침 브리핑",
+    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 1°C (-6-10°C), 강수확률 20%, 구름많음\n\n📅 오늘의 일정:\n• 쏜애플 콘\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
+    "type": "morning_briefing",
+    "executionId": "github-actions-20383983443-1032",
+    "timestamp": "2025-12-19T22:17:56.604Z",
+    "source": "server"
+  },
+  {
     "id": 1766143849220,
     "title": "⚠️ 중요 날씨 알림",
     "body": "4°C (-6-10°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 강수확률 급증: 0% → 60%\n🕐 확인 시간: 2025. 12. 19. 오후 8:30:48",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-19535331211-828",
     "timestamp": "2025-11-20T11:28:53.073Z",
-    "source": "server"
-  },
-  {
-    "id": 1763633994196,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 근로 대체\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-19533449618-827",
-    "timestamp": "2025-11-20T10:19:54.196Z",
     "source": "server"
   }
 ]
