@@ -1,5 +1,14 @@
 [
   {
+    "id": 1766375457748,
+    "title": "🚨 긴급 날씨 알림",
+    "body": "-1°C (-5-5°C), 맑음\n\n📋 발송 이유: 극단적 기온 변화: -8°C → 2°C\n🕐 확인 시간: 2025. 12. 22. 오후 12:50:57",
+    "type": "weather_change",
+    "executionId": "github-actions-20421159549-1048",
+    "timestamp": "2025-12-22T03:50:57.748Z",
+    "source": "server"
+  },
+  {
     "id": 1766355396041,
     "title": "🌅 아침 브리핑",
     "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -3°C (-5-5°C), 맑음\n\n📅 오늘의 일정:\n• 숙명여대 OT 10시\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-19589424701-838",
     "timestamp": "2025-11-22T03:14:14.063Z",
-    "source": "server"
-  },
-  {
-    "id": 1763763518525,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 날씨 정보를 가져올 수 없습니다.\n\n📅 오늘의 일정:\n• ai top 100 본선\n• 김공서 16-17시?\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-19584994440-836",
-    "timestamp": "2025-11-21T22:18:38.525Z",
     "source": "server"
   }
 ]
