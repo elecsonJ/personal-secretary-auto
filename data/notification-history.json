@@ -1,5 +1,14 @@
 [
   {
+    "id": 1766398818061,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 온톨로지 OT 17시\n• 1시 C 기말 시험지 열람\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-20429001200-1051",
+    "timestamp": "2025-12-22T10:20:18.061Z",
+    "source": "server"
+  },
+  {
     "id": 1766375457748,
     "title": "🚨 긴급 날씨 알림",
     "body": "-1°C (-5-5°C), 맑음\n\n📋 발송 이유: 극단적 기온 변화: -8°C → 2°C\n🕐 확인 시간: 2025. 12. 22. 오후 12:50:57",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-19594073106-841",
     "timestamp": "2025-11-22T10:17:10.085Z",
-    "source": "server"
-  },
-  {
-    "id": 1763781254063,
-    "title": "🚨 긴급 날씨 알림",
-    "body": "8°C (5-16°C), 강수확률 20%, 구름많음\n\n📋 발송 이유: 극단적 기온 변화: 2°C → 13°C\n🕐 확인 시간: 2025. 11. 22. 오후 12:14:13",
-    "type": "weather_change",
-    "executionId": "github-actions-19589424701-838",
-    "timestamp": "2025-11-22T03:14:14.063Z",
     "source": "server"
   }
 ]
