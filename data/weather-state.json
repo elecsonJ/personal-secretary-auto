@@ -1,13 +1,13 @@
 {
   "rainProbability": "0",
-  "temperature": "0.9",
+  "temperature": "2.4",
   "minTemp": -13,
   "maxTemp": 5,
   "skyCondition": "맑음",
-  "rainType": "눈",
-  "rainAmount": "2",
-  "description": "-6°C (-13-5°C), 맑음",
+  "rainType": "비",
+  "rainAmount": "1",
+  "description": "-7°C (-13-5°C), 맑음",
   "urgencyLevel": "low",
-  "lastNotificationSent": "2025-12-23T05:41:50.913Z",
-  "lastNotificationReason": "강수 형태 변화: 없음 → 눈"
+  "lastNotificationSent": "2025-12-23T08:46:06.134Z",
+  "lastNotificationReason": "강수 형태 변화: 눈 → 비"
 }
