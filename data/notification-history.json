@@ -1,5 +1,14 @@
 [
   {
+    "id": 1766479565510,
+    "title": "⚠️ 중요 날씨 알림",
+    "body": "-7°C (-13-5°C), 맑음\n\n📋 발송 이유: 강수 형태 변화: 눈 → 비\n🕐 확인 시간: 2025. 12. 23. 오후 5:46:05",
+    "type": "weather_change",
+    "executionId": "github-actions-20455950624-1057",
+    "timestamp": "2025-12-23T08:46:05.510Z",
+    "source": "server"
+  },
+  {
     "id": 1766468509992,
     "title": "⚠️ 중요 날씨 알림",
     "body": "-6°C (-13-5°C), 맑음\n\n📋 발송 이유: 강수 형태 변화: 없음 → 눈\n🕐 확인 시간: 2025. 12. 23. 오후 2:41:49",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-19618092841-850",
     "timestamp": "2025-11-23T22:17:36.140Z",
-    "source": "server"
-  },
-  {
-    "id": 1763893037380,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 서울대 수강료 납부\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-19609665828-848",
-    "timestamp": "2025-11-23T10:17:17.380Z",
     "source": "server"
   }
 ]
