@@ -1,5 +1,14 @@
 [
   {
+    "id": 1766571612732,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-20484039349-1065",
+    "timestamp": "2025-12-24T10:20:12.732Z",
+    "source": "server"
+  },
+  {
     "id": 1766532703207,
     "title": "🌤️ 날씨 변화 알림",
     "body": "-6°C (-13-5°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 강수확률 변화: 0% → 30%\n🕐 확인 시간: 2025. 12. 24. 오전 8:31:42",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-19651037190-857",
     "timestamp": "2025-11-24T22:17:36.055Z",
-    "source": "server"
-  },
-  {
-    "id": 1763979653558,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 브아솔 콘 티켓 배송일\n• 창공설 미팅?\n• 데통 동영상 강의 대체\n\n⭐ HIGH 우선순위 작업:\n• C언어공부\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n• 국장 신청하기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-19630865176-855",
-    "timestamp": "2025-11-24T10:20:53.558Z",
     "source": "server"
   }
 ]
