@@ -1,5 +1,14 @@
 [
   {
+    "id": 1767521905873,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 숙명여대 온라인 10-12시 (1)\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-20691428088-1142",
+    "timestamp": "2026-01-04T10:18:25.873Z",
+    "source": "server"
+  },
+  {
     "id": 1767499119473,
     "title": "🚨 긴급 날씨 알림",
     "body": "0°C (-8-3°C), 맑음\n\n📋 발송 이유: 극단적 기온 변화: -8°C → 3°C\n🕐 확인 시간: 2026. 1. 4. 오후 12:58:39",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-19892338591-919",
     "timestamp": "2025-12-03T11:31:22.098Z",
-    "source": "server"
-  },
-  {
-    "id": 1764757320862,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 숙명여대 수강료 납부\n• 창공설 미팅\n• 근로 대체 10-11시\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-19890433993-918",
-    "timestamp": "2025-12-03T10:22:00.862Z",
     "source": "server"
   }
 ]
