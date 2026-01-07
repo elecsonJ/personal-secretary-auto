@@ -1,5 +1,14 @@
 [
   {
+    "id": 1767781334123,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 숙명여대 빅데이터 윈터스쿨\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-20778218913-1163",
+    "timestamp": "2026-01-07T10:22:14.123Z",
+    "source": "server"
+  },
+  {
     "id": 1767764582829,
     "title": "⚠️ 중요 날씨 알림",
     "body": "0°C (-10-5°C), 강수확률 10%, 구름많음\n\n📋 발송 이유: 강수확률 급감: 60% → 10%\n🕐 확인 시간: 2026. 1. 7. 오후 2:43:02",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-20003522327-947",
     "timestamp": "2025-12-07T11:27:07.324Z",
-    "source": "server"
-  },
-  {
-    "id": 1765102602240,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-20002734228-946",
-    "timestamp": "2025-12-07T10:16:42.240Z",
     "source": "server"
   }
 ]
