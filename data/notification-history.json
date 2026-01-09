@@ -1,5 +1,14 @@
 [
   {
+    "id": 1767954068509,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 영어 실습?\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-20848754295-1177",
+    "timestamp": "2026-01-09T10:21:08.509Z",
+    "source": "server"
+  },
+  {
     "id": 1767910697383,
     "title": "🌅 아침 브리핑",
     "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -9°C (-11-6°C), 강수확률 10%, 구름많음\n\n📅 오늘의 일정:\n• 숙명여대 빅데이터 윈터스쿨\n• 학원 알바\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-20044632495-955",
     "timestamp": "2025-12-08T22:17:10.242Z",
-    "source": "server"
-  },
-  {
-    "id": 1765189281243,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 데통 휴강\n• 자구 휴강\n• 자구 동영상\n• 데통 동영상\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-20024666448-953",
-    "timestamp": "2025-12-08T10:21:21.243Z",
     "source": "server"
   }
 ]
