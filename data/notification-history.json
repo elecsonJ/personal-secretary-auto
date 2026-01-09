@@ -1,5 +1,14 @@
 [
   {
+    "id": 1768001591566,
+    "title": "🌤️ 날씨 변화 알림",
+    "body": "-4°C (-11-5°C), 맑음\n\n📋 발송 이유: 강수확률 변화: 30% → 0%\n🕐 확인 시간: 2026. 1. 10. 오전 8:33:11",
+    "type": "weather_change",
+    "executionId": "github-actions-20868674857-1180",
+    "timestamp": "2026-01-09T23:33:11.566Z",
+    "source": "server"
+  },
+  {
     "id": 1767997096300,
     "title": "🌅 아침 브리핑",
     "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -4°C (-11-5°C), 맑음\n\n📅 오늘의 일정:\n• 영어 실습?\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-20060046852-960",
     "timestamp": "2025-12-09T10:22:15.947Z",
-    "source": "server"
-  },
-  {
-    "id": 1765251285755,
-    "title": "🚨 긴급 날씨 알림",
-    "body": "4°C (-5-11°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 극단적 기온 변화: -4°C → 6°C\n🕐 확인 시간: 2025. 12. 9. 오후 12:34:45",
-    "type": "weather_change",
-    "executionId": "github-actions-20050993916-957",
-    "timestamp": "2025-12-09T03:34:45.755Z",
     "source": "server"
   }
 ]
