@@ -1,5 +1,14 @@
 [
   {
+    "id": 1768433388972,
+    "title": "🌤️ 날씨 변화 알림",
+    "body": "-1°C (-6-8°C), 맑음\n\n📋 발송 이유: 강수확률 변화: 30% → 0%\n🕐 확인 시간: 2026. 1. 15. 오전 8:29:48",
+    "type": "weather_change",
+    "executionId": "github-actions-21013647124-1215",
+    "timestamp": "2026-01-14T23:29:48.972Z",
+    "source": "server"
+  },
+  {
     "id": 1768429157410,
     "title": "🌅 아침 브리핑",
     "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -2°C (-6-8°C), 맑음\n\n📅 오늘의 일정:\n• aws 교육 (1)\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-20191405334-989",
     "timestamp": "2025-12-13T11:27:52.300Z",
-    "source": "server"
-  },
-  {
-    "id": 1765621098782,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 알고리즘 과제4\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-20190656104-988",
-    "timestamp": "2025-12-13T10:18:18.782Z",
     "source": "server"
   }
 ]
