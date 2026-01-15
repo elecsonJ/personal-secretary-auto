@@ -1,5 +1,14 @@
 [
   {
+    "id": 1768472537100,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 해외단기파견 신청\n• aws 교육 (2)\n• 매쓰랩 1부\n• 효진님 생일\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-21027831749-1219",
+    "timestamp": "2026-01-15T10:22:17.100Z",
+    "source": "server"
+  },
+  {
     "id": 1768433388972,
     "title": "🌤️ 날씨 변화 알림",
     "body": "-1°C (-6-8°C), 맑음\n\n📋 발송 이유: 강수확률 변화: 30% → 0%\n🕐 확인 시간: 2026. 1. 15. 오전 8:29:48",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-20198632738-990",
     "timestamp": "2025-12-13T22:16:02.644Z",
-    "source": "server"
-  },
-  {
-    "id": 1765625272300,
-    "title": "🌤️ 날씨 변화 알림",
-    "body": "1°C (-6-9°C), 맑음\n\n📋 발송 이유: 강수확률 변화: 30% → 0%\n🕐 확인 시간: 2025. 12. 13. 오후 8:27:51",
-    "type": "weather_change",
-    "executionId": "github-actions-20191405334-989",
-    "timestamp": "2025-12-13T11:27:52.300Z",
     "source": "server"
   }
 ]
