@@ -1,5 +1,14 @@
 [
   {
+    "id": 1768542176596,
+    "title": "🌤️ 날씨 변화 알림",
+    "body": "0°C (-7-4°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 강수확률 변화: 60% → 30%\n🕐 확인 시간: 2026. 1. 16. 오후 2:42:56",
+    "type": "weather_change",
+    "executionId": "github-actions-21056953323-1224",
+    "timestamp": "2026-01-16T05:42:56.596Z",
+    "source": "server"
+  },
+  {
     "id": 1768535252422,
     "title": "🌤️ 날씨 변화 알림",
     "body": "0°C (-7-6°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 강수확률 변화: 30% → 60%\n🕐 확인 시간: 2026. 1. 16. 오후 12:47:32",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-20228753784-1002",
     "timestamp": "2025-12-15T10:23:38.436Z",
-    "source": "server"
-  },
-  {
-    "id": 1765750557451,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -1°C (-3-9°C), 맑음\n\n📅 오늘의 일정:\n• 알고리즘 기말\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-20214950506-997",
-    "timestamp": "2025-12-14T22:15:57.451Z",
     "source": "server"
   }
 ]
