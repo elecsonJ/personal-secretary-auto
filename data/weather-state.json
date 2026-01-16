@@ -1,13 +1,13 @@
 {
-  "rainProbability": "20",
-  "temperature": "-6",
+  "rainProbability": "0",
+  "temperature": "-0.2",
   "minTemp": -15,
   "maxTemp": 5,
-  "skyCondition": "구름많음",
+  "skyCondition": "맑음",
   "rainType": "없음",
   "rainAmount": "0",
-  "description": "-6°C (-15-5°C), 강수확률 20%, 구름많음",
+  "description": "-8°C (-15-5°C), 맑음",
   "urgencyLevel": "low",
-  "lastNotificationSent": "2026-01-16T08:46:56.260Z",
-  "lastNotificationReason": "극단적 기온 변화: 8°C → -6°C"
+  "lastNotificationSent": null,
+  "lastNotificationReason": null
 }
