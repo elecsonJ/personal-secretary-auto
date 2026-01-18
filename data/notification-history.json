@@ -1,5 +1,14 @@
 [
   {
+    "id": 1768774621951,
+    "title": "🌅 아침 브리핑",
+    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -13°C (-15--3°C), 맑음\n\n📅 오늘의 일정:\n• 서울대 온톨로지 캠프\n• 학원 알바 없음\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
+    "type": "morning_briefing",
+    "executionId": "github-actions-21119533690-1242",
+    "timestamp": "2026-01-18T22:17:01.951Z",
+    "source": "server"
+  },
+  {
     "id": 1768731537930,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 서울대 온톨로지 캠프\n• 학원 알바 없음\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-20299502263-1016",
     "timestamp": "2025-12-17T10:22:19.743Z",
-    "source": "server"
-  },
-  {
-    "id": 1765923450095,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 9°C (-4-11°C), 강수확률 60%, 흐림\n\n📅 오늘의 일정:\n• 기말기간\n• Stanford Summer Session 12시\n\n⭐ HIGH 우선순위 작업:\n• 데통 원서읽기\n• 천인국자료구조 예제풀기\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-20284495575-1011",
-    "timestamp": "2025-12-16T22:17:30.095Z",
     "source": "server"
   }
 ]
