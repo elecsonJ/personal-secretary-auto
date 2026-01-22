@@ -1,5 +1,14 @@
 [
   {
+    "id": 1769071877691,
+    "title": "🌤️ 날씨 변화 알림",
+    "body": "-4°C (-12--2°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 날씨 변화: 맑음 → 흐림\n🕐 확인 시간: 2026. 1. 22. 오후 5:51:17",
+    "type": "weather_change",
+    "executionId": "github-actions-21242004542-1267",
+    "timestamp": "2026-01-22T08:51:17.691Z",
+    "source": "server"
+  },
+  {
     "id": 1769054145143,
     "title": "🌤️ 날씨 변화 알림",
     "body": "-5°C (-13--2°C), 맑음\n\n📋 발송 이유: 강수확률 변화: 30% → 0%\n🕐 확인 시간: 2026. 1. 22. 오후 12:55:44",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-20385302673-1033",
     "timestamp": "2025-12-19T23:31:19.630Z",
-    "source": "server"
-  },
-  {
-    "id": 1766182676604,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 1°C (-6-10°C), 강수확률 20%, 구름많음\n\n📅 오늘의 일정:\n• 쏜애플 콘\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-20383983443-1032",
-    "timestamp": "2025-12-19T22:17:56.604Z",
     "source": "server"
   }
 ]
