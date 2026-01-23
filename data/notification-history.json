@@ -1,5 +1,14 @@
 [
   {
+    "id": 1769163770492,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
+    "type": "evening_briefing",
+    "executionId": "github-actions-21282805728-1275",
+    "timestamp": "2026-01-23T10:22:50.492Z",
+    "source": "server"
+  },
+  {
     "id": 1769140240328,
     "title": "🚨 긴급 날씨 알림",
     "body": "-4°C (-12--1°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 극단적 기온 변화: -13°C → -2°C\n🕐 확인 시간: 2026. 1. 23. 오후 12:50:40",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-20400773311-1039",
     "timestamp": "2025-12-20T22:15:38.906Z",
-    "source": "server"
-  },
-  {
-    "id": 1766230078221,
-    "title": "⚠️ 중요 날씨 알림",
-    "body": "-2°C (-7-6°C), 맑음\n\n📋 발송 이유: 강수확률 급감: 60% → 0%\n🕐 확인 시간: 2025. 12. 20. 오후 8:27:57",
-    "type": "weather_change",
-    "executionId": "github-actions-20393728842-1038",
-    "timestamp": "2025-12-20T11:27:58.221Z",
     "source": "server"
   }
 ]
