@@ -1,13 +1,13 @@
 {
   "rainProbability": "30",
-  "temperature": "-4.8",
-  "minTemp": -13,
+  "temperature": "-10.2",
+  "minTemp": -12,
   "maxTemp": 1,
   "skyCondition": "흐림",
   "rainType": "없음",
   "rainAmount": "0",
-  "description": "-2°C (-13-1°C), 강수확률 30%, 흐림",
+  "description": "-6°C (-12-1°C), 강수확률 30%, 흐림",
   "urgencyLevel": "normal",
-  "lastNotificationSent": "2026-01-28T11:36:54.605Z",
-  "lastNotificationReason": "강수확률 변화: 0% → 30%"
+  "lastNotificationSent": null,
+  "lastNotificationReason": null
 }
