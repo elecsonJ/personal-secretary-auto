@@ -1,5 +1,14 @@
 [
   {
+    "id": 1769945757082,
+    "title": "🌤️ 날씨 변화 알림",
+    "body": "-3°C (-10-6°C), 맑음\n\n📋 발송 이유: 강수확률 변화: 30% → 0%\n🕐 확인 시간: 2026. 2. 1. 오후 8:35:56",
+    "type": "weather_change",
+    "executionId": "github-actions-21562171025-1339",
+    "timestamp": "2026-02-01T11:35:57.082Z",
+    "source": "server"
+  },
+  {
     "id": 1769941411202,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 매쓰랩\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-20617005289-1114",
     "timestamp": "2025-12-31T10:20:10.641Z",
-    "source": "server"
-  },
-  {
-    "id": 1767137480591,
-    "title": "🌤️ 날씨 변화 알림",
-    "body": "-8°C (-14-2°C), 맑음\n\n📋 발송 이유: 강수확률 변화: 30% → 0%\n🕐 확인 시간: 2025. 12. 31. 오전 8:31:20",
-    "type": "weather_change",
-    "executionId": "github-actions-20608192047-1110",
-    "timestamp": "2025-12-30T23:31:20.591Z",
     "source": "server"
   }
 ]
