@@ -1,5 +1,14 @@
 [
   {
+    "id": 1770811115822,
+    "title": "🌤️ 날씨 변화 알림",
+    "body": "1°C (-4-9°C), 맑음\n\n📋 발송 이유: 강수확률 변화: 30% → 0%\n🕐 확인 시간: 2026. 2. 11. 오후 8:58:35",
+    "type": "weather_change",
+    "executionId": "github-actions-21904149609-1409",
+    "timestamp": "2026-02-11T11:58:35.822Z",
+    "source": "server"
+  },
+  {
     "id": 1770763031599,
     "title": "🌤️ 날씨 변화 알림",
     "body": "3°C (-4-9°C), 맑음\n\n📋 발송 이유: 강수확률 변화: 30% → 0%\n🕐 확인 시간: 2026. 2. 11. 오전 7:37:11",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-20747002060-1157",
     "timestamp": "2026-01-06T11:31:41.143Z",
-    "source": "server"
-  },
-  {
-    "id": 1767694881647,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 숙명여대 빅데이터 윈터스쿨\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-20745335331-1156",
-    "timestamp": "2026-01-06T10:21:21.647Z",
     "source": "server"
   }
 ]
