@@ -1,5 +1,14 @@
 [
   {
+    "id": 1771993701545,
+    "title": "🚨 긴급 날씨 알림",
+    "body": "10°C (-1-14°C), 맑음\n\n📋 발송 이유: 극단적 기온 변화: 1°C → 11°C\n🕐 확인 시간: 2026. 2. 25. 오후 1:28:21",
+    "type": "weather_change",
+    "executionId": "github-actions-22382194026-1503",
+    "timestamp": "2026-02-25T04:28:21.545Z",
+    "source": "server"
+  },
+  {
     "id": 1771972213625,
     "title": "🌤️ 날씨 변화 알림",
     "body": "1°C (-1-14°C), 맑음\n\n📋 발송 이유: 강수확률 변화: 30% → 0%\n🕐 확인 시간: 2026. 2. 25. 오전 7:30:13",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-21082612312-1228",
     "timestamp": "2026-01-16T22:18:20.355Z",
-    "source": "server"
-  },
-  {
-    "id": 1768558900775,
-    "title": "🌆 저녁 브리핑",
-    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• 윤이정 13-14시 6회차\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문",
-    "type": "evening_briefing",
-    "executionId": "github-actions-21063390113-1226",
-    "timestamp": "2026-01-16T10:21:40.775Z",
     "source": "server"
   }
 ]
