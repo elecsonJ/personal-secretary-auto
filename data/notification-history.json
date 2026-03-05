@@ -1,5 +1,14 @@
 [
   {
+    "id": 1772749704098,
+    "title": "🌅 아침 브리핑",
+    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: -1°C (-5-7°C), 강수확률 30%, 흐림\n\n📅 오늘 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
+    "type": "morning_briefing",
+    "executionId": "github-actions-22739786396-1564",
+    "timestamp": "2026-03-05T22:28:24.098Z",
+    "source": "server"
+  },
+  {
     "id": 1772711323514,
     "title": "⚠️ 중요 날씨 알림",
     "body": "2°C (-4-7°C), 맑음\n\n📋 발송 이유: 강수 형태 변화: 비 → 비/눈\n🕐 확인 시간: 2026. 3. 5. 오후 8:48:43",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-21313566323-1282",
     "timestamp": "2026-01-24T10:19:34.677Z",
-    "source": "server"
-  },
-  {
-    "id": 1769226252866,
-    "title": "🚨 긴급 날씨 알림",
-    "body": "-4°C (-12--2°C), 맑음\n\n📋 발송 이유: 극단적 기온 변화: -14°C → -3°C\n🕐 확인 시간: 2026. 1. 24. 오후 12:44:12",
-    "type": "weather_change",
-    "executionId": "github-actions-21308624714-1279",
-    "timestamp": "2026-01-24T03:44:12.866Z",
     "source": "server"
   }
 ]
