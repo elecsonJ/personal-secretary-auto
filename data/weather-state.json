@@ -1,13 +1,13 @@
 {
-  "rainProbability": "0",
-  "temperature": "11.9",
+  "rainProbability": "30",
+  "temperature": "12.5",
   "minTemp": 10,
   "maxTemp": 25,
-  "skyCondition": "맑음",
+  "skyCondition": "흐림",
   "rainType": "없음",
   "rainAmount": "0",
-  "description": "14°C (10-25°C), 맑음",
-  "urgencyLevel": "low",
-  "lastNotificationSent": null,
-  "lastNotificationReason": null
+  "description": "13°C (10-25°C), 강수확률 30%, 흐림",
+  "urgencyLevel": "normal",
+  "lastNotificationSent": "2026-04-13T22:39:47.753Z",
+  "lastNotificationReason": "강수확률 변화: 0% → 30%"
 }
