@@ -1,13 +1,13 @@
 {
   "rainProbability": "0",
-  "temperature": "16",
+  "temperature": "15.9",
   "minTemp": 13,
-  "maxTemp": 26,
+  "maxTemp": 27,
   "skyCondition": "맑음",
   "rainType": "비",
-  "rainAmount": "3.5",
-  "description": "23°C (13-26°C), 맑음",
+  "rainAmount": "5.5",
+  "description": "19°C (13-27°C), 맑음",
   "urgencyLevel": "low",
-  "lastNotificationSent": "2026-05-20T06:19:34.532Z",
-  "lastNotificationReason": "강수량 급증: 0.5mm → 3.5mm/h"
+  "lastNotificationSent": "2026-05-20T11:20:42.679Z",
+  "lastNotificationReason": "강수량 급증: 3.5mm → 5.5mm/h"
 }
