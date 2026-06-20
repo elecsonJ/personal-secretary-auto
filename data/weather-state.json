@@ -1,12 +1,12 @@
 {
   "rainProbability": "0",
-  "temperature": "21.1",
+  "temperature": "21.7",
   "minTemp": 18,
   "maxTemp": 29,
   "skyCondition": "맑음",
-  "rainType": "비",
-  "rainAmount": "1.5",
-  "description": "23°C (18-29°C), 맑음",
+  "rainType": "없음",
+  "rainAmount": "0",
+  "description": "29°C (18-29°C), 맑음",
   "urgencyLevel": "low",
   "lastNotificationSent": null,
   "lastNotificationReason": null
