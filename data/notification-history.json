@@ -1,5 +1,14 @@
 [
   {
+    "id": 1782555831388,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• 여권, 토익\n• 공통수학1, 2\n• 운전면허\n• 문학 데이터 분석 실습\n• 인공지능과 언어학\n• 찐영어\n• CLRS\n• 파이토치 교과서\n• 수1,수2,미적\n• 기하, 확통\n• 코테 책\n• 영어공부\n\n🔄 Daily 작업:\n• 영어 작문\n• 운동",
+    "type": "evening_briefing",
+    "executionId": "github-actions-28286431645-2263",
+    "timestamp": "2026-06-27T10:23:51.388Z",
+    "source": "server"
+  },
+  {
     "id": 1781909596953,
     "title": "⚠️ 중요 날씨 알림",
     "body": "19°C (18-29°C), 맑음\n\n📋 발송 이유: 강수 형태 변화: 없음 → 비\n🕐 확인 시간: 2026. 6. 20. 오전 7:53:16",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-23086111152-1625",
     "timestamp": "2026-03-14T10:26:48.559Z",
-    "source": "server"
-  },
-  {
-    "id": 1773440692077,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 0°C (-2-13°C), 맑음\n\n📅 오늘의 일정:\n• AI TOP 100 예선\n• 윤이정 14회차\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-23072924369-1620",
-    "timestamp": "2026-03-13T22:24:52.077Z",
     "source": "server"
   }
 ]
