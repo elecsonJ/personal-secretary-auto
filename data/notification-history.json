@@ -1,5 +1,14 @@
 [
   {
+    "id": 1783320466350,
+    "title": "⚠️ 중요 날씨 알림",
+    "body": "27°C (23-30°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 강수량 급감: 21.5mm → 0mm/h\n🕐 확인 시간: 2026. 7. 6. 오후 3:47:46",
+    "type": "weather_change",
+    "executionId": "github-actions-28773188660-2313",
+    "timestamp": "2026-07-06T06:47:46.350Z",
+    "source": "server"
+  },
+  {
     "id": 1783296981696,
     "title": "🚨 긴급 날씨 알림",
     "body": "25°C (23-30°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 집중호우 (21.5mm/h)\n🕐 확인 시간: 2026. 7. 6. 오전 9:16:21",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-23365041284-1669",
     "timestamp": "2026-03-20T22:25:29.261Z",
-    "source": "server"
-  },
-  {
-    "id": 1773959108550,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 4°C (-2-16°C), 강수확률 30%, 흐림\n\n📅 오늘의 일정:\n• 수강취소기간\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-23319811958-1662",
-    "timestamp": "2026-03-19T22:25:08.550Z",
     "source": "server"
   }
 ]
