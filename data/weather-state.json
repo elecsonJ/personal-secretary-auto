@@ -1,13 +1,13 @@
 {
-  "rainProbability": "30",
-  "temperature": "27",
+  "rainProbability": "20",
+  "temperature": "23.9",
   "minTemp": 22,
-  "maxTemp": 32,
-  "skyCondition": "흐림",
+  "maxTemp": 31,
+  "skyCondition": "구름많음",
   "rainType": "없음",
   "rainAmount": "0",
-  "description": "30°C (22-32°C), 강수확률 30%, 흐림",
-  "urgencyLevel": "normal",
+  "description": "25°C (22-31°C), 강수확률 20%, 구름많음",
+  "urgencyLevel": "low",
   "lastNotificationSent": null,
   "lastNotificationReason": null
 }
