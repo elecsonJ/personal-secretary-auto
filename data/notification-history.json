@@ -1,5 +1,14 @@
 [
   {
+    "id": 1784328300752,
+    "title": "⚠️ 중요 날씨 알림",
+    "body": "23°C (23-30°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 강수량 급증: 0mm → 6mm/h\n🕐 확인 시간: 2026. 7. 18. 오전 7:45:00",
+    "type": "weather_change",
+    "executionId": "github-actions-29618777359-2380",
+    "timestamp": "2026-07-17T22:45:00.752Z",
+    "source": "server"
+  },
+  {
     "id": 1784283095346,
     "title": "🌆 저녁 브리핑",
     "body": "🌆 저녁 브리핑입니다.\n\n📅 내일 등록된 일정이 없습니다.\n\n⭐ HIGH 우선순위 작업:\n• 여권, 토익\n• 공통수학1, 2\n• 운전면허\n• 문학 데이터 분석 실습\n• 인공지능과 언어학\n• 찐영어\n• CLRS\n• 파이토치 교과서\n• 수1,수2,미적\n• 기하, 확통\n• 코테 책\n• 영어공부\n\n🔄 Daily 작업:\n• 영어 작문\n• 운동",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-23934037821-1762",
     "timestamp": "2026-04-03T04:39:08.202Z",
-    "source": "server"
-  },
-  {
-    "id": 1775173850714,
-    "title": "⚠️ 중요 날씨 알림",
-    "body": "9°C (4-19°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 강수확률 급증: 0% → 60%\n🕐 확인 시간: 2026. 4. 3. 오전 8:50:50",
-    "type": "weather_change",
-    "executionId": "github-actions-23927320340-1761",
-    "timestamp": "2026-04-02T23:50:50.714Z",
     "source": "server"
   }
 ]
