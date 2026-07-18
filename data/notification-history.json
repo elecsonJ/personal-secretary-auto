@@ -1,5 +1,14 @@
 [
   {
+    "id": 1784376311211,
+    "title": "⚠️ 중요 날씨 알림",
+    "body": "25°C (23-31°C), 맑음\n\n📋 발송 이유: 강수확률 급감: 60% → 0%\n🕐 확인 시간: 2026. 7. 18. 오후 9:05:10",
+    "type": "weather_change",
+    "executionId": "github-actions-29643679435-2386",
+    "timestamp": "2026-07-18T12:05:11.211Z",
+    "source": "server"
+  },
+  {
     "id": 1784333413774,
     "title": "⚠️ 중요 날씨 알림",
     "body": "26°C (23-30°C), 강수확률 60%, 흐림\n\n📋 발송 이유: 강수량 급감: 6mm → 0.5mm/h\n🕐 확인 시간: 2026. 7. 18. 오전 9:10:13",
@@ -888,15 +897,6 @@
     "type": "morning_briefing",
     "executionId": "github-actions-23988878804-1774",
     "timestamp": "2026-04-04T22:25:55.535Z",
-    "source": "server"
-  },
-  {
-    "id": 1775255376080,
-    "title": "🌅 아침 브리핑",
-    "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 4°C (3-17°C), 맑음\n\n📅 오늘의 일정:\n• AI TOP 100 본선\n• 생동성 1기 입원 17시\n• 우진 13-15시\n• 우현 10-12시\n\n⭐ HIGH 우선순위 작업:\n• 찐영어\n• 파이토치 교과서\n• 인공지능과 언어학\n• 문학 데이터 분석 실습\n• 기하, 확통\n• 영어공부\n• 코테 책\n• 수1,수2,미적\n• CLRS\n• 운전면허\n• 공통수학1, 2\n\n🔄 Daily 작업:\n• 운동\n• 영어 작문\n\n",
-    "type": "morning_briefing",
-    "executionId": "github-actions-23964588948-1767",
-    "timestamp": "2026-04-03T22:29:36.080Z",
     "source": "server"
   }
 ]
