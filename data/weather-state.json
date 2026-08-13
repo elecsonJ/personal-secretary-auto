@@ -1,13 +1,13 @@
 {
   "rainProbability": "60",
-  "temperature": "30.2",
+  "temperature": "27.8",
   "minTemp": 24,
   "maxTemp": 33,
   "skyCondition": "흐림",
   "rainType": "비",
   "rainAmount": "0",
-  "description": "27°C (24-33°C), 강수확률 60%, 흐림",
+  "description": "26°C (24-33°C), 강수확률 60%, 흐림",
   "urgencyLevel": "normal",
-  "lastNotificationSent": "2026-08-13T09:33:41.007Z",
-  "lastNotificationReason": "강수확률 변화: 30% → 60%"
+  "lastNotificationSent": null,
+  "lastNotificationReason": null
 }
