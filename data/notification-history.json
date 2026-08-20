@@ -1,5 +1,14 @@
 [
   {
+    "id": 1787221584304,
+    "title": "🌆 저녁 브리핑",
+    "body": "🌆 저녁 브리핑입니다.\n\n📅 내일의 일정:\n• ai pilot 미팅 11시\n• 매쓰랩 6회\n\n⭐ HIGH 우선순위 작업:\n• 여권, 토익\n• 공통수학1, 2\n• 운전면허\n• 문학 데이터 분석 실습\n• 인공지능과 언어학\n• 찐영어\n• CLRS\n• 파이토치 교과서\n• 수1,수2,미적\n• 기하, 확통\n• 코테 책\n• 영어공부\n\n🔄 Daily 작업:\n• 영어 작문\n• 운동",
+    "type": "evening_briefing",
+    "executionId": "github-actions-32358919301-2595",
+    "timestamp": "2026-08-20T10:26:24.304Z",
+    "source": "server"
+  },
+  {
     "id": 1787178267112,
     "title": "🌅 아침 브리핑",
     "body": "🌅 좋은 아침입니다!\n\n🌤️ 오늘 날씨: 날씨 정보를 가져올 수 없습니다.\n\n📅 오늘의 일정:\n• 매쓰랩 5회\n• AI서밋서울앤엑스포\n\n⭐ HIGH 우선순위 작업:\n• 여권, 토익\n• 공통수학1, 2\n• 운전면허\n• 문학 데이터 분석 실습\n• 인공지능과 언어학\n• 찐영어\n• CLRS\n• 파이토치 교과서\n• 수1,수2,미적\n• 기하, 확통\n• 코테 책\n• 영어공부\n\n🔄 Daily 작업:\n• 영어 작문\n• 운동\n\n",
@@ -888,15 +897,6 @@
     "type": "weather_change",
     "executionId": "github-actions-26195226767-2065",
     "timestamp": "2026-05-20T23:09:09.589Z",
-    "source": "server"
-  },
-  {
-    "id": 1779279728118,
-    "title": "⚠️ 중요 날씨 알림",
-    "body": "19°C (13-27°C), 맑음\n\n📋 발송 이유: 강수량 급감: 5.5mm → 5.5mm/h\n🕐 확인 시간: 2026. 5. 20. 오후 9:22:07",
-    "type": "weather_change",
-    "executionId": "github-actions-26162178166-2064",
-    "timestamp": "2026-05-20T12:22:08.118Z",
     "source": "server"
   }
 ]
