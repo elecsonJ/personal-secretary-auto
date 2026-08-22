@@ -1,5 +1,14 @@
 [
   {
+    "id": 1787388515402,
+    "title": "⚠️ 중요 날씨 알림",
+    "body": "29°C (25-33°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 강수량 급감: 6mm → 2mm/h\n🕐 확인 시간: 2026. 8. 22. 오후 5:48:34",
+    "type": "weather_change",
+    "executionId": "github-actions-32563242594-2608",
+    "timestamp": "2026-08-22T08:48:35.402Z",
+    "source": "server"
+  },
+  {
     "id": 1787377396900,
     "title": "⚠️ 중요 날씨 알림",
     "body": "31°C (25-33°C), 강수확률 30%, 흐림\n\n📋 발송 이유: 강수량 급증: 0mm → 6mm/h\n🕐 확인 시간: 2026. 8. 22. 오후 2:43:16",
@@ -888,15 +897,6 @@
     "type": "evening_briefing",
     "executionId": "github-actions-26358449190-2084",
     "timestamp": "2026-05-24T10:12:13.052Z",
-    "source": "server"
-  },
-  {
-    "id": 1779538117619,
-    "title": "⚠️ 중요 날씨 알림",
-    "body": "21°C (15-29°C), 강수확률 10%, 구름많음\n\n📋 발송 이유: 강수확률 급감: 60% → 10%\n🕐 확인 시간: 2026. 5. 23. 오후 9:08:37",
-    "type": "weather_change",
-    "executionId": "github-actions-26332257422-2080",
-    "timestamp": "2026-05-23T12:08:37.619Z",
     "source": "server"
   }
 ]
