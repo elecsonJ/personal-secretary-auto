@@ -1,6 +1,6 @@
 {
   "rainProbability": "30",
-  "temperature": "17.7",
+  "temperature": "17.1",
   "minTemp": 17,
   "maxTemp": 30,
   "skyCondition": "흐림",
@@ -8,6 +8,6 @@
   "rainAmount": "0",
   "description": "19°C (17-30°C), 강수확률 30%, 흐림",
   "urgencyLevel": "normal",
-  "lastNotificationSent": "2026-09-21T15:07:16.732Z",
-  "lastNotificationReason": "극단적 기온 변화: 27°C → 17°C"
+  "lastNotificationSent": null,
+  "lastNotificationReason": null
 }
